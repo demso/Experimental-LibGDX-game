@@ -188,7 +188,6 @@ public class GameScreen implements Screen {
         doPhysicsStep(deltaTime);
         updatePlayer(deltaTime);
 
-        camera.setToOrtho(false, Gdx.graphics.getWidth() * (1/16f) * (1/zoom), Gdx.graphics.getHeight() * (1/16f) * (1/zoom));
         camera.position.x = player.position.x;
         camera.position.y = player.position.y;
         camera.update();
@@ -308,7 +307,7 @@ public class GameScreen implements Screen {
     }
     @Override
     public void resize(int width, int height) {
-
+        camera.setToOrtho(false, Gdx.graphics.getWidth() * (1/16f) * (1/zoom), Gdx.graphics.getHeight() * (1/16f) * (1/zoom));
     }
     @Override
     public void pause() {
