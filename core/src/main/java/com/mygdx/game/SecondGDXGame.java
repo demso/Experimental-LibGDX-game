@@ -4,6 +4,7 @@ import box2dLight.RayHandler;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -27,9 +28,13 @@ import com.badlogic.gdx.utils.Array;
 public class SecondGDXGame extends Game {
     Player player = new Player(this);
     SpriteBatch batch;
+    MainMenuScreen menuScreen;
+    GameScreen gameScreen;
     @Override
     public void create() {
         batch = new SpriteBatch();
-        this.setScreen(new GameScreen(this));
+        menuScreen = new MainMenuScreen(this);
+        gameScreen = new GameScreen(this);
+        this.setScreen(menuScreen);
     }
 }
