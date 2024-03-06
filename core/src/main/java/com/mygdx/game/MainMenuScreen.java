@@ -29,8 +29,8 @@ class MainMenuScreen implements Screen {
 
     public MainMenuScreen(final SecondGDXGame gam) {
         game = gam;
-        skin = new Skin(Gdx.files.internal("vis/skin/x2/uiskin.json"));
-        stage = new Stage(new ScreenViewport());
+        skin = game.skin;
+        stage = new Stage(new ScreenViewport(), game.batch);
         buttonsGroup = new VerticalGroup().space(30);
         buttonsGroup.setColor(Color.BLUE);
         buttonsGroup.fill();
@@ -45,8 +45,13 @@ class MainMenuScreen implements Screen {
             public boolean keyUp (InputEvent event, int keycode) {
                 if (keycode == Input.Keys.ESCAPE){
                     Gdx.app.exit();
+                    return true;
                 }
-                return true;
+                if (keycode == Input.Keys.SPACE){
+                    game.setScreen(game.gameScreen);
+                    return true;
+                }
+                return false;
             }
         });
         settingsButton = new TextButton("Settings", skin);

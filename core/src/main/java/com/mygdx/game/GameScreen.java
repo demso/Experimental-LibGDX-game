@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapLayers;
@@ -21,12 +22,21 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.ScalingViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import org.jetbrains.annotations.NotNull;
 
 public class GameScreen implements Screen {
     SecondGDXGame game;
     private Player player;
+    Skin skin;
+    BitmapFont font;
     Batch batch;
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
@@ -47,14 +57,22 @@ public class GameScreen implements Screen {
     TextureRegion textureRegions[][];
     private float zoom = 3;
     private float speedd = 10f;
+    private final String mapToLoad = "tiledmap.tmx";
+    private final int tileSide = 16;
+
+    Stage stage;
+    Label label;
 
     GameScreen(@NotNull SecondGDXGame game){
         this.game = game;
+        font = game.font;
+        skin = game.skin;
+        stage = new Stage(new ScreenViewport(), game.batch);
         debugRenderer = new ShapeRenderer();
         Box2D.init();
         world = new World(new Vector2(0, 0), true);
         loadMap();
-        renderer = new OrthogonalTiledMapRenderer(map, 1 / 16f);
+        renderer = new OrthogonalTiledMapRenderer(map, 1f / tileSide);
         batch = renderer.getBatch();
         debugRendererPh = new Box2DDebugRenderer();
         textureSheet = new Texture(Gdx.files.internal("ClassicRPG_Sheet.png"));
@@ -74,10 +92,21 @@ public class GameScreen implements Screen {
         loadAnimations();
         initPhysics();
         initLights();
+
+        label = new Label("Hello bros", skin);
+        stage.addActor(label);
+        stage.addListener(new InputListener(){
+            @Override
+            public boolean keyUp (InputEvent event, int keycode) {
+                if (keycode == Input.Keys.ESCAPE)
+                    game.setScreen(game.menuScreen);
+                return true;
+            }
+        });
     }
 
     void loadMap(){
-        map = new TmxMapLoader().load("tiledmap.tmx");
+        map = new TmxMapLoader().load(mapToLoad);
         MapLayers mlayers = map.getLayers();
         // var what = ((TiledMapTileMapObject) mlayers.get("shadows").getObjects().get(0)).getProperties();
         var obstaclesLayer = (TiledMapTileLayer) mlayers.get("obstacles");
@@ -92,7 +121,7 @@ public class GameScreen implements Screen {
         BodyDef stoneBodyDef = new BodyDef();
         PolygonShape stoneBox = new PolygonShape();
         FixtureDef stoneFixtureDef = new FixtureDef();
-        stoneBox.setAsBox(0.4f, 0.4f);
+        stoneBox.setAsBox(0.95f, 0.95f);
         stoneFixtureDef.shape = stoneBox;
         stoneFixtureDef.filter.groupIndex = -10;
 
@@ -118,6 +147,8 @@ public class GameScreen implements Screen {
                             staticObjects.add(stoneBody);
                             break;
                         case "fence":
+                            break;
+                        case "wall":
                             break;
                     }
                 }
@@ -201,6 +232,14 @@ public class GameScreen implements Screen {
         rayHandler.setCombinedMatrix(camera);
         rayHandler.updateAndRender();
 
+        updateStage();
+        stage.act(deltaTime);
+        stage.draw();
+
+        stage.getBatch().begin();
+        font.draw(stage.getBatch(), "FPS=" + Gdx.graphics.getFramesPerSecond(), 0, stage.getCamera().viewportHeight - 2);
+        stage.getBatch().end();
+
         if (debug) {
             renderDebug();
             debugRendererPh.render(world, camera.combined);
@@ -245,6 +284,11 @@ public class GameScreen implements Screen {
 
         player.position.x = (player.body.getPosition().x);
         player.position.y = (player.body.getPosition().y);
+    }
+    private void updateStage(){
+        float height = Gdx.graphics.getHeight();
+        float width = Gdx.graphics.getWidth();
+        label.setPosition(100, height - 100);
     }
     private void doPhysicsStep(float deltaTime) {
         float frameTime = Math.min(deltaTime, 0.25f);
@@ -308,6 +352,7 @@ public class GameScreen implements Screen {
     @Override
     public void resize(int width, int height) {
         camera.setToOrtho(false, Gdx.graphics.getWidth() * (1/16f) * (1/zoom), Gdx.graphics.getHeight() * (1/16f) * (1/zoom));
+        stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
     }
     @Override
     public void pause() {
@@ -323,6 +368,6 @@ public class GameScreen implements Screen {
     }
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(null);
+        Gdx.input.setInputProcessor(stage);
     }
 }

@@ -28,9 +28,11 @@ public class Lwjgl3Launcher {
 //        configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
 //        return configuration;
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-        config.setForegroundFPS(144);
+        config.useVsync(true);
+        config.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate);
         config.setTitle("My GDX Game");
         config.setWindowedMode(1000, 700);
+        config.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
         return config;
     }
 }
