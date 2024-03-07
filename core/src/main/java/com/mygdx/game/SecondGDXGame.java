@@ -34,13 +34,16 @@ public class SecondGDXGame extends Game {
     GameScreen gameScreen;
     Skin skin;
     BitmapFont font;
+    BitmapFont debugFont;
     @Override
     public void create() {
         batch = new SpriteBatch();
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Xolonium-Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 20;
-        font = generator.generateFont(parameter); // font size 12 pixels
+        font = generator.generateFont(parameter);
+        parameter.size = 8;
+        debugFont = generator.generateFont(parameter);
         generator.dispose(); // don't forget to dispose to avoid memory leaks!
         skin = new Skin(Gdx.files.internal("vis/skin/x2/uiskin.json"));
         menuScreen = new MainMenuScreen(this);

@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
@@ -21,12 +22,14 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -57,8 +60,8 @@ public class GameScreen implements Screen {
     TextureRegion textureRegions[][];
     private float zoom = 3;
     private float speedd = 10f;
-    private final String mapToLoad = "tiledmap.tmx";
-    private final int tileSide = 16;
+    private final String mapToLoad = "newmap.tmx";
+    private final int tileSide = 32;
 
     Stage stage;
     Label label;
@@ -86,7 +89,7 @@ public class GameScreen implements Screen {
 
         game.player.WIDTH = 1;
         game.player.HEIGHT = 1;
-        player.position.set(5,5);
+        player.position.set(5,95);
 
         loadMap();
         loadAnimations();
@@ -94,12 +97,17 @@ public class GameScreen implements Screen {
         initLights();
 
         label = new Label("Hello bros", skin);
+        label.setFontScale(0.5f);
+        label.setWidth(350);
+        label.setAlignment(Align.topLeft);
         stage.addActor(label);
         stage.addListener(new InputListener(){
             @Override
             public boolean keyUp (InputEvent event, int keycode) {
                 if (keycode == Input.Keys.ESCAPE)
                     game.setScreen(game.menuScreen);
+                if (keycode == Input.Keys.B)
+                    stage.setDebugAll(!stage.isDebugAll());
                 return true;
             }
         });
@@ -110,6 +118,7 @@ public class GameScreen implements Screen {
         MapLayers mlayers = map.getLayers();
         // var what = ((TiledMapTileMapObject) mlayers.get("shadows").getObjects().get(0)).getProperties();
         var obstaclesLayer = (TiledMapTileLayer) mlayers.get("obstacles");
+        var groundLayer = (TiledMapTileLayer) mlayers.get("ground");
 
         BodyDef treeBodyDef = new BodyDef();
         PolygonShape treeBox = new PolygonShape();
@@ -124,6 +133,34 @@ public class GameScreen implements Screen {
         stoneBox.setAsBox(0.95f, 0.95f);
         stoneFixtureDef.shape = stoneBox;
         stoneFixtureDef.filter.groupIndex = -10;
+
+        BodyDef fullBodyDef = new BodyDef();
+        PolygonShape fullBox = new PolygonShape();
+        FixtureDef fullFixtureDef = new FixtureDef();
+        fullBox.setAsBox(0.5f, 0.5f);
+        fullFixtureDef.shape = fullBox;
+        fullFixtureDef.filter.groupIndex = 0;
+
+        BodyDef windowVertBodyDef = new BodyDef();
+        PolygonShape windowVertBox = new PolygonShape();
+        FixtureDef windowVertFixtureDef = new FixtureDef();
+        windowVertBox.setAsBox(0.05f, 0.5f);
+        windowVertFixtureDef.shape = windowVertBox;
+        windowVertFixtureDef.filter.groupIndex = -10;
+
+        BodyDef windowHorBodyDef = new BodyDef();
+        PolygonShape windowHorBox = new PolygonShape();
+        FixtureDef windowHorFixtureDef = new FixtureDef();
+        windowHorBox.setAsBox(0.5f, 0.05f);
+        windowHorFixtureDef.shape = windowHorBox;
+        windowHorFixtureDef.filter.groupIndex = -10;
+
+        BodyDef transparentBodyDef = new BodyDef();
+        PolygonShape transparentBox = new PolygonShape();
+        FixtureDef transparentFixtureDef = new FixtureDef();
+        transparentBox.setAsBox(0.5f, 0.5f);
+        transparentFixtureDef.shape = transparentBox;
+        transparentFixtureDef.filter.groupIndex = -10;
 
         Array<TiledMapTile> cells = new Array<>();
         for(var i = 0; i < obstaclesLayer.getWidth(); i++)
@@ -149,6 +186,57 @@ public class GameScreen implements Screen {
                         case "fence":
                             break;
                         case "wall":
+                            fullBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
+                            Body fullBody = world.createBody(fullBodyDef);
+                            fullBody.createFixture(fullFixtureDef);
+                            fullBody.setUserData(cell);
+                            staticObjects.add(fullBody);
+                            break;
+                        case "window":
+                            boolean northFloor = groundLayer.getCell(i, j + 1).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
+                            boolean southFloor = groundLayer.getCell(i, j - 1).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
+                            boolean westFloor = groundLayer.getCell(i -1, j).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
+                            boolean eastFloor = groundLayer.getCell(i + 1, j).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
+                            if(northFloor && southFloor && westFloor && eastFloor || !northFloor && !southFloor && !westFloor && !eastFloor){
+                                transparentBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
+                                Body transparentBody = world.createBody(transparentBodyDef);
+                                transparentBody.createFixture(transparentFixtureDef);
+                                transparentBody.setUserData(cell);
+                                staticObjects.add(transparentBody);
+                            }
+                            else if(northFloor){
+                                windowHorBodyDef.position.set(new Vector2(i+0.5f, j+0.9f));
+                                Body windowHorBody = world.createBody(windowHorBodyDef);
+                                windowHorBody.createFixture(windowHorFixtureDef);
+                                windowHorBody.setUserData(cell);
+                                staticObjects.add(windowHorBody);
+                            }
+                            else if(southFloor){
+                                windowHorBodyDef.position.set(new Vector2(i+0.5f, j+0.1f));
+                                Body windowHorBody = world.createBody(windowHorBodyDef);
+                                windowHorBody.createFixture(windowHorFixtureDef);
+                                windowHorBody.setUserData(cell);
+                                staticObjects.add(windowHorBody);
+                            }
+                            else if(westFloor){
+                                windowVertBodyDef.position.set(new Vector2(i+0.1f, j+0.5f));
+                                Body windowVertBody = world.createBody(windowVertBodyDef);
+                                windowVertBody.createFixture(windowVertFixtureDef);
+                                windowVertBody.setUserData(cell);
+                                staticObjects.add(windowVertBody);
+                            }
+                            else if(eastFloor){
+                                windowVertBodyDef.position.set(new Vector2(i+0.9f, j+0.5f));
+                                Body windowVertBody = world.createBody(windowVertBodyDef);
+                                windowVertBody.createFixture(windowVertFixtureDef);
+                                windowVertBody.setUserData(cell);
+                                staticObjects.add(windowVertBody);
+                            }
+//                            windowBodyDef.position.set(new Vector2(i+0.95f, j+0.5f));
+//                            Body windowBody = world.createBody(windowBodyDef);
+//                            windowBody.createFixture(windowFixtureDef);
+//                            windowBody.setUserData(cell);
+//                            staticObjects.add(windowBody);
                             break;
                     }
                 }
@@ -182,9 +270,9 @@ public class GameScreen implements Screen {
         rayHandler.setAmbientLight(0.1f, 0.1f, 0.1f, 1f);
         rayHandler.setBlurNum(2);
 
-        light = new PointLight(rayHandler, 5000, Color.GOLD, 15f, 0, 0);
+        light = new PointLight(rayHandler, 450, Color.WHITE, 100f, 0, 0);
         light.setSoft(true);
-        light.setSoftnessLength(6f);
+        light.setSoftnessLength(1.5f);
         light.attachToBody(player.body, 0, 0);
         light.setIgnoreAttachedBody(true);
         Filter f = new Filter();
@@ -194,7 +282,7 @@ public class GameScreen implements Screen {
     public void initPhysics(){
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(5, 10);
+        bodyDef.position.set(5, 95);
         Body body = world.createBody(bodyDef);
         CircleShape circle = new CircleShape();
         circle.setRadius(0.3f);
@@ -232,6 +320,10 @@ public class GameScreen implements Screen {
         rayHandler.setCombinedMatrix(camera);
         rayHandler.updateAndRender();
 
+//        renderer.getBatch().begin();
+//        renderer.renderTileLayer((TiledMapTileLayer) map.getLayers().get("obstacles"));
+//        renderer.getBatch().end();
+
         updateStage();
         stage.act(deltaTime);
         stage.draw();
@@ -241,7 +333,7 @@ public class GameScreen implements Screen {
         stage.getBatch().end();
 
         if (debug) {
-            renderDebug();
+            //renderDebug();
             debugRendererPh.render(world, camera.combined);
         }
     }
@@ -289,6 +381,35 @@ public class GameScreen implements Screen {
         float height = Gdx.graphics.getHeight();
         float width = Gdx.graphics.getWidth();
         label.setPosition(100, height - 100);
+        StringBuilder labelText = new StringBuilder("");
+        Vector3 mouse_position = new Vector3(0,0,0);
+        Vector3 tilePosition = camera.unproject(mouse_position.set((float) Gdx.input.getX(), (float) Gdx.input.getY(), 0));
+        int tileX = (int)Math.floor(tilePosition.x);
+        int tileY = (int)Math.floor(tilePosition.y);
+        TiledMapTileLayer curLayer1 = (TiledMapTileLayer)map.getLayers().get("obstacles");
+        for (var x = 0; x < map.getLayers().size(); x++){
+            TiledMapTileLayer currentLayer = (TiledMapTileLayer)map.getLayers().get(x);
+            TiledMapTileLayer.Cell mcell = currentLayer.getCell(tileX, tileY);
+            if(mcell != null){
+                labelText.append("X : ").append(tileX).append("\n").append("Y : ").append(tileY).append("\n").append("class : ").append("ID : ").append(mcell.getTile().getId()).append("\n");
+                var itrK = mcell.getTile().getProperties().getKeys();
+                var itrV = mcell.getTile().getProperties().getValues();
+                while (itrK.hasNext()){
+                    labelText.append(itrK.next()).append(" : ").append(itrV.next()).append("\n");
+                }
+            }
+        }
+        TiledMapTileLayer.Cell mcell = curLayer.getCell(tileX, tileY);
+        //System.out.println(camera.unproject(mouse_position));
+        if(mcell != null){
+            labelText.append("X : ").append(tileX).append("\n").append("Y : ").append(tileY).append("\n").append("class : ").append("ID : ").append(mcell.getTile().getId()).append("\n");
+            var itrK = mcell.getTile().getProperties().getKeys();
+            var itrV = mcell.getTile().getProperties().getValues();
+            while (itrK.hasNext()){
+                labelText.append(itrK.next()).append(" : ").append(itrV.next()).append("\n");
+            }
+        }
+        label.setText(labelText);
     }
     private void doPhysicsStep(float deltaTime) {
         float frameTime = Math.min(deltaTime, 0.25f);
