@@ -57,9 +57,10 @@ public class GameScreen implements Screen {
     Box2DDebugRenderer debugRendererPh;
     Array<Body> staticObjects = new Array<>() ;
     PointLight light;
+
     TextureRegion textureRegions[][];
-    private float zoom = 3;
-    private float speedd = 10f;
+    private float zoom = 4 ;
+    private float speedd = 5f;
     private final String mapToLoad = "newmap.tmx";
     private final int tileSide = 32;
 
@@ -87,8 +88,8 @@ public class GameScreen implements Screen {
         camera.update();
         renderer.setView(camera);
 
-        game.player.WIDTH = 1;
-        game.player.HEIGHT = 1;
+        game.player.WIDTH = 0.8f;
+        game.player.HEIGHT = 0.8f;
         player.position.set(5,95);
 
         loadMap();
@@ -96,7 +97,7 @@ public class GameScreen implements Screen {
         initPhysics();
         initLights();
 
-        label = new Label("Hello bros", skin);
+        label = new Label("", skin);
         label.setFontScale(0.5f);
         label.setWidth(350);
         label.setAlignment(Align.topLeft);
@@ -108,6 +109,14 @@ public class GameScreen implements Screen {
                     game.setScreen(game.menuScreen);
                 if (keycode == Input.Keys.B)
                     stage.setDebugAll(!stage.isDebugAll());
+                if (keycode == Input.Keys.EQUALS){
+                    zoom += 0.5f;
+                    camera.setToOrtho(false, Gdx.graphics.getWidth() * (1/16f) * (1/zoom), Gdx.graphics.getHeight() * (1/16f) * (1/zoom));
+                }
+                if (keycode == Input.Keys.MINUS){
+                    zoom -= 0.5f;
+                    camera.setToOrtho(false, Gdx.graphics.getWidth() * (1/16f) * (1/zoom), Gdx.graphics.getHeight() * (1/16f) * (1/zoom));
+                }
                 return true;
             }
         });
@@ -120,26 +129,19 @@ public class GameScreen implements Screen {
         var obstaclesLayer = (TiledMapTileLayer) mlayers.get("obstacles");
         var groundLayer = (TiledMapTileLayer) mlayers.get("ground");
 
-        BodyDef treeBodyDef = new BodyDef();
-        PolygonShape treeBox = new PolygonShape();
-        FixtureDef treeFixtureDef = new FixtureDef();
-        treeBox.setAsBox(0.6f, 0.4f);
-        treeFixtureDef.shape = treeBox;
-        treeFixtureDef.filter.groupIndex = 0;
-
-        BodyDef stoneBodyDef = new BodyDef();
-        PolygonShape stoneBox = new PolygonShape();
-        FixtureDef stoneFixtureDef = new FixtureDef();
-        stoneBox.setAsBox(0.95f, 0.95f);
-        stoneFixtureDef.shape = stoneBox;
-        stoneFixtureDef.filter.groupIndex = -10;
-
         BodyDef fullBodyDef = new BodyDef();
         PolygonShape fullBox = new PolygonShape();
         FixtureDef fullFixtureDef = new FixtureDef();
         fullBox.setAsBox(0.5f, 0.5f);
         fullFixtureDef.shape = fullBox;
         fullFixtureDef.filter.groupIndex = 0;
+
+        BodyDef metalClosetBodyDef = new BodyDef();
+        PolygonShape metalClosetBox = new PolygonShape();
+        FixtureDef metalClosetFixtureDef = new FixtureDef();
+        metalClosetBox.setAsBox(0.33f, 0.25f);
+        metalClosetFixtureDef.shape = metalClosetBox;
+        metalClosetFixtureDef.filter.groupIndex = 0;
 
         BodyDef windowVertBodyDef = new BodyDef();
         PolygonShape windowVertBox = new PolygonShape();
@@ -169,22 +171,6 @@ public class GameScreen implements Screen {
                 if (cell != null && cell.getTile().getProperties().get("type") != null){
                     var df = cell.getTile().getProperties();
                     switch (cell.getTile().getProperties().get("type").toString()){
-                        case "tree":
-                            treeBodyDef.position.set(new Vector2(i+1f, j+0.5f));
-                            Body treeBody = world.createBody(treeBodyDef);
-                            treeBody.createFixture(treeFixtureDef);
-                            treeBody.setUserData(cell);
-                            staticObjects.add(treeBody);
-                            break;
-                        case "stone":
-                            stoneBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
-                            Body stoneBody = world.createBody(stoneBodyDef);
-                            stoneBody.createFixture(stoneFixtureDef);
-                            stoneBody.setUserData(cell);
-                            staticObjects.add(stoneBody);
-                            break;
-                        case "fence":
-                            break;
                         case "wall":
                             fullBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
                             Body fullBody = world.createBody(fullBodyDef);
@@ -192,11 +178,25 @@ public class GameScreen implements Screen {
                             fullBody.setUserData(cell);
                             staticObjects.add(fullBody);
                             break;
+                        case "fullBody":
+                            fullBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
+                            fullBody = world.createBody(fullBodyDef);
+                            fullBody.createFixture(fullFixtureDef);
+                            fullBody.setUserData(cell);
+                            staticObjects.add(fullBody);
+                            break;
+                        case "metalCloset":
+                            metalClosetBodyDef.position.set(new Vector2(i+0.5f, j+0.3f));
+                            Body metalClosetBody = world.createBody(metalClosetBodyDef);
+                            metalClosetBody.createFixture(metalClosetFixtureDef);
+                            metalClosetBody.setUserData(cell);
+                            staticObjects.add(metalClosetBody);
+                            break;
                         case "window":
-                            boolean northFloor = groundLayer.getCell(i, j + 1).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
-                            boolean southFloor = groundLayer.getCell(i, j - 1).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
-                            boolean westFloor = groundLayer.getCell(i -1, j).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
-                            boolean eastFloor = groundLayer.getCell(i + 1, j).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
+                            boolean southFloor = groundLayer.getCell(i, j + 1).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
+                            boolean northFloor = groundLayer.getCell(i, j - 1).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
+                            boolean eastFloor = groundLayer.getCell(i - 1, j).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
+                            boolean westFloor = groundLayer.getCell(i + 1, j).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
                             if(northFloor && southFloor && westFloor && eastFloor || !northFloor && !southFloor && !westFloor && !eastFloor){
                                 transparentBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
                                 Body transparentBody = world.createBody(transparentBodyDef);
@@ -205,43 +205,37 @@ public class GameScreen implements Screen {
                                 staticObjects.add(transparentBody);
                             }
                             else if(northFloor){
-                                windowHorBodyDef.position.set(new Vector2(i+0.5f, j+0.9f));
+                                windowHorBodyDef.position.set(new Vector2(i+0.5f, j+0.95f));
                                 Body windowHorBody = world.createBody(windowHorBodyDef);
                                 windowHorBody.createFixture(windowHorFixtureDef);
                                 windowHorBody.setUserData(cell);
                                 staticObjects.add(windowHorBody);
                             }
                             else if(southFloor){
-                                windowHorBodyDef.position.set(new Vector2(i+0.5f, j+0.1f));
+                                windowHorBodyDef.position.set(new Vector2(i+0.5f, j+0.05f));
                                 Body windowHorBody = world.createBody(windowHorBodyDef);
                                 windowHorBody.createFixture(windowHorFixtureDef);
                                 windowHorBody.setUserData(cell);
                                 staticObjects.add(windowHorBody);
                             }
                             else if(westFloor){
-                                windowVertBodyDef.position.set(new Vector2(i+0.1f, j+0.5f));
+                                windowVertBodyDef.position.set(new Vector2(i+0.05f, j+0.5f));
                                 Body windowVertBody = world.createBody(windowVertBodyDef);
                                 windowVertBody.createFixture(windowVertFixtureDef);
                                 windowVertBody.setUserData(cell);
                                 staticObjects.add(windowVertBody);
                             }
                             else if(eastFloor){
-                                windowVertBodyDef.position.set(new Vector2(i+0.9f, j+0.5f));
+                                windowVertBodyDef.position.set(new Vector2(i+0.95f, j+0.5f));
                                 Body windowVertBody = world.createBody(windowVertBodyDef);
                                 windowVertBody.createFixture(windowVertFixtureDef);
                                 windowVertBody.setUserData(cell);
                                 staticObjects.add(windowVertBody);
                             }
-//                            windowBodyDef.position.set(new Vector2(i+0.95f, j+0.5f));
-//                            Body windowBody = world.createBody(windowBodyDef);
-//                            windowBody.createFixture(windowFixtureDef);
-//                            windowBody.setUserData(cell);
-//                            staticObjects.add(windowBody);
                             break;
                     }
                 }
             }
-        treeBox.dispose();
     }
     void loadAnimations() {
         TextureRegion[] walkFrames = new TextureRegion[4];
@@ -267,12 +261,12 @@ public class GameScreen implements Screen {
         rayHandler.setCombinedMatrix(camera);
         RayHandler.setGammaCorrection(true);
         RayHandler.useDiffuseLight(true);
-        rayHandler.setAmbientLight(0.1f, 0.1f, 0.1f, 1f);
-        rayHandler.setBlurNum(2);
+        rayHandler.setAmbientLight(0f, 0f, 0f, 1f);
+        rayHandler.setBlurNum(1);
 
-        light = new PointLight(rayHandler, 450, Color.WHITE, 100f, 0, 0);
+        light = new PointLight(rayHandler, 1300, Color.WHITE, 100f, 0, 0);
         light.setSoft(true);
-        light.setSoftnessLength(1.5f);
+        light.setSoftnessLength(2f);
         light.attachToBody(player.body, 0, 0);
         light.setIgnoreAttachedBody(true);
         Filter f = new Filter();
@@ -285,18 +279,17 @@ public class GameScreen implements Screen {
         bodyDef.position.set(5, 95);
         Body body = world.createBody(bodyDef);
         CircleShape circle = new CircleShape();
-        circle.setRadius(0.3f);
+        circle.setRadius(0.2f);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
-        fixtureDef.density = 0.5f;
+        fixtureDef.density = 0.01f;
         fixtureDef.friction = 0.4f;
         fixtureDef.restitution = 0.0f; // Make it bounce a little bit
         body.createFixture(fixtureDef);
         body.setFixedRotation(true);
         circle.dispose();
-
         player.body = body;
-        player.body.setLinearDamping(12f);
+        player.body.setLinearDamping(speedd);
         body.setUserData(player);
     }
     @Override
@@ -341,34 +334,48 @@ public class GameScreen implements Screen {
         if (deltaTime == 0) return;
         if (deltaTime > 0.1f) deltaTime = 0.1f;
         player.stateTime += deltaTime;
-
+        //player.body.setLinearVelocity(player.body.getLinearVelocity().add());
+        player.body.setLinearVelocity(0,0);
         Vector2 vel = player.body.getLinearVelocity();
         Vector2 pos = player.body.getPosition();
 
-        if ((Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) && vel.x > -game.player.MAX_VELOCITY) {
-            player.body.applyLinearImpulse(-speedd, 0, pos.x, pos.y, true);
-            player.state = Player.State.Walking;
-            player.facing = Player.Facing.LEFT;
+        boolean moveToTheRight = Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D);
+        boolean moveToTheLeft = Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A);
+        boolean moveUp = Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W);
+        boolean moveDown = Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S);
+
+        if (!(moveToTheRight && moveToTheLeft)) {
+            if (moveToTheLeft) {
+                //player.body.applyLinearImpulse(-speedd, 0, pos.x, pos.y, true);
+                player.body.setLinearVelocity(-100f, player.body.getLinearVelocity().y);
+                player.state = Player.State.Walking;
+                player.facing = Player.Facing.LEFT;
+            }
+
+            if (moveToTheRight) {
+                //player.body.applyLinearImpulse(speedd, 0, pos.x, pos.y, true);
+                player.body.setLinearVelocity(100f, player.body.getLinearVelocity().y);
+                player.state = Player.State.Walking;
+                player.facing = Player.Facing.RIGHT;
+            }
         }
 
-        if ((Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) && vel.x < game.player.MAX_VELOCITY) {
-            player.body.applyLinearImpulse(speedd, 0, pos.x, pos.y, true);
-            player.state = Player.State.Walking;
-            player.facing = Player.Facing.RIGHT;
-        }
+        if (!(moveUp && moveDown)){
+            if (moveUp) {
+                //player.body.applyLinearImpulse(0, speedd, pos.x, pos.y, true);
+                player.body.setLinearVelocity(player.body.getLinearVelocity().x, 100f);
+                player.state = Player.State.Walking;
+                player.facing = Player.Facing.UP;
+            }
 
-        if ((Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) && vel.y < game.player.MAX_VELOCITY) {
-            player.body.applyLinearImpulse(0, speedd, pos.x, pos.y, true);
-            player.state = Player.State.Walking;
-            player.facing = Player.Facing.UP;
+            if (moveDown) {
+                //player.body.applyLinearImpulse(0, -speedd, pos.x, pos.y, true);
+                player.body.setLinearVelocity(player.body.getLinearVelocity().x, -100f);
+                player.state = Player.State.Walking;
+                player.facing = Player.Facing.DOWN;
+            }
         }
-
-        if ((Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) && vel.y > -game.player.MAX_VELOCITY) {
-            player.body.applyLinearImpulse(0, -speedd, pos.x, pos.y, true);
-            player.state = Player.State.Walking;
-            player.facing = Player.Facing.DOWN;
-        }
-        player.body.setLinearVelocity(player.body.getLinearVelocity().clamp(0,10f));
+        player.body.setLinearVelocity(player.body.getLinearVelocity().clamp(0,speedd));
         if (Gdx.input.isKeyJustPressed(Input.Keys.B)) debug = !debug;
         if (Math.abs(player.body.getLinearVelocity().len2()) < 0.5f) {
             player.state = Player.State.Standing;
@@ -381,33 +388,31 @@ public class GameScreen implements Screen {
         float height = Gdx.graphics.getHeight();
         float width = Gdx.graphics.getWidth();
         label.setPosition(100, height - 100);
+        if(debug)
+            drawTileDebugInfo();
+        else
+            label.setText("");
+    }
+    private void drawTileDebugInfo() {
         StringBuilder labelText = new StringBuilder("");
+        labelText.append("Player velocity : ").append(player.body.getLinearVelocity()).append("\n");
         Vector3 mouse_position = new Vector3(0,0,0);
         Vector3 tilePosition = camera.unproject(mouse_position.set((float) Gdx.input.getX(), (float) Gdx.input.getY(), 0));
         int tileX = (int)Math.floor(tilePosition.x);
         int tileY = (int)Math.floor(tilePosition.y);
-        TiledMapTileLayer curLayer1 = (TiledMapTileLayer)map.getLayers().get("obstacles");
         for (var x = 0; x < map.getLayers().size(); x++){
             TiledMapTileLayer currentLayer = (TiledMapTileLayer)map.getLayers().get(x);
             TiledMapTileLayer.Cell mcell = currentLayer.getCell(tileX, tileY);
+
             if(mcell != null){
-                labelText.append("X : ").append(tileX).append("\n").append("Y : ").append(tileY).append("\n").append("class : ").append("ID : ").append(mcell.getTile().getId()).append("\n");
+                labelText.append("Layer : ").append(currentLayer.getName()).append("\nX : ").append(tileX).append("\n").append("Y : ").append(tileY).append("\n").append("ID : ").append(mcell.getTile().getId()).append("\n");
                 var itrK = mcell.getTile().getProperties().getKeys();
                 var itrV = mcell.getTile().getProperties().getValues();
                 while (itrK.hasNext()){
                     labelText.append(itrK.next()).append(" : ").append(itrV.next()).append("\n");
                 }
             }
-        }
-        TiledMapTileLayer.Cell mcell = curLayer.getCell(tileX, tileY);
-        //System.out.println(camera.unproject(mouse_position));
-        if(mcell != null){
-            labelText.append("X : ").append(tileX).append("\n").append("Y : ").append(tileY).append("\n").append("class : ").append("ID : ").append(mcell.getTile().getId()).append("\n");
-            var itrK = mcell.getTile().getProperties().getKeys();
-            var itrV = mcell.getTile().getProperties().getValues();
-            while (itrK.hasNext()){
-                labelText.append(itrK.next()).append(" : ").append(itrV.next()).append("\n");
-            }
+            labelText.append("\n");
         }
         label.setText(labelText);
     }
