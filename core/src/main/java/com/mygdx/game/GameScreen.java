@@ -36,6 +36,12 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import org.jetbrains.annotations.NotNull;
 
 public class GameScreen implements Screen {
+
+    final static short PLAYER_CF= 0x0008,
+    PLAYER_INTERACT_CF =   0x0002,
+    LIGHT_CF =             0x4000,
+    ALL_CF = Short.MAX_VALUE;
+
     SecondGDXGame game;
     private Player player;
     Skin skin;
@@ -53,6 +59,7 @@ public class GameScreen implements Screen {
     private ShapeRenderer debugRenderer;
     private RayHandler rayHandler;
     private World world;
+    private Array<Body> bodies;
     private float accumulator = 0;
     Box2DDebugRenderer debugRendererPh;
     Array<Body> staticObjects = new Array<>() ;
@@ -74,8 +81,47 @@ public class GameScreen implements Screen {
         stage = new Stage(new ScreenViewport(), game.batch);
         debugRenderer = new ShapeRenderer();
         Box2D.init();
+        bodies = new Array<>();
         world = new World(new Vector2(0, 0), true);
+        world.getBodies(bodies);
+        world.setContactListener(new ContactListener() {
+            static int ll = 0;
+            static int llend = 0;
+            @Override
+            public void beginContact(Contact contact) {
+                ll++;
+                System.out.println("начало контакта (A) " + contact.getFixtureA().getBody().getUserData() + " c (B) " + contact.getFixtureB().getBody().getUserData());
+//               if (contact.getFixtureB().getBody().getUserData() instanceof Player){
+//                   world.getBodies(bodies);
+//                   ll++;
+//                   System.out.println("начало контакта игрока "+ll);
+//               }
+
+            }
+
+            @Override
+            public void endContact(Contact contact) {
+                llend++;
+                System.out.println("конец контакта (A) " + contact.getFixtureA().getBody().getUserData() + " c (B) " + contact.getFixtureB().getBody().getUserData());
+//                if (contact.getFixtureB().getBody().getUserData() instanceof Player){
+//                    llend++;
+//                    System.out.println("конец контакта игрока "+llend);
+//                }
+            }
+
+            @Override
+            public void preSolve(Contact contact, Manifold oldManifold) {
+
+            }
+
+            @Override
+            public void postSolve(Contact contact, ContactImpulse impulse) {
+
+            }
+        });
+
         loadMap();
+
         renderer = new OrthogonalTiledMapRenderer(map, 1f / tileSide);
         batch = renderer.getBatch();
         debugRendererPh = new Box2DDebugRenderer();
@@ -92,7 +138,6 @@ public class GameScreen implements Screen {
         game.player.HEIGHT = 0.8f;
         player.position.set(5,95);
 
-        loadMap();
         loadAnimations();
         initPhysics();
         initLights();
@@ -164,7 +209,8 @@ public class GameScreen implements Screen {
         transparentFixtureDef.shape = transparentBox;
         transparentFixtureDef.filter.groupIndex = -10;
 
-        Array<TiledMapTile> cells = new Array<>();
+        Body fullBody;
+
         for(var i = 0; i < obstaclesLayer.getWidth(); i++)
             for(var j = 0; j < obstaclesLayer.getHeight(); j++){
                 var cell = obstaclesLayer.getCell(i, j);
@@ -173,7 +219,7 @@ public class GameScreen implements Screen {
                     switch (cell.getTile().getProperties().get("type").toString()){
                         case "wall":
                             fullBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
-                            Body fullBody = world.createBody(fullBodyDef);
+                            fullBody = world.createBody(fullBodyDef);
                             fullBody.createFixture(fullFixtureDef);
                             fullBody.setUserData(cell);
                             staticObjects.add(fullBody);
@@ -193,45 +239,57 @@ public class GameScreen implements Screen {
                             staticObjects.add(metalClosetBody);
                             break;
                         case "window":
-                            boolean southFloor = groundLayer.getCell(i, j + 1).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
-                            boolean northFloor = groundLayer.getCell(i, j - 1).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
-                            boolean eastFloor = groundLayer.getCell(i - 1, j).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
-                            boolean westFloor = groundLayer.getCell(i + 1, j).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
-                            if(northFloor && southFloor && westFloor && eastFloor || !northFloor && !southFloor && !westFloor && !eastFloor){
-                                transparentBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
-                                Body transparentBody = world.createBody(transparentBodyDef);
-                                transparentBody.createFixture(transparentFixtureDef);
-                                transparentBody.setUserData(cell);
-                                staticObjects.add(transparentBody);
-                            }
-                            else if(northFloor){
+                            boolean southWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_0 && cell.getFlipVertically() && cell.getFlipVertically();
+                            boolean northWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_0 && !cell.getFlipVertically() && !cell.getFlipVertically();
+                            boolean eastWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_270 && !cell.getFlipVertically() && !cell.getFlipVertically();
+                            boolean westWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_90 && !cell.getFlipVertically() && !cell.getFlipVertically();
+//                            boolean southWard = groundLayer.getCell(i, j + 1).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
+//                            boolean northWard = groundLayer.getCell(i, j - 1).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
+//                            boolean eastWard = groundLayer.getCell(i - 1, j).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
+//                            boolean westWard = groundLayer.getCell(i + 1, j).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
+//                            if(northWard && southWard && westWard && eastWard || !northWard && !southWard && !westWard && !eastWard){
+//                                transparentBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
+//                                Body transparentBody = world.createBody(transparentBodyDef);
+//                                transparentBody.createFixture(transparentFixtureDef);
+//                                transparentBody.setUserData(cell);
+//                                staticObjects.add(transparentBody);
+//                            }
+//                            else
+                            if(northWard){
                                 windowHorBodyDef.position.set(new Vector2(i+0.5f, j+0.95f));
                                 Body windowHorBody = world.createBody(windowHorBodyDef);
                                 windowHorBody.createFixture(windowHorFixtureDef);
                                 windowHorBody.setUserData(cell);
                                 staticObjects.add(windowHorBody);
                             }
-                            else if(southFloor){
+                            else if(southWard){
                                 windowHorBodyDef.position.set(new Vector2(i+0.5f, j+0.05f));
                                 Body windowHorBody = world.createBody(windowHorBodyDef);
                                 windowHorBody.createFixture(windowHorFixtureDef);
                                 windowHorBody.setUserData(cell);
                                 staticObjects.add(windowHorBody);
                             }
-                            else if(westFloor){
+                            else if(westWard){
                                 windowVertBodyDef.position.set(new Vector2(i+0.05f, j+0.5f));
                                 Body windowVertBody = world.createBody(windowVertBodyDef);
                                 windowVertBody.createFixture(windowVertFixtureDef);
                                 windowVertBody.setUserData(cell);
                                 staticObjects.add(windowVertBody);
                             }
-                            else if(eastFloor){
+                            else if(eastWard){
                                 windowVertBodyDef.position.set(new Vector2(i+0.95f, j+0.5f));
                                 Body windowVertBody = world.createBody(windowVertBodyDef);
                                 windowVertBody.createFixture(windowVertFixtureDef);
                                 windowVertBody.setUserData(cell);
                                 staticObjects.add(windowVertBody);
                             }
+                            break;
+                        case "door":
+                            fullBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
+                            fullBody = world.createBody(fullBodyDef);
+                            fullBody.createFixture(fullFixtureDef);
+                            fullBody.setUserData(cell);
+                            staticObjects.add(fullBody);
                             break;
                     }
                 }
@@ -270,13 +328,14 @@ public class GameScreen implements Screen {
         light.attachToBody(player.body, 0, 0);
         light.setIgnoreAttachedBody(true);
         Filter f = new Filter();
+        //f.categoryBits = LIGHT_CF;
         f.groupIndex = -10;
         light.setContactFilter(f);
     }
     public void initPhysics(){
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(5, 95);
+        bodyDef.position.set(new Vector2(5, 95));
         Body body = world.createBody(bodyDef);
         CircleShape circle = new CircleShape();
         circle.setRadius(0.2f);
@@ -284,13 +343,34 @@ public class GameScreen implements Screen {
         fixtureDef.shape = circle;
         fixtureDef.density = 0.01f;
         fixtureDef.friction = 0.4f;
-        fixtureDef.restitution = 0.0f; // Make it bounce a little bit
+        fixtureDef.restitution = 0.0f;
+        fixtureDef.filter.categoryBits = PLAYER_CF;
         body.createFixture(fixtureDef);
         body.setFixedRotation(true);
+        body.setUserData(player);
         circle.dispose();
+
+        BodyDef sensorBodyDef = new BodyDef();
+        sensorBodyDef.type = BodyDef.BodyType.DynamicBody;
+        sensorBodyDef.position.set(new Vector2(5, 95));
+        Body sensorBody = world.createBody(sensorBodyDef);
+        CircleShape sensorCircle = new CircleShape();
+        sensorCircle.setRadius(2f);
+        FixtureDef sensorFixtureDef = new FixtureDef();
+        sensorFixtureDef.shape = sensorCircle;
+        sensorFixtureDef.isSensor = true;
+        sensorFixtureDef.filter.categoryBits = PLAYER_INTERACT_CF;
+        sensorFixtureDef.filter.maskBits = (short) (sensorFixtureDef.filter.maskBits & ~PLAYER_CF);
+        sensorBody.createFixture(sensorFixtureDef);
+        sensorBody.setFixedRotation(true);
+        sensorBody.setSleepingAllowed(false);
+        sensorBody.setUserData(new BodyUserData(player, "playerInteractionBubble"));
+        sensorCircle.dispose();
+
+        player.sensorBody = sensorBody;
         player.body = body;
         player.body.setLinearDamping(speedd);
-        body.setUserData(player);
+
     }
     @Override
     public void render (float deltaTime) {
@@ -383,6 +463,8 @@ public class GameScreen implements Screen {
 
         player.position.x = (player.body.getPosition().x);
         player.position.y = (player.body.getPosition().y);
+
+        player.sensorBody.setTransform(player.position, 0);
     }
     private void updateStage(){
         float height = Gdx.graphics.getHeight();
@@ -405,7 +487,7 @@ public class GameScreen implements Screen {
             TiledMapTileLayer.Cell mcell = currentLayer.getCell(tileX, tileY);
 
             if(mcell != null){
-                labelText.append("Layer : ").append(currentLayer.getName()).append("\nX : ").append(tileX).append("\n").append("Y : ").append(tileY).append("\n").append("ID : ").append(mcell.getTile().getId()).append("\n");
+                labelText.append("Rotation : ").append(mcell.getRotation()).append("\nFlip Horizontally : ").append(mcell.getFlipHorizontally()).append("\nFlip Vertically : ").append(mcell.getFlipVertically()).append("\nLayer : ").append(currentLayer.getName()).append("\nX : ").append(tileX).append("\n").append("Y : ").append(tileY).append("\n").append("ID : ").append(mcell.getTile().getId()).append("\n");
                 var itrK = mcell.getTile().getProperties().getKeys();
                 var itrV = mcell.getTile().getProperties().getValues();
                 while (itrK.hasNext()){

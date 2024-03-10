@@ -10,6 +10,7 @@ class Player {
     float MAX_VELOCITY = 10f;
     float DAMPING = 0.87f;
     Body body;
+    Body sensorBody;
     enum State {
         Standing, Walking
     }
