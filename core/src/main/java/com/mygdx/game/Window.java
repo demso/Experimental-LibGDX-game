@@ -5,7 +5,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Filter;
 
-class Door extends BodyUserData{
+public class Window extends BodyUserData{
     TiledMapTileLayer.Cell cell;
     TiledMapTile closed;
     TiledMapTile open;
@@ -15,15 +15,13 @@ class Door extends BodyUserData{
     float x;
     float y;
     boolean isOpen = false;
-    Door(GameScreen game, TiledMapTileLayer.Cell cell, Body body, TiledMapTile open, TiledMapTile closed, float x, float y){
-        super(cell,"door");
+    Window(GameScreen game, TiledMapTileLayer.Cell cell, Body body, TiledMapTile open, TiledMapTile closed, float x, float y){
+        super(cell,"window");
         this.game = game;
         this.cell = cell;
         this.open = open;
         this.closed = closed;
         physicalBody = body;
-        this.x = x;
-        this.y = y;
     }
 
     void doAction() {

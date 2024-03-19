@@ -43,7 +43,7 @@ public class GameScreen implements Screen {
     ALL_CF = Short.MAX_VALUE;
 
     SecondGDXGame game;
-    private Player player;
+    Player player;
     Skin skin;
     BitmapFont font;
     Batch batch;
@@ -52,6 +52,7 @@ public class GameScreen implements Screen {
     private OrthographicCamera camera;
     private boolean debug = false;
     Texture textureSheet;
+    Texture userSelection;
     Animation<TextureRegion> walkSide;
     Animation<TextureRegion> walkUp;
     Animation<TextureRegion> walkDown;
@@ -91,18 +92,33 @@ public class GameScreen implements Screen {
             public void beginContact(Contact contact) {
                 ll++;
                 System.out.println("начало контакта (A) " + contact.getFixtureA().getBody().getUserData() + " c (B) " + contact.getFixtureB().getBody().getUserData());
-//               if (contact.getFixtureB().getBody().getUserData() instanceof Player){
+                var dataA = contact.getFixtureA().getBody().getUserData();
+                var dataB = contact.getFixtureB().getBody().getUserData();
+                if (dataA instanceof BodyUserData && ((BodyUserData) dataA).bodyName.equals("playerInteractionBubble")){
+                    player.closeObjects.add(contact.getFixtureB().getBody());
+                }
+                if (dataB instanceof BodyUserData && ((BodyUserData) dataB).bodyName.equals("playerInteractionBubble")){
+                    player.closeObjects.add(contact.getFixtureA().getBody());
+                }
+                //               if (contact.getFixtureB().getBody().getUserData() instanceof Player){
 //                   world.getBodies(bodies);
 //                   ll++;
 //                   System.out.println("начало контакта игрока "+ll);
 //               }
-
             }
 
             @Override
             public void endContact(Contact contact) {
                 llend++;
                 System.out.println("конец контакта (A) " + contact.getFixtureA().getBody().getUserData() + " c (B) " + contact.getFixtureB().getBody().getUserData());
+                var dataA = contact.getFixtureA().getBody().getUserData();
+                var dataB = contact.getFixtureB().getBody().getUserData();
+                if (dataA instanceof BodyUserData && ((BodyUserData) dataA).bodyName.equals("playerInteractionBubble")){
+                    player.closeObjects.removeValue(contact.getFixtureB().getBody(), true);
+                }
+                if (dataB instanceof BodyUserData && ((BodyUserData) dataB).bodyName.equals("playerInteractionBubble")){
+                    player.closeObjects.removeValue(contact.getFixtureA().getBody(), true);
+                }
 //                if (contact.getFixtureB().getBody().getUserData() instanceof Player){
 //                    llend++;
 //                    System.out.println("конец контакта игрока "+llend);
@@ -127,6 +143,7 @@ public class GameScreen implements Screen {
         debugRendererPh = new Box2DDebugRenderer();
         textureSheet = new Texture(Gdx.files.internal("ClassicRPG_Sheet.png"));
         textureRegions= TextureRegion.split(textureSheet, 16, 16);
+        userSelection = new Texture(Gdx.files.internal("selection.png"));
         camera = new OrthographicCamera();
         player = game.player;
 
@@ -161,6 +178,17 @@ public class GameScreen implements Screen {
                 if (keycode == Input.Keys.MINUS){
                     zoom -= 0.5f;
                     camera.setToOrtho(false, Gdx.graphics.getWidth() * (1/16f) * (1/zoom), Gdx.graphics.getHeight() * (1/16f) * (1/zoom));
+                }
+                if (keycode == Input.Keys.R){
+                    System.out.println(player.getClosestObject());
+                }
+                if (keycode == Input.Keys.E){
+                    if (player.closestObject != null) {
+                        var obj = player.closestObject.getUserData();
+                        if (player.closestObject.getUserData() instanceof Door) {
+                            ((Door) obj).doAction();
+                        }
+                    }
                 }
                 return true;
             }
@@ -221,21 +249,21 @@ public class GameScreen implements Screen {
                             fullBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
                             fullBody = world.createBody(fullBodyDef);
                             fullBody.createFixture(fullFixtureDef);
-                            fullBody.setUserData(cell);
+                            fullBody.setUserData(new BodyUserData(cell, "betonWall"));
                             staticObjects.add(fullBody);
                             break;
                         case "fullBody":
                             fullBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
                             fullBody = world.createBody(fullBodyDef);
                             fullBody.createFixture(fullFixtureDef);
-                            fullBody.setUserData(cell);
+                            fullBody.setUserData(new BodyUserData(cell, "mareFullBody"));
                             staticObjects.add(fullBody);
                             break;
                         case "metalCloset":
                             metalClosetBodyDef.position.set(new Vector2(i+0.5f, j+0.3f));
                             Body metalClosetBody = world.createBody(metalClosetBodyDef);
                             metalClosetBody.createFixture(metalClosetFixtureDef);
-                            metalClosetBody.setUserData(cell);
+                            metalClosetBody.setUserData(new BodyUserData(cell, "metalCloset"));
                             staticObjects.add(metalClosetBody);
                             break;
                         case "window":
@@ -259,28 +287,28 @@ public class GameScreen implements Screen {
                                 windowHorBodyDef.position.set(new Vector2(i+0.5f, j+0.95f));
                                 Body windowHorBody = world.createBody(windowHorBodyDef);
                                 windowHorBody.createFixture(windowHorFixtureDef);
-                                windowHorBody.setUserData(cell);
+                                windowHorBody.setUserData(new BodyUserData(cell, "northWindow"));
                                 staticObjects.add(windowHorBody);
                             }
                             else if(southWard){
                                 windowHorBodyDef.position.set(new Vector2(i+0.5f, j+0.05f));
                                 Body windowHorBody = world.createBody(windowHorBodyDef);
                                 windowHorBody.createFixture(windowHorFixtureDef);
-                                windowHorBody.setUserData(cell);
+                                windowHorBody.setUserData(new BodyUserData(cell, "southWindow"));
                                 staticObjects.add(windowHorBody);
                             }
                             else if(westWard){
                                 windowVertBodyDef.position.set(new Vector2(i+0.05f, j+0.5f));
                                 Body windowVertBody = world.createBody(windowVertBodyDef);
                                 windowVertBody.createFixture(windowVertFixtureDef);
-                                windowVertBody.setUserData(cell);
+                                windowVertBody.setUserData(new BodyUserData(cell, "westWindow"));
                                 staticObjects.add(windowVertBody);
                             }
                             else if(eastWard){
                                 windowVertBodyDef.position.set(new Vector2(i+0.95f, j+0.5f));
                                 Body windowVertBody = world.createBody(windowVertBodyDef);
                                 windowVertBody.createFixture(windowVertFixtureDef);
-                                windowVertBody.setUserData(cell);
+                                windowVertBody.setUserData(new BodyUserData(cell, "eastWindow"));
                                 staticObjects.add(windowVertBody);
                             }
                             break;
@@ -288,7 +316,7 @@ public class GameScreen implements Screen {
                             fullBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
                             fullBody = world.createBody(fullBodyDef);
                             fullBody.createFixture(fullFixtureDef);
-                            fullBody.setUserData(cell);
+                            fullBody.setUserData(new Door(this,cell, fullBody, map.getTileSets().getTileSet("normalTerrain").getTile(160), map.getTileSets().getTileSet("normalTerrain").getTile(110), i, j));
                             staticObjects.add(fullBody);
                             break;
                     }
@@ -355,7 +383,7 @@ public class GameScreen implements Screen {
         sensorBodyDef.position.set(new Vector2(5, 95));
         Body sensorBody = world.createBody(sensorBodyDef);
         CircleShape sensorCircle = new CircleShape();
-        sensorCircle.setRadius(2f);
+        sensorCircle.setRadius(1f);
         FixtureDef sensorFixtureDef = new FixtureDef();
         sensorFixtureDef.shape = sensorCircle;
         sensorFixtureDef.isSensor = true;
@@ -382,30 +410,31 @@ public class GameScreen implements Screen {
 
         camera.position.x = player.position.x;
         camera.position.y = player.position.y;
+
         camera.update();
 
         renderer.setView(camera);
         renderer.render();
 
         renderPlayer(deltaTime);
-        //System.out.println(light.getPosition() + " " + player.body.getPosition());
 
         rayHandler.setCombinedMatrix(camera);
         rayHandler.updateAndRender();
 
-//        renderer.getBatch().begin();
-//        renderer.renderTileLayer((TiledMapTileLayer) map.getLayers().get("obstacles"));
-//        renderer.getBatch().end();
+        if (player.closestObject != null) {
+            batch.begin();
+            batch.draw(userSelection, (int)player.closestObject.getPosition().x, (int)player.closestObject.getPosition().y,1,1);
+            batch.end();
+        }
 
         updateStage();
         stage.act(deltaTime);
         stage.draw();
 
-        stage.getBatch().begin();
-        font.draw(stage.getBatch(), "FPS=" + Gdx.graphics.getFramesPerSecond(), 0, stage.getCamera().viewportHeight - 2);
-        stage.getBatch().end();
-
         if (debug) {
+            stage.getBatch().begin();
+            font.draw(stage.getBatch(), "FPS=" + Gdx.graphics.getFramesPerSecond(), 0, stage.getCamera().viewportHeight - 2);
+            stage.getBatch().end();
             //renderDebug();
             debugRendererPh.render(world, camera.combined);
         }
@@ -465,6 +494,8 @@ public class GameScreen implements Screen {
         player.position.y = (player.body.getPosition().y);
 
         player.sensorBody.setTransform(player.position, 0);
+
+        player.closestObject = player.getClosestObject();
     }
     private void updateStage(){
         float height = Gdx.graphics.getHeight();
@@ -475,9 +506,13 @@ public class GameScreen implements Screen {
         else
             label.setText("");
     }
+    Body clObj;
+    StringBuilder labelText = new StringBuilder();
     private void drawTileDebugInfo() {
-        StringBuilder labelText = new StringBuilder("");
+        labelText = new StringBuilder();
         labelText.append("Player velocity : ").append(player.body.getLinearVelocity()).append("\n");
+        clObj = player.closestObject;
+        labelText.append("Closest object : ").append(clObj == null ? null : clObj.getUserData() instanceof BodyUserData ? ((BodyUserData) clObj.getUserData()).bodyName + " " + clObj.getPosition() : clObj.getUserData()).append("\n\n");
         Vector3 mouse_position = new Vector3(0,0,0);
         Vector3 tilePosition = camera.unproject(mouse_position.set((float) Gdx.input.getX(), (float) Gdx.input.getY(), 0));
         int tileX = (int)Math.floor(tilePosition.x);

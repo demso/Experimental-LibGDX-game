@@ -2,6 +2,8 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.utils.Array;
+import org.jetbrains.annotations.Nullable;
 
 class Player {
     SecondGDXGame game;
@@ -11,6 +13,8 @@ class Player {
     float DAMPING = 0.87f;
     Body body;
     Body sensorBody;
+    Array<Body> closeObjects;
+    Body closestObject;
     enum State {
         Standing, Walking
     }
@@ -25,5 +29,22 @@ class Player {
 
     Player(SecondGDXGame game){
         this.game = game;
+        closeObjects = new Array<>();
+    }
+
+    @Nullable
+    Body getClosestObject(){
+        Body co = null;
+        float minDist = Float.MAX_VALUE;
+        float dist = 0;
+        for (Body closeObject : closeObjects) {
+            dist = body.getPosition().dst2(closeObject.getPosition());
+            if (dist < minDist){
+                co = closeObject;
+                minDist = dist;
+            }
+
+        }
+        return co;
     }
 }
