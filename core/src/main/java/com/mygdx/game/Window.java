@@ -32,7 +32,7 @@ public class Window extends BodyUserData{
             filtr.maskBits = 0x0002;
         else
             filtr.maskBits = -1;
-        game.player.body.getFixtureList().get(0).refilter();
+        game.game.player.body.getFixtureList().get(0).refilter();
         cell.setTile(currentTile);
     }
 }

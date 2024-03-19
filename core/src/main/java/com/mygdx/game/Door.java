@@ -11,13 +11,13 @@ class Door extends BodyUserData{
     TiledMapTile open;
     TiledMapTile currentTile;
     Body physicalBody;
-    GameScreen game;
+    GameItself gameItself;
     float x;
     float y;
     boolean isOpen = false;
-    Door(GameScreen game, TiledMapTileLayer.Cell cell, Body body, TiledMapTile open, TiledMapTile closed, float x, float y){
+    Door(GameItself gameItself, TiledMapTileLayer.Cell cell, Body body, TiledMapTile open, TiledMapTile closed, float x, float y){
         super(cell,"door");
-        this.game = game;
+        this.gameItself = gameItself;
         this.cell = cell;
         this.open = open;
         this.closed = closed;
@@ -34,7 +34,7 @@ class Door extends BodyUserData{
             filtr.maskBits = 0x0002;
         else
             filtr.maskBits = -1;
-        game.player.body.getFixtureList().get(0).refilter();
+        gameItself.game.player.body.getFixtureList().get(0).refilter();
         cell.setTile(currentTile);
     }
 }

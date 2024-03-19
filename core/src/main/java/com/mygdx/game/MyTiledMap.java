@@ -8,8 +8,8 @@ import com.badlogic.gdx.utils.Array;
 public class MyTiledMap extends TiledMap {
     World world;
     Array<Body> staticObjects = new Array<>();
-    MyTiledMap(GameScreen gs){
+    MyTiledMap(GameItself gameItself){
         super();
-        this.world = gs.world;
+        this.world = gameItself.world;
     }
 }
