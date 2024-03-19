@@ -63,7 +63,6 @@ public class GameScreen implements Screen {
     private Array<Body> bodies;
     private float accumulator = 0;
     Box2DDebugRenderer debugRendererPh;
-    Array<Body> staticObjects = new Array<>() ;
     PointLight light;
 
     TextureRegion textureRegions[][];
@@ -99,11 +98,6 @@ public class GameScreen implements Screen {
                 if (dataB instanceof BodyUserData && ((BodyUserData) dataB).bodyName.equals("playerInteractionBubble")){
                     player.closeObjects.add(contact.getFixtureA().getBody());
                 }
-                //               if (contact.getFixtureB().getBody().getUserData() instanceof Player){
-//                   world.getBodies(bodies);
-//                   ll++;
-//                   System.out.println("начало контакта игрока "+ll);
-//               }
             }
 
             @Override
@@ -117,10 +111,6 @@ public class GameScreen implements Screen {
                 if (dataB instanceof BodyUserData && ((BodyUserData) dataB).bodyName.equals("playerInteractionBubble")){
                     player.closeObjects.removeValue(contact.getFixtureA().getBody(), true);
                 }
-//                if (contact.getFixtureB().getBody().getUserData() instanceof Player){
-//                    llend++;
-//                    System.out.println("конец контакта игрока "+llend);
-//                }
             }
 
             @Override
@@ -134,7 +124,7 @@ public class GameScreen implements Screen {
             }
         });
 
-        loadMap();
+        map = new MyTmxMapLoader(this).load(mapToLoad);
 
         renderer = new OrthogonalTiledMapRenderer(map, 1f / tileSide);
         batch = renderer.getBatch();
@@ -193,120 +183,6 @@ public class GameScreen implements Screen {
         });
     }
 
-    void loadMap(){
-        map = new MyTmxMapLoader().load(mapToLoad);
-        MapLayers mlayers = map.getLayers();
-        var obstaclesLayer = (TiledMapTileLayer) mlayers.get("obstacles");
-
-        BodyDef fullBodyDef = new BodyDef();
-        PolygonShape fullBox = new PolygonShape();
-        FixtureDef fullFixtureDef = new FixtureDef();
-        fullBox.setAsBox(0.5f, 0.5f);
-        fullFixtureDef.shape = fullBox;
-        fullFixtureDef.filter.groupIndex = 0;
-
-        BodyDef metalClosetBodyDef = new BodyDef();
-        PolygonShape metalClosetBox = new PolygonShape();
-        FixtureDef metalClosetFixtureDef = new FixtureDef();
-        metalClosetBox.setAsBox(0.33f, 0.25f);
-        metalClosetFixtureDef.shape = metalClosetBox;
-        metalClosetFixtureDef.filter.groupIndex = 0;
-
-        BodyDef windowVertBodyDef = new BodyDef();
-        PolygonShape windowVertBox = new PolygonShape();
-        FixtureDef windowVertFixtureDef = new FixtureDef();
-        windowVertBox.setAsBox(0.05f, 0.5f);
-        windowVertFixtureDef.shape = windowVertBox;
-        windowVertFixtureDef.filter.groupIndex = -10;
-
-        BodyDef windowHorBodyDef = new BodyDef();
-        PolygonShape windowHorBox = new PolygonShape();
-        FixtureDef windowHorFixtureDef = new FixtureDef();
-        windowHorBox.setAsBox(0.5f, 0.05f);
-        windowHorFixtureDef.shape = windowHorBox;
-        windowHorFixtureDef.filter.groupIndex = -10;
-
-        BodyDef transparentBodyDef = new BodyDef();
-        PolygonShape transparentBox = new PolygonShape();
-        FixtureDef transparentFixtureDef = new FixtureDef();
-        transparentBox.setAsBox(0.5f, 0.5f);
-        transparentFixtureDef.shape = transparentBox;
-        transparentFixtureDef.filter.groupIndex = -10;
-
-        Body fullBody;
-
-        for(var i = 0; i < obstaclesLayer.getWidth(); i++)
-            for(var j = 0; j < obstaclesLayer.getHeight(); j++){
-                var cell = obstaclesLayer.getCell(i, j);
-                if (cell != null && cell.getTile().getProperties().get("type") != null){
-                    var df = cell.getTile().getProperties();
-                    switch (cell.getTile().getProperties().get("type").toString()){
-                        case "wall":
-                            fullBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
-                            fullBody = world.createBody(fullBodyDef);
-                            fullBody.createFixture(fullFixtureDef);
-                            fullBody.setUserData(new BodyUserData(cell, "betonWall"));
-                            staticObjects.add(fullBody);
-                            break;
-                        case "fullBody":
-                            fullBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
-                            fullBody = world.createBody(fullBodyDef);
-                            fullBody.createFixture(fullFixtureDef);
-                            fullBody.setUserData(new BodyUserData(cell, "mareFullBody"));
-                            staticObjects.add(fullBody);
-                            break;
-                        case "metalCloset":
-                            metalClosetBodyDef.position.set(new Vector2(i+0.5f, j+0.3f));
-                            Body metalClosetBody = world.createBody(metalClosetBodyDef);
-                            metalClosetBody.createFixture(metalClosetFixtureDef);
-                            metalClosetBody.setUserData(new BodyUserData(cell, "metalCloset"));
-                            staticObjects.add(metalClosetBody);
-                            break;
-                        case "window":
-                            boolean southWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_0 && cell.getFlipVertically() && cell.getFlipVertically();
-                            boolean northWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_0 && !cell.getFlipVertically() && !cell.getFlipVertically();
-                            boolean eastWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_270 && !cell.getFlipVertically() && !cell.getFlipVertically();
-                            boolean westWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_90 && !cell.getFlipVertically() && !cell.getFlipVertically();
-                            if(northWard){
-                                windowHorBodyDef.position.set(new Vector2(i+0.5f, j+0.95f));
-                                Body windowHorBody = world.createBody(windowHorBodyDef);
-                                windowHorBody.createFixture(windowHorFixtureDef);
-                                windowHorBody.setUserData(new BodyUserData(cell, "northWindow"));
-                                staticObjects.add(windowHorBody);
-                            }
-                            else if(southWard){
-                                windowHorBodyDef.position.set(new Vector2(i+0.5f, j+0.05f));
-                                Body windowHorBody = world.createBody(windowHorBodyDef);
-                                windowHorBody.createFixture(windowHorFixtureDef);
-                                windowHorBody.setUserData(new BodyUserData(cell, "southWindow"));
-                                staticObjects.add(windowHorBody);
-                            }
-                            else if(westWard){
-                                windowVertBodyDef.position.set(new Vector2(i+0.05f, j+0.5f));
-                                Body windowVertBody = world.createBody(windowVertBodyDef);
-                                windowVertBody.createFixture(windowVertFixtureDef);
-                                windowVertBody.setUserData(new BodyUserData(cell, "westWindow"));
-                                staticObjects.add(windowVertBody);
-                            }
-                            else if(eastWard){
-                                windowVertBodyDef.position.set(new Vector2(i+0.95f, j+0.5f));
-                                Body windowVertBody = world.createBody(windowVertBodyDef);
-                                windowVertBody.createFixture(windowVertFixtureDef);
-                                windowVertBody.setUserData(new BodyUserData(cell, "eastWindow"));
-                                staticObjects.add(windowVertBody);
-                            }
-                            break;
-                        case "door":
-                            fullBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
-                            fullBody = world.createBody(fullBodyDef);
-                            fullBody.createFixture(fullFixtureDef);
-                            fullBody.setUserData(new Door(this,cell, fullBody, map.getTileSets().getTileSet("normalTerrain").getTile(160), map.getTileSets().getTileSet("normalTerrain").getTile(110), i, j));
-                            staticObjects.add(fullBody);
-                            break;
-                    }
-                }
-            }
-    }
     void loadAnimations() {
         TextureRegion[] walkFrames = new TextureRegion[4];
         int index = 0;
