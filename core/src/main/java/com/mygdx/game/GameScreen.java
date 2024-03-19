@@ -59,7 +59,7 @@ public class GameScreen implements Screen {
     float frameDur = 0.1f;
     private ShapeRenderer debugRenderer;
     private RayHandler rayHandler;
-    private World world;
+    World world;
     private Array<Body> bodies;
     private float accumulator = 0;
     Box2DDebugRenderer debugRendererPh;
@@ -194,11 +194,9 @@ public class GameScreen implements Screen {
     }
 
     void loadMap(){
-        map = new TmxMapLoader().load(mapToLoad);
+        map = new MyTmxMapLoader().load(mapToLoad);
         MapLayers mlayers = map.getLayers();
-        // var what = ((TiledMapTileMapObject) mlayers.get("shadows").getObjects().get(0)).getProperties();
         var obstaclesLayer = (TiledMapTileLayer) mlayers.get("obstacles");
-        var groundLayer = (TiledMapTileLayer) mlayers.get("ground");
 
         BodyDef fullBodyDef = new BodyDef();
         PolygonShape fullBox = new PolygonShape();
@@ -269,18 +267,6 @@ public class GameScreen implements Screen {
                             boolean northWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_0 && !cell.getFlipVertically() && !cell.getFlipVertically();
                             boolean eastWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_270 && !cell.getFlipVertically() && !cell.getFlipVertically();
                             boolean westWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_90 && !cell.getFlipVertically() && !cell.getFlipVertically();
-//                            boolean southWard = groundLayer.getCell(i, j + 1).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
-//                            boolean northWard = groundLayer.getCell(i, j - 1).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
-//                            boolean eastWard = groundLayer.getCell(i - 1, j).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
-//                            boolean westWard = groundLayer.getCell(i + 1, j).getTile().getProperties().get("supercustomproperty", "", String.class).equals("floor");
-//                            if(northWard && southWard && westWard && eastWard || !northWard && !southWard && !westWard && !eastWard){
-//                                transparentBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
-//                                Body transparentBody = world.createBody(transparentBodyDef);
-//                                transparentBody.createFixture(transparentFixtureDef);
-//                                transparentBody.setUserData(cell);
-//                                staticObjects.add(transparentBody);
-//                            }
-//                            else
                             if(northWard){
                                 windowHorBodyDef.position.set(new Vector2(i+0.5f, j+0.95f));
                                 Body windowHorBody = world.createBody(windowHorBodyDef);
