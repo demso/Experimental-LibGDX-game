@@ -91,7 +91,6 @@ public class GameScreen implements Screen {
             @Override
             public void beginContact(Contact contact) {
                 ll++;
-                System.out.println("начало контакта (A) " + contact.getFixtureA().getBody().getUserData() + " c (B) " + contact.getFixtureB().getBody().getUserData());
                 var dataA = contact.getFixtureA().getBody().getUserData();
                 var dataB = contact.getFixtureB().getBody().getUserData();
                 if (dataA instanceof BodyUserData && ((BodyUserData) dataA).bodyName.equals("playerInteractionBubble")){
@@ -110,7 +109,6 @@ public class GameScreen implements Screen {
             @Override
             public void endContact(Contact contact) {
                 llend++;
-                System.out.println("конец контакта (A) " + contact.getFixtureA().getBody().getUserData() + " c (B) " + contact.getFixtureB().getBody().getUserData());
                 var dataA = contact.getFixtureA().getBody().getUserData();
                 var dataB = contact.getFixtureB().getBody().getUserData();
                 if (dataA instanceof BodyUserData && ((BodyUserData) dataA).bodyName.equals("playerInteractionBubble")){
