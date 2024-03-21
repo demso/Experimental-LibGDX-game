@@ -6,21 +6,16 @@ import com.badlogic.gdx.utils.Scaling;
 import com.mygdx.game.*;
 
 public class ItemInfoPopUp extends Table {
-    Table itemImgContainer;
     Image itemImage;
     Label itemName;
     VerticalGroup itemPropsVGroup;
     Label itemDesc;
-    TextArea tarea;
     public ItemInfoPopUp(Item item, float x, float y){
         super(SecondGDXGame.skin);
         this.setBackground("default-pane");
-        this.setSize(170f,200f);
-        this.setPosition(x,y);
 
         itemImage = new Image(item.tile.getTextureRegion());
         itemImage.setScaling(Scaling.fill);
-        itemImage.setSize(100,100);
         add(itemImage).minSize(50);
 
         itemName = new Label(item.itemName, SecondGDXGame.skin);
@@ -41,5 +36,6 @@ public class ItemInfoPopUp extends Table {
         this.align(Align.top);
         this.pad(5);
         this.pack();
+        this.setPosition(x,y-getHeight());
     }
 }

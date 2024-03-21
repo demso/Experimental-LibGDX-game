@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import org.jetbrains.annotations.NotNull;
 
 public class GameScreen implements Screen {
@@ -25,9 +26,9 @@ public class GameScreen implements Screen {
     }
     @Override
     public void resize(int width, int height) {
-        gameItself.camera.setToOrtho(false, Gdx.graphics.getWidth() * (1/16f) * (1/ gameItself.zoom), Gdx.graphics.getHeight() * (1/16f) * (1/ gameItself.zoom));
-        stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
-        gameItself.hudStage.getViewport().update((int)Math.floor(Gdx.graphics.getWidth() * (1/16f) * (1/ gameItself.zoom)), (int)Math.floor(Gdx.graphics.getHeight() * (1/16f) * (1/ gameItself.zoom)), true);
+       stage.getViewport().update(width, height, true);
+       gameItself.gameStage.getViewport().update(width , height, false);
+       gameItself.camera.setToOrtho(false, width * (1f/GameItself.tileSide) * (1/ gameItself.zoom), height * (1f/GameItself.tileSide) * (1/ gameItself.zoom));
     }
     @Override
     public void pause() {

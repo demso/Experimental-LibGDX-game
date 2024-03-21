@@ -29,7 +29,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 
 public class SecondGDXGame extends Game {
-    Player player = new Player(this);
+    public Player player = new Player(this);
     SpriteBatch batch;
     static MainMenuScreen menuScreen;
     static GameScreen gameScreen;

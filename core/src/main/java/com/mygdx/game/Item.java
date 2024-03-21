@@ -46,31 +46,6 @@ public class Item extends Box2DSprite {
         this.tileName = tile.getProperties().get("name", "no_name", String.class);
         this.gameItself = gi;
         setPhysicalBody(physicalBody);
-        clickListener = new Table();
-        clickListener.setSize(spriteWidth-0.1f,spiteHeight-0.1f);
-        clickListener.setPosition(position.x-clickListener.getWidth()/2f, position.y-clickListener.getHeight()/2f);
-        clickListener.setTouchable(Touchable.enabled);
-        clickListener.addListener(new ClickListener(){
-            @Override
-            public void enter (InputEvent event, float x, float y, int pointer, @Null Actor fromActor) {
-                super.enter(event, x, y, pointer, fromActor);
-                gameItself.hudStage.getActors().removeValue(popup, true);
-                gameItself.debugEntries.put(tileName + "_ClickListener", "Pointing at "+tileName+ " at "+position);
-                popup = new ItemInfoPopUp(item,position.x,position.y);
-                Vector3 mousePosition = gameItself.hudStage.getCamera().unproject(new Vector3((float) Gdx.input.getX(), (float) Gdx.input.getY(), 0));
-                popup.setPosition(mousePosition.x, mousePosition.y-popup.getHeight());
-                gameItself.hudStage.addActor(popup);
-            }
-
-            @Override
-            public void exit (InputEvent event, float x, float y, int pointer, @Null Actor toActor) {
-                super.exit(event, x, y, pointer, toActor);
-                gameItself.debugEntries.removeKey(tileName + "_ClickListener");
-                gameItself.hudStage.getActors().removeValue(popup, true);
-            }
-        });
-
-        gameItself.gameStage.addActor(clickListener);
     }
 
     public Body getPhysicalBody() {
@@ -78,8 +53,34 @@ public class Item extends Box2DSprite {
     }
 
     public void setPhysicalBody(Body physicalBody) {
-        this.physicalBody = physicalBody;
-        position = physicalBody.getPosition();
+        if(physicalBody != null) {
+            this.physicalBody = physicalBody;
+            position = physicalBody.getPosition();
+            clickListener = new Table();
+            clickListener.setSize(spriteWidth-0.1f,spiteHeight-0.1f);
+            clickListener.setPosition(position.x-clickListener.getWidth()/2f, position.y-clickListener.getHeight()/2f);
+            clickListener.setTouchable(Touchable.enabled);
+            clickListener.addListener(new ClickListener(){
+                @Override
+                public void enter (InputEvent event, float x, float y, int pointer, @Null Actor fromActor) {
+                    super.enter(event, x, y, pointer, fromActor);
+                    gameItself.hudStage.getActors().removeValue(popup, true);
+                    gameItself.debugEntries.put(tileName + "_ClickListener", "Pointing at "+tileName+ " at "+position);
+                    Vector3 mousePosition = gameItself.hudStage.getCamera().unproject(new Vector3((float) Gdx.input.getX(), (float) Gdx.input.getY(), 0));
+                    popup = new ItemInfoPopUp(item,mousePosition.x,mousePosition.y);
+                    gameItself.hudStage.addActor(popup);
+                }
+
+                @Override
+                public void exit (InputEvent event, float x, float y, int pointer, @Null Actor toActor) {
+                    super.exit(event, x, y, pointer, toActor);
+                    gameItself.debugEntries.removeKey(tileName + "_ClickListener");
+                    gameItself.hudStage.getActors().removeValue(popup, true);
+                }
+            });
+
+            gameItself.gameStage.addActor(clickListener);
+        }
     }
 
     public void clearPhysicalBody(){

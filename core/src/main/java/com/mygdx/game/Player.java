@@ -3,9 +3,10 @@ package com.mygdx.game;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
+import com.kotcrab.vis.ui.util.adapter.ArrayAdapter;
 import org.jetbrains.annotations.Nullable;
 
-class Player {
+public class Player {
     SecondGDXGame game;
     float WIDTH;
     float HEIGHT;
@@ -26,6 +27,7 @@ class Player {
         RIGHT, LEFT, UP, DOWN
     }
     Facing facing = Facing.DOWN;
+    Array<Item> inventoryItems = new Array<>();
 
     Player(SecondGDXGame game){
         this.game = game;
@@ -46,5 +48,14 @@ class Player {
 
         }
         return co;
+    }
+    public void addItemToInventory(Item item){
+        inventoryItems.add(item);
+    }
+    public void removeItemToInventory(Item item){
+        inventoryItems.removeValue(item, true);
+    }
+    public Array<Item> getInventoryItems(){
+        return inventoryItems;
     }
 }

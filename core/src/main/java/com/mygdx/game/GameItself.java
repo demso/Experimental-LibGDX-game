@@ -29,7 +29,9 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
 import com.badlogic.gdx.utils.ObjectIntMap;
+import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.UI.HUD;
 import net.dermetfan.gdx.graphics.g2d.Box2DSprite;
 
@@ -40,7 +42,7 @@ public class GameItself {
         ALL_CF = Short.MAX_VALUE;
     SecondGDXGame game;
     GameScreen gameScreen;
-    Player player;
+    public Player player;
     Skin skin;
     BitmapFont font;
     Batch batch;
@@ -62,10 +64,10 @@ public class GameItself {
     Box2DDebugRenderer debugRendererPh;
     PointLight light;
     TextureRegion textureRegions[][];
-    float zoom = 4 ;
+    float zoom = 1 ;
     float speedd = 5f;
     final String mapToLoad = "worldMap/newmap.tmx";
-    final int tileSide = 32;
+    public static final int tileSide = 32;
     HUD hudStage;
     Stage gameStage;
     Label label;
@@ -82,15 +84,9 @@ public class GameItself {
         debugRenderer = new ShapeRenderer();
         bodies = new Array<>();
         world = new World(new Vector2(0, 0), true);
-        hudStage = new HUD(new ScreenViewport(), game.batch);
+        hudStage = new HUD(this, new ScreenViewport(), game.batch);
         camera = new OrthographicCamera();
         gameStage = new Stage(new ScreenViewport(camera));
-
-        Button b = new Button(SecondGDXGame.skin);
-        b.getMinHeight();
-        b.setSize(1f,1f);
-        b.setPosition(2f,93f);
-        gameStage.addActor(b);
 
         camera.setToOrtho(false, 30, 20);
 
@@ -110,6 +106,8 @@ public class GameItself {
         initTextures();
         initScene2D();
         initPhysics();
+
+        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("10mm_fmj", 1)), null, this));
     }
     void initTextures(){
         textureSheet = new Texture(Gdx.files.internal("ClassicRPG_Sheet.png"));
@@ -151,12 +149,12 @@ public class GameItself {
                     gameStage.setDebugAll(debug);
                 }
                 if (keycode == Input.Keys.EQUALS){
-                    zoom += 0.5f;
-                    camera.setToOrtho(false, Gdx.graphics.getWidth() * (1/16f) * (1/zoom), Gdx.graphics.getHeight() * (1/16f) * (1/zoom));
+                    zoom += 0.3f;
+                    camera.setToOrtho(false, Gdx.graphics.getWidth() * (1f/tileSide) * (1/zoom), Gdx.graphics.getHeight() * (1f/tileSide) * (1/zoom));
                 }
                 if (keycode == Input.Keys.MINUS){
-                    zoom -= 0.5f;
-                    camera.setToOrtho(false, Gdx.graphics.getWidth() * (1/16f) * (1/zoom), Gdx.graphics.getHeight() * (1/16f) * (1/zoom));
+                    zoom -= 0.3f;
+                    camera.setToOrtho(false, Gdx.graphics.getWidth() * (1f/tileSide) * (1/zoom), Gdx.graphics.getHeight() * (1f/tileSide) * (1/zoom));
                 }
                 if (keycode == Input.Keys.R){
                     System.out.println(player.getClosestObject());
@@ -168,6 +166,9 @@ public class GameItself {
                             ((Door) obj).doAction();
                         }
                     }
+                }
+                if (keycode == Input.Keys.I){
+                    hudStage.toggleInventoryHUD();
                 }
                 return true;
             }
