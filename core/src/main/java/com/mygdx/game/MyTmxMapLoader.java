@@ -14,6 +14,8 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
 
+import java.util.function.Consumer;
+
 public class MyTmxMapLoader extends TmxMapLoader {
     GameItself gameItself;
     MyTmxMapLoader(GameItself gameItself){
@@ -38,6 +40,12 @@ public class MyTmxMapLoader extends TmxMapLoader {
 
         MyTiledMap map = loadTiledMap(tmxFile, parameter, new ImageResolver.DirectImageResolver(textures));
         map.setOwnedResources(textures.values().toArray());
+        map.getTileSets().forEach(tiledMapTiles -> tiledMapTiles.forEach(tiledMapTile -> {
+            String tileName = tiledMapTile.getProperties().get("name", String.class);
+            if (tileName != null)
+                gameItself.tilemapa.put(tileName, tiledMapTile.getId());
+        }));
+
         return map;
     }
 
@@ -141,7 +149,45 @@ public class MyTmxMapLoader extends TmxMapLoader {
         return (MyTiledMap) map;
     }
 
+    @Override
+    protected void loadTileLayer (TiledMap map, MapLayers parentLayers, XmlReader.Element element) {
+        if (element.getName().equals("layer")) {
+            int width = element.getIntAttribute("width", 0);
+            int height = element.getIntAttribute("height", 0);
+            int tileWidth = map.getProperties().get("tilewidth", Integer.class);
+            int tileHeight = map.getProperties().get("tileheight", Integer.class);
+            TiledMapTileLayer layer = new TiledMapTileLayer(width, height, tileWidth, tileHeight);
+
+            loadBasicLayerInfo(layer, element);
+
+            int[] ids = getTileIds(element, width, height);
+            TiledMapTileSets tilesets = map.getTileSets();
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int id = ids[y * width + x];
+                    boolean flipHorizontally = ((id & FLAG_FLIP_HORIZONTALLY) != 0);
+                    boolean flipVertically = ((id & FLAG_FLIP_VERTICALLY) != 0);
+                    boolean flipDiagonally = ((id & FLAG_FLIP_DIAGONALLY) != 0);
+
+                    TiledMapTile tile = tilesets.getTile(id & ~MASK_CLEAR);
+                    if (tile != null) {
+                        TiledMapTileLayer.Cell cell = createTileLayerCell(flipHorizontally, flipVertically, flipDiagonally);
+                        cell.setTile(tile);
+                        layer.setCell(x, flipY ? height - 1 - y : y, cell);
+                    }
+                }
+            }
+            XmlReader.Element properties = element.getChildByName("properties");
+            if (properties != null) {
+                loadProperties(layer.getProperties(), properties);
+            }
+            parentLayers.add(layer);
+        }
+    }
+
     void initPhysics(){
+
+
         MyTiledMap mymap = (MyTiledMap) map;
         MapLayers mlayers = mymap.getLayers();
         var obstaclesLayer = (TiledMapTileLayer) mlayers.get("obstacles");

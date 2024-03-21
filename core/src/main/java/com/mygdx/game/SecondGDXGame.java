@@ -24,17 +24,18 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 
 public class SecondGDXGame extends Game {
     Player player = new Player(this);
     SpriteBatch batch;
-    MainMenuScreen menuScreen;
-    GameScreen gameScreen;
-    Skin skin;
-    BitmapFont font;
-    BitmapFont debugFont;
+    static MainMenuScreen menuScreen;
+    static GameScreen gameScreen;
+    public static Skin skin;
+    static BitmapFont font;
+    public static BitmapFont fontRoboto14;
     @Override
     public void create() {
         batch = new SpriteBatch();
@@ -42,10 +43,17 @@ public class SecondGDXGame extends Game {
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 20;
         font = generator.generateFont(parameter);
-        parameter.size = 8;
-        debugFont = generator.generateFont(parameter);
+        generator.dispose();
+
+        generator = new FreeTypeFontGenerator(Gdx.files.internal("Roboto-Regular.ttf"));
+        parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 14;
+        fontRoboto14 = generator.generateFont(parameter);
+
         generator.dispose(); // don't forget to dispose to avoid memory leaks!
         skin = new Skin(Gdx.files.internal("vis/skin/x2/uiskin.json"));
+        skin.add("default14font", fontRoboto14);
+        Button.ButtonStyle bs = skin.get(Button.ButtonStyle.class);
         menuScreen = new MainMenuScreen(this);
         gameScreen = new GameScreen(this);
         this.setScreen(menuScreen);

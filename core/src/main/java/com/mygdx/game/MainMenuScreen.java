@@ -51,7 +51,10 @@ class MainMenuScreen implements Screen {
                     game.setScreen(game.gameScreen);
                     return true;
                 }
-                return false;
+                if (keycode == Input.Keys.B){
+                    stage.setDebugAll(!stage.isDebugAll());
+                }
+                return true;
             }
         });
         settingsButton = new TextButton("Settings", skin);
@@ -60,7 +63,6 @@ class MainMenuScreen implements Screen {
         buttonsGroup.addActor(settingsButton);
         buttonsGroup.setPosition(230,stage.getHeight()-200);
         stage.addActor(buttonsGroup);
-        stage.setDebugAll(true);
     }
 
     @Override

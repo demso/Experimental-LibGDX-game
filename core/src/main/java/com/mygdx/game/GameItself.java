@@ -22,18 +22,22 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ArrayMap;
+import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.game.UI.HUD;
+import net.dermetfan.gdx.graphics.g2d.Box2DSprite;
 
 public class GameItself {
     final static short PLAYER_CF= 0x0008,
         PLAYER_INTERACT_CF =   0x0002,
         LIGHT_CF =             0x4000,
         ALL_CF = Short.MAX_VALUE;
-
     SecondGDXGame game;
     GameScreen gameScreen;
     Player player;
@@ -57,27 +61,119 @@ public class GameItself {
     float accumulator = 0;
     Box2DDebugRenderer debugRendererPh;
     PointLight light;
-
     TextureRegion textureRegions[][];
     float zoom = 4 ;
     float speedd = 5f;
-    final String mapToLoad = "newmap.tmx";
+    final String mapToLoad = "worldMap/newmap.tmx";
     final int tileSide = 32;
-
-    Stage stage;
+    HUD hudStage;
+    Stage gameStage;
     Label label;
+    ObjectIntMap<String> tilemapa;
+    ArrayMap<String, String> debugEntries = new ArrayMap<>();
 
     GameItself(GameScreen gameScreen){
         this.game = gameScreen.game;
         this.gameScreen = gameScreen;
+        this.player = game.player;
+        this.font = game.font;
+        this.skin = game.skin;
 
-        font = game.font;
-        skin = game.skin;
-        stage = new Stage(new ScreenViewport(), game.batch);
         debugRenderer = new ShapeRenderer();
-        Box2D.init();
         bodies = new Array<>();
         world = new World(new Vector2(0, 0), true);
+        hudStage = new HUD(new ScreenViewport(), game.batch);
+        camera = new OrthographicCamera();
+        gameStage = new Stage(new ScreenViewport(camera));
+
+        Button b = new Button(SecondGDXGame.skin);
+        b.getMinHeight();
+        b.setSize(1f,1f);
+        b.setPosition(2f,93f);
+        gameStage.addActor(b);
+
+        camera.setToOrtho(false, 30, 20);
+
+        tilemapa = new ObjectIntMap<>();
+        map = new MyTmxMapLoader(this).load(mapToLoad);
+
+        renderer = new OrthogonalTiledMapRenderer(map, 1f / tileSide);
+        batch = renderer.getBatch();
+        debugRendererPh = new Box2DDebugRenderer();
+
+        renderer.setView(camera);
+
+        game.player.WIDTH = 0.8f;
+        game.player.HEIGHT = 0.8f;
+        player.position.set(5,95);
+
+        initTextures();
+        initScene2D();
+        initPhysics();
+    }
+    void initTextures(){
+        textureSheet = new Texture(Gdx.files.internal("ClassicRPG_Sheet.png"));
+        textureRegions= TextureRegion.split(textureSheet, 16, 16);
+        userSelection = new Texture(Gdx.files.internal("selection.png"));
+
+        TextureRegion[] walkFrames = new TextureRegion[4];
+        int index = 0;
+        for (int i = 0; i < 4; i++)
+            walkFrames[index++] = textureRegions[0][i];
+        walkDown = new Animation<TextureRegion>(frameDur, walkFrames);
+
+        walkFrames = new TextureRegion[4];
+        index = 0;
+        for (int i = 0; i < 4; i++)
+            walkFrames[index++] = textureRegions[1][i];
+        walkSide = new Animation<TextureRegion>(frameDur, walkFrames);
+
+        walkFrames = new TextureRegion[4];
+        index = 0;
+        for (int i = 0; i < 4; i++)
+            walkFrames[index++] = textureRegions[3][i];
+        walkUp = new Animation<TextureRegion>(frameDur, walkFrames);
+    }
+    void initScene2D(){
+        label = new Label("", skin);
+        label.setFontScale(0.5f);
+        label.setWidth(350);
+        label.setAlignment(Align.topLeft);
+        hudStage.addActor(label);
+        hudStage.addListener(new InputListener(){
+            @Override
+            public boolean keyUp (InputEvent event, int keycode) {
+                if (keycode == Input.Keys.ESCAPE)
+                    game.setScreen(game.menuScreen);
+                if (keycode == Input.Keys.B){
+                    debug = !debug;
+                    hudStage.setDebugAll(debug);
+                    gameStage.setDebugAll(debug);
+                }
+                if (keycode == Input.Keys.EQUALS){
+                    zoom += 0.5f;
+                    camera.setToOrtho(false, Gdx.graphics.getWidth() * (1/16f) * (1/zoom), Gdx.graphics.getHeight() * (1/16f) * (1/zoom));
+                }
+                if (keycode == Input.Keys.MINUS){
+                    zoom -= 0.5f;
+                    camera.setToOrtho(false, Gdx.graphics.getWidth() * (1/16f) * (1/zoom), Gdx.graphics.getHeight() * (1/16f) * (1/zoom));
+                }
+                if (keycode == Input.Keys.R){
+                    System.out.println(player.getClosestObject());
+                }
+                if (keycode == Input.Keys.E){
+                    if (player.closestObject != null) {
+                        var obj = player.closestObject.getUserData();
+                        if (player.closestObject.getUserData() instanceof Door) {
+                            ((Door) obj).doAction();
+                        }
+                    }
+                }
+                return true;
+            }
+        });
+    }
+    void initPhysics(){
         world.getBodies(bodies);
         world.setContactListener(new ContactListener() {
             static int ll = 0;
@@ -119,151 +215,23 @@ public class GameItself {
             }
         });
 
-        map = new MyTmxMapLoader(this).load(mapToLoad);
-
-        renderer = new OrthogonalTiledMapRenderer(map, 1f / tileSide);
-        batch = renderer.getBatch();
-        debugRendererPh = new Box2DDebugRenderer();
-        camera = new OrthographicCamera();
-        player = game.player;
-
-        camera.setToOrtho(false, 30, 20);
-        camera.update();
-        renderer.setView(camera);
-
-        game.player.WIDTH = 0.8f;
-        game.player.HEIGHT = 0.8f;
-        player.position.set(5,95);
-
-        initTextures();
-        initPhysics();
-
-        label = new Label("", skin);
-        label.setFontScale(0.5f);
-        label.setWidth(350);
-        label.setAlignment(Align.topLeft);
-        stage.addActor(label);
-        stage.addListener(new InputListener(){
-            @Override
-            public boolean keyUp (InputEvent event, int keycode) {
-                if (keycode == Input.Keys.ESCAPE)
-                    game.setScreen(game.menuScreen);
-                if (keycode == Input.Keys.B)
-                    stage.setDebugAll(!stage.isDebugAll());
-                if (keycode == Input.Keys.EQUALS){
-                    zoom += 0.5f;
-                    camera.setToOrtho(false, Gdx.graphics.getWidth() * (1/16f) * (1/zoom), Gdx.graphics.getHeight() * (1/16f) * (1/zoom));
-                }
-                if (keycode == Input.Keys.MINUS){
-                    zoom -= 0.5f;
-                    camera.setToOrtho(false, Gdx.graphics.getWidth() * (1/16f) * (1/zoom), Gdx.graphics.getHeight() * (1/16f) * (1/zoom));
-                }
-                if (keycode == Input.Keys.R){
-                    System.out.println(player.getClosestObject());
-                }
-                if (keycode == Input.Keys.E){
-                    if (player.closestObject != null) {
-                        var obj = player.closestObject.getUserData();
-                        if (player.closestObject.getUserData() instanceof Door) {
-                            ((Door) obj).doAction();
-                        }
-                    }
-                }
-                return true;
-            }
-        });
-    }
-    void render(float deltaTime){
-        Gdx.gl.glClearColor(0,0,0,1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        update(deltaTime);
-
-        camera.position.x = player.position.x;
-        camera.position.y = player.position.y;
-
-        camera.update();
-
-        renderer.setView(camera);
-        renderer.render();
-
-        renderPlayer();
-
-        rayHandler.setCombinedMatrix(camera);
-        rayHandler.updateAndRender();
-
-        if (player.closestObject != null) {
-            batch.begin();
-            batch.draw(userSelection, (int)player.closestObject.getPosition().x, (int)player.closestObject.getPosition().y,1,1);
-            batch.end();
-        }
-
-        stage.act(deltaTime);
-        stage.draw();
-
-        if (debug) {
-            stage.getBatch().begin();
-            font.draw(stage.getBatch(), "FPS=" + Gdx.graphics.getFramesPerSecond(), 0, stage.getCamera().viewportHeight - 2);
-            stage.getBatch().end();
-            //renderDebug();
-            debugRendererPh.render(world, camera.combined);
-        }
-    }
-    void initTextures() {
-        textureSheet = new Texture(Gdx.files.internal("ClassicRPG_Sheet.png"));
-        textureRegions= TextureRegion.split(textureSheet, 16, 16);
-        userSelection = new Texture(Gdx.files.internal("selection.png"));
-
-        TextureRegion[] walkFrames = new TextureRegion[4];
-        int index = 0;
-        for (int i = 0; i < 4; i++)
-            walkFrames[index++] = textureRegions[0][i];
-        walkDown = new Animation<TextureRegion>(frameDur, walkFrames);
-
-        walkFrames = new TextureRegion[4];
-        index = 0;
-        for (int i = 0; i < 4; i++)
-            walkFrames[index++] = textureRegions[1][i];
-        walkSide = new Animation<TextureRegion>(frameDur, walkFrames);
-
-        walkFrames = new TextureRegion[4];
-        index = 0;
-        for (int i = 0; i < 4; i++)
-            walkFrames[index++] = textureRegions[3][i];
-        walkUp = new Animation<TextureRegion>(frameDur, walkFrames);
-    }
-    void renderPlayer(){
-        //player
-        TextureRegion frame = null;
-        switch (player.state) {
-            case Standing:
-                frame = walkDown.getKeyFrame(1);
-                break;
-            case Walking:
-                switch (player.facing) {
-                    case RIGHT:
-                    case LEFT:
-                        frame = walkSide.getKeyFrame(player.stateTime, true);
-                        break;
-                    case UP:
-                        frame = walkUp.getKeyFrame(player.stateTime, true);
-                        break;
-                    case DOWN:
-                        frame = walkDown.getKeyFrame(player.stateTime, true);
-                        break;
-                }
-                break;
-        }
-        Batch batch = renderer.getBatch();
-        batch.begin();
-        if (player.facing == Player.Facing.RIGHT)
-            batch.draw(frame, player.position.x - player.WIDTH/2 + player.WIDTH, player.position.y - player.WIDTH * 1/4, -player.WIDTH, player.HEIGHT);
-        else
-            batch.draw(frame, player.position.x - player.WIDTH/2, player.position.y - player.WIDTH * 1/4, player.WIDTH, player.HEIGHT);
-        batch.end();
-    }
-    public void initPhysics(){
         //world
+        BodyDef transparentBodyDef = new BodyDef();
+        CircleShape transparentBox = new CircleShape();
+        FixtureDef transparentFixtureDef = new FixtureDef();
+        transparentBox.setRadius(0.2f);
+        transparentFixtureDef.shape = transparentBox;
+        transparentFixtureDef.filter.groupIndex = -10;
+
+        transparentBodyDef.position.set(new Vector2(3.6f, 95.6f));
+        Body bb = world.createBody(transparentBodyDef);
+        bb.createFixture(transparentFixtureDef);
+        Filter filtr = bb.getFixtureList().get(0).getFilterData();
+        filtr.maskBits = 0x0002;
+        bb.getFixtureList().get(0).refilter();
+        bb.setUserData(new Item(map.getTileSets().getTile(tilemapa.get("10mm_fmj", 1)), bb, this));
+
+        //player
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(new Vector2(5, 95));
@@ -319,8 +287,9 @@ public class GameItself {
         f.groupIndex = -10;
         light.setContactFilter(f);
     }
+
     private void update(float deltaTime) {
-        //physicsStep
+        //UPDATE PHYSICSSTEP
         float frameTime = Math.min(deltaTime, 0.25f);
         accumulator += frameTime;
         while (accumulator >= 1/60f) {
@@ -328,20 +297,16 @@ public class GameItself {
             accumulator -= 1/60f;
         }
 
-        //player
+        //UPDATE PLAYER
         if (deltaTime == 0) return;
         if (deltaTime > 0.1f) deltaTime = 0.1f;
         player.stateTime += deltaTime;
-        //player.body.setLinearVelocity(player.body.getLinearVelocity().add());
         player.body.setLinearVelocity(0,0);
-        Vector2 vel = player.body.getLinearVelocity();
-        Vector2 pos = player.body.getPosition();
 
         boolean moveToTheRight = Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D);
         boolean moveToTheLeft = Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A);
         boolean moveUp = Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W);
         boolean moveDown = Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S);
-
         if (!(moveToTheRight && moveToTheLeft)) {
             if (moveToTheLeft) {
                 //player.body.applyLinearImpulse(-speedd, 0, pos.x, pos.y, true);
@@ -357,7 +322,6 @@ public class GameItself {
                 player.facing = Player.Facing.RIGHT;
             }
         }
-
         if (!(moveUp && moveDown)){
             if (moveUp) {
                 //player.body.applyLinearImpulse(0, speedd, pos.x, pos.y, true);
@@ -373,8 +337,8 @@ public class GameItself {
                 player.facing = Player.Facing.DOWN;
             }
         }
+
         player.body.setLinearVelocity(player.body.getLinearVelocity().clamp(0,speedd));
-        if (Gdx.input.isKeyJustPressed(Input.Keys.B)) debug = !debug;
         if (Math.abs(player.body.getLinearVelocity().len2()) < 0.5f) {
             player.state = Player.State.Standing;
         }
@@ -386,7 +350,7 @@ public class GameItself {
 
         player.closestObject = player.getClosestObject();
 
-        //stage
+        //UPDATE STAGE
         float height = Gdx.graphics.getHeight();
         float width = Gdx.graphics.getWidth();
         label.setPosition(100, height - 100);
@@ -394,7 +358,82 @@ public class GameItself {
             drawTileDebugInfo();
         else
             label.setText("");
-            }
+    }
+
+    void render(float deltaTime){
+        Gdx.gl.glClearColor(0,0,0,1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        update(deltaTime);
+
+        camera.position.x = player.position.x;
+        camera.position.y = player.position.y;
+
+        camera.update();
+
+        renderer.setView(camera);
+        renderer.render();
+
+        gameStage.act(deltaTime);
+        gameStage.draw();
+
+        batch.begin();
+        Box2DSprite.draw(batch, world, true);
+        batch.end();
+
+        renderPlayer();
+
+        rayHandler.setCombinedMatrix(camera);
+        rayHandler.updateAndRender();
+
+        if (player.closestObject != null) {
+            batch.begin();
+            batch.draw(userSelection, (int)player.closestObject.getPosition().x, (int)player.closestObject.getPosition().y,1,1);
+            batch.end();
+        }
+
+        hudStage.act(deltaTime);
+        hudStage.draw();
+
+        if (debug) {
+//            stage.getBatch().begin();
+//            font.draw(stage.getBatch(), "FPS=" + Gdx.graphics.getFramesPerSecond(), 0, stage.getCamera().viewportHeight - 2);
+//            stage.getBatch().end();
+            //renderDebug();
+            debugRendererPh.render(world, camera.combined);
+        }
+    }
+    void renderPlayer(){
+        //player
+        TextureRegion frame = null;
+        switch (player.state) {
+            case Standing:
+                frame = walkDown.getKeyFrame(1);
+                break;
+            case Walking:
+                switch (player.facing) {
+                    case RIGHT:
+                    case LEFT:
+                        frame = walkSide.getKeyFrame(player.stateTime, true);
+                        break;
+                    case UP:
+                        frame = walkUp.getKeyFrame(player.stateTime, true);
+                        break;
+                    case DOWN:
+                        frame = walkDown.getKeyFrame(player.stateTime, true);
+                        break;
+                }
+                break;
+        }
+        Batch batch = renderer.getBatch();
+        batch.begin();
+        if (player.facing == Player.Facing.RIGHT)
+            batch.draw(frame, player.position.x - player.WIDTH/2 + player.WIDTH, player.position.y - player.WIDTH * 1/4, -player.WIDTH, player.HEIGHT);
+        else
+            batch.draw(frame, player.position.x - player.WIDTH/2, player.position.y - player.WIDTH * 1/4, player.WIDTH, player.HEIGHT);
+        batch.end();
+    }
+
     Body clObj;
     StringBuilder labelText = new StringBuilder();
     private void drawTileDebugInfo() {
@@ -402,6 +441,8 @@ public class GameItself {
         labelText.append("Player velocity : ").append(player.body.getLinearVelocity()).append("\n");
         clObj = player.closestObject;
         labelText.append("Closest object : ").append(clObj == null ? null : clObj.getUserData() instanceof BodyUserData ? ((BodyUserData) clObj.getUserData()).bodyName + " " + clObj.getPosition() : clObj.getUserData()).append("\n\n");
+        if (debugEntries.size > 0)
+            debugEntries.values().forEach((kall) -> labelText.append(kall).append("\n\n"));
         Vector3 mouse_position = new Vector3(0,0,0);
         Vector3 tilePosition = camera.unproject(mouse_position.set((float) Gdx.input.getX(), (float) Gdx.input.getY(), 0));
         int tileX = (int)Math.floor(tilePosition.x);
@@ -422,21 +463,5 @@ public class GameItself {
         }
         label.setText(labelText);
     }
-    private void renderDebug () {
-        debugRenderer.setProjectionMatrix(camera.combined);
-        debugRenderer.begin(ShapeRenderer.ShapeType.Line);
-        debugRenderer.setColor(Color.RED);
-        debugRenderer.rect(player.position.x - player.WIDTH/2, player.position.y - player.HEIGHT/2, player.WIDTH, player.HEIGHT);
-        debugRenderer.setColor(Color.YELLOW);
-        TiledMapTileLayer layer = (TiledMapTileLayer)map.getLayers().get("layer1");
-        for (int y = 0; y <= layer.getHeight(); y++) {
-            for (int x = 0; x <= layer.getWidth(); x++) {
-                TiledMapTileLayer.Cell cell = layer.getCell(x, y);
-                if (cell != null) {
-                    if (camera.frustum.boundsInFrustum(x + 0.5f, y + 0.5f, 0, 1, 1, 0)) debugRenderer.rect(x, y, 1, 1);
-                }
-            }
-        }
-        debugRenderer.end();
-    }
 }
+
