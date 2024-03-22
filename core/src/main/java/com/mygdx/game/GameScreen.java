@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class GameScreen implements Screen {
     static GameItself gameItself;
-    SecondGDXGame game;
+    public SecondGDXGame game;
     Stage stage;
     GameScreen(@NotNull SecondGDXGame game){
         this.game = game;

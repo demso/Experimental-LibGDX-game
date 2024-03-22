@@ -14,22 +14,21 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ArrayMap;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.UI.HUD;
+import com.mygdx.game.tiledmap.BodyUserData;
+import com.mygdx.game.tiledmap.Door;
+import com.mygdx.game.tiledmap.MyTmxMapLoader;
 import net.dermetfan.gdx.graphics.g2d.Box2DSprite;
 
 public class GameItself {
@@ -40,12 +39,12 @@ public class GameItself {
     public SecondGDXGame game;
     public GameScreen gameScreen;
     public Player player;
-    Skin skin;
+    public Skin skin;
     BitmapFont font;
     Batch batch;
-    TiledMap map;
+    public TiledMap map;
     OrthogonalTiledMapRenderer renderer;
-    OrthographicCamera camera;
+    public OrthographicCamera camera;
     boolean debug = false;
     Texture textureSheet;
     Texture userSelection;
@@ -55,7 +54,7 @@ public class GameItself {
     float frameDur = 0.1f;
     ShapeRenderer debugRenderer;
     RayHandler rayHandler;
-    World world;
+    public World world;
     Array<Body> bodies;
     float accumulator = 0;
     Box2DDebugRenderer debugRendererPh;
@@ -68,8 +67,7 @@ public class GameItself {
     HUD hudStage;
     public Stage gameStage;
     Label label;
-    ObjectIntMap<String> tilemapa;
-    ArrayMap<String, String> debugEntries = new ArrayMap<>();
+    public ObjectIntMap<String> tilemapa;
 
     GameItself(GameScreen gameScreen){
         this.game = gameScreen.game;
@@ -133,13 +131,7 @@ public class GameItself {
         walkUp = new Animation<TextureRegion>(frameDur, walkFrames);
     }
     void initScene2D(){
-        label = new Label("", skin);
-        label.setFontScale(0.5f);
-        label.setWidth(350);
-        label.setAlignment(Align.topLeft);
-        hudStage.addActor(label);
         hudStage.addListener(new HUDInputListener());
-
     }
     void initPhysics(){
         world.getBodies(bodies);
@@ -303,13 +295,7 @@ public class GameItself {
         player.closestObject = player.getClosestObject();
 
         //UPDATE STAGE
-        float height = Gdx.graphics.getHeight();
-        float width = Gdx.graphics.getWidth();
-        label.setPosition(100, height - 100);
-        if(debug)
-            drawTileDebugInfo();
-        else
-            label.setText("");
+        hudStage.update(debug);
     }
 
     void render(float deltaTime){
@@ -386,46 +372,15 @@ public class GameItself {
         batch.end();
     }
 
-    Body clObj;
-    StringBuilder labelText = new StringBuilder();
-    private void drawTileDebugInfo() {
-        labelText = new StringBuilder();
-        labelText.append("Player velocity : ").append(player.body.getLinearVelocity()).append("\n");
-        clObj = player.closestObject;
-        labelText.append("Closest object : ").append(clObj == null ? null : clObj.getUserData() instanceof BodyUserData ? ((BodyUserData) clObj.getUserData()).bodyName + " " + clObj.getPosition() : clObj.getUserData()).append("\n\n");
-        if (debugEntries.size > 0)
-            debugEntries.values().forEach((kall) -> labelText.append(kall).append("\n\n"));
-        Vector3 mouse_position = new Vector3(0,0,0);
-        Vector3 tilePosition = camera.unproject(mouse_position.set((float) Gdx.input.getX(), (float) Gdx.input.getY(), 0));
-        int tileX = (int)Math.floor(tilePosition.x);
-        int tileY = (int)Math.floor(tilePosition.y);
-        for (var x = 0; x < map.getLayers().size(); x++){
-            TiledMapTileLayer currentLayer = (TiledMapTileLayer)map.getLayers().get(x);
-            TiledMapTileLayer.Cell mcell = currentLayer.getCell(tileX, tileY);
-
-            if(mcell != null){
-                labelText.append("Rotation : ").append(mcell.getRotation()).append("\nFlip Horizontally : ").append(mcell.getFlipHorizontally()).append("\nFlip Vertically : ").append(mcell.getFlipVertically()).append("\nLayer : ").append(currentLayer.getName()).append("\nX : ").append(tileX).append("\n").append("Y : ").append(tileY).append("\n").append("ID : ").append(mcell.getTile().getId()).append("\n");
-                var itrK = mcell.getTile().getProperties().getKeys();
-                var itrV = mcell.getTile().getProperties().getValues();
-                while (itrK.hasNext()){
-                    labelText.append(itrK.next()).append(" : ").append(itrV.next()).append("\n");
-                }
-            }
-            labelText.append("\n");
-        }
-        label.setText(labelText);
-    }
-
     class HUDInputListener extends InputListener {
-
         @Override
         public boolean keyUp (InputEvent event, int keycode) {
             if (keycode == Input.Keys.ESCAPE)
                 if (hudStage.esClosablePopups.notEmpty()){
                     hudStage.closeInventoryHUD();
 
-                } else
-                    game.setScreen(game.menuScreen);
+                }
+                else game.setScreen(game.menuScreen);
             if (keycode == Input.Keys.B){
                 debug = !debug;
                 hudStage.setDebugAll(debug);

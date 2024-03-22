@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.tiledmap;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,12 +13,11 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
-
-import java.util.function.Consumer;
+import com.mygdx.game.GameItself;
 
 public class MyTmxMapLoader extends TmxMapLoader {
     GameItself gameItself;
-    MyTmxMapLoader(GameItself gameItself){
+    public MyTmxMapLoader(GameItself gameItself){
         super();
         this.gameItself = gameItself;
     }

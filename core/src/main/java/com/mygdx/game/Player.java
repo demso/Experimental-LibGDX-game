@@ -12,10 +12,10 @@ public class Player {
     float HEIGHT;
     float MAX_VELOCITY = 10f;
     float DAMPING = 0.87f;
-    Body body;
+    public Body body;
     Body sensorBody;
     Array<Body> closeObjects;
-    Body closestObject;
+    public Body closestObject;
     enum State {
         Standing, Walking
     }

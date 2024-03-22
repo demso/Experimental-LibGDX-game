@@ -1,14 +1,15 @@
-package com.mygdx.game;
+package com.mygdx.game.tiledmap;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.GameItself;
 
 public class MyTiledMap extends TiledMap {
     World world;
     Array<Body> staticObjects = new Array<>();
-    
+
     MyTiledMap(GameItself gameItself){
         super();
         this.world = gameItself.world;

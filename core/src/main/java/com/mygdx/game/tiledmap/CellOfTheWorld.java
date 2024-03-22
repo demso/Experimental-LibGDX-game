@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.tiledmap;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.physics.box2d.Body;

@@ -92,7 +92,7 @@ public class Item extends Box2DSprite {
                 public void enter (InputEvent event, float x, float y, int pointer, @Null Actor fromActor) {
                     super.enter(event, x, y, pointer, fromActor);
                   //  gameItself.hudStage.getActors().removeValue(popup, true);
-                    gameItself.debugEntries.put(tileName + "_ClickListener", "Pointing at "+tileName+ " at "+position);
+                    gameItself.hudStage.debugEntries.put(tileName + "_ClickListener", "Pointing at "+tileName+ " at "+position);
                     gameItself.hudStage.showItemInfoWindow(item);
 //                    Vector3 mousePosition = gameItself.hudStage.getCamera().unproject(new Vector3((float) Gdx.input.getX(), (float) Gdx.input.getY(), 0));
 //                    popup = new ItemInfoPopUp(item,mousePosition.x,mousePosition.y);
@@ -102,7 +102,7 @@ public class Item extends Box2DSprite {
                 @Override
                 public void exit (InputEvent event, float x, float y, int pointer, @Null Actor toActor) {
                     super.exit(event, x, y, pointer, toActor);
-                    gameItself.debugEntries.removeKey(tileName + "_ClickListener");
+                    gameItself.hudStage.debugEntries.removeKey(tileName + "_ClickListener");
                     gameItself.hudStage.hideItemInfoWindow(item);
                    // gameItself.hudStage.getActors().removeValue(popup, true);
                 }
