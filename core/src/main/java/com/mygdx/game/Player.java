@@ -49,6 +49,10 @@ public class Player {
         }
         return co;
     }
+    public void pickupItem(Item item){
+        item.pickup();
+        addItemToInventory(item);
+    }
     public void addItemToInventory(Item item){
         inventoryItems.add(item);
     }

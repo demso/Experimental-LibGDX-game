@@ -6,4 +6,24 @@
    <property name="name" value="10mm_fmj"/>
   </properties>
  </tile>
+ <tile id="5">
+  <properties>
+   <property name="name" value="coolrocket"/>
+  </properties>
+ </tile>
+ <tile id="9">
+  <properties>
+   <property name="name" value="shotgunammo"/>
+  </properties>
+ </tile>
+ <tile id="1610">
+  <properties>
+   <property name="name" value="watches"/>
+  </properties>
+ </tile>
+ <tile id="2860">
+  <properties>
+   <property name="name" value="beef"/>
+  </properties>
+ </tile>
 </tileset>

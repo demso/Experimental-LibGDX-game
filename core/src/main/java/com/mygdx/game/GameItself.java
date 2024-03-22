@@ -22,16 +22,13 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
 import com.badlogic.gdx.utils.ObjectIntMap;
-import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.UI.HUD;
 import net.dermetfan.gdx.graphics.g2d.Box2DSprite;
 
@@ -40,8 +37,8 @@ public class GameItself {
         PLAYER_INTERACT_CF =   0x0002,
         LIGHT_CF =             0x4000,
         ALL_CF = Short.MAX_VALUE;
-    SecondGDXGame game;
-    GameScreen gameScreen;
+    public SecondGDXGame game;
+    public GameScreen gameScreen;
     public Player player;
     Skin skin;
     BitmapFont font;
@@ -64,12 +61,12 @@ public class GameItself {
     Box2DDebugRenderer debugRendererPh;
     PointLight light;
     TextureRegion textureRegions[][];
-    float zoom = 1 ;
+    float zoom = 2 ;
     float speedd = 5f;
     final String mapToLoad = "worldMap/newmap.tmx";
     public static final int tileSide = 32;
     HUD hudStage;
-    Stage gameStage;
+    public Stage gameStage;
     Label label;
     ObjectIntMap<String> tilemapa;
     ArrayMap<String, String> debugEntries = new ArrayMap<>();
@@ -107,7 +104,10 @@ public class GameItself {
         initScene2D();
         initPhysics();
 
-        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("10mm_fmj", 1)), null, this));
+        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("10mm_fmj", 1)), this, "10mm FMJ bullets"));
+        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("beef", 1)), this, "Beef"));
+        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("watches", 1)), this, "Watches"));
+        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("shotgunammo", 1)), this, "Shotgun ammo"));
     }
     void initTextures(){
         textureSheet = new Texture(Gdx.files.internal("ClassicRPG_Sheet.png"));
@@ -138,41 +138,8 @@ public class GameItself {
         label.setWidth(350);
         label.setAlignment(Align.topLeft);
         hudStage.addActor(label);
-        hudStage.addListener(new InputListener(){
-            @Override
-            public boolean keyUp (InputEvent event, int keycode) {
-                if (keycode == Input.Keys.ESCAPE)
-                    game.setScreen(game.menuScreen);
-                if (keycode == Input.Keys.B){
-                    debug = !debug;
-                    hudStage.setDebugAll(debug);
-                    gameStage.setDebugAll(debug);
-                }
-                if (keycode == Input.Keys.EQUALS){
-                    zoom += 0.3f;
-                    camera.setToOrtho(false, Gdx.graphics.getWidth() * (1f/tileSide) * (1/zoom), Gdx.graphics.getHeight() * (1f/tileSide) * (1/zoom));
-                }
-                if (keycode == Input.Keys.MINUS){
-                    zoom -= 0.3f;
-                    camera.setToOrtho(false, Gdx.graphics.getWidth() * (1f/tileSide) * (1/zoom), Gdx.graphics.getHeight() * (1f/tileSide) * (1/zoom));
-                }
-                if (keycode == Input.Keys.R){
-                    System.out.println(player.getClosestObject());
-                }
-                if (keycode == Input.Keys.E){
-                    if (player.closestObject != null) {
-                        var obj = player.closestObject.getUserData();
-                        if (player.closestObject.getUserData() instanceof Door) {
-                            ((Door) obj).doAction();
-                        }
-                    }
-                }
-                if (keycode == Input.Keys.I){
-                    hudStage.toggleInventoryHUD();
-                }
-                return true;
-            }
-        });
+        hudStage.addListener(new HUDInputListener());
+
     }
     void initPhysics(){
         world.getBodies(bodies);
@@ -217,20 +184,8 @@ public class GameItself {
         });
 
         //world
-        BodyDef transparentBodyDef = new BodyDef();
-        CircleShape transparentBox = new CircleShape();
-        FixtureDef transparentFixtureDef = new FixtureDef();
-        transparentBox.setRadius(0.2f);
-        transparentFixtureDef.shape = transparentBox;
-        transparentFixtureDef.filter.groupIndex = -10;
-
-        transparentBodyDef.position.set(new Vector2(3.6f, 95.6f));
-        Body bb = world.createBody(transparentBodyDef);
-        bb.createFixture(transparentFixtureDef);
-        Filter filtr = bb.getFixtureList().get(0).getFilterData();
-        filtr.maskBits = 0x0002;
-        bb.getFixtureList().get(0).refilter();
-        bb.setUserData(new Item(map.getTileSets().getTile(tilemapa.get("10mm_fmj", 1)), bb, this));
+        Item it = new Item(map.getTileSets().getTile(tilemapa.get("10mm_fmj", 1)), this, "10mm FMJ bullets");
+        it.allocate(world, new Vector2(3.5f,96.5f));
 
         //player
         BodyDef bodyDef = new BodyDef();
@@ -310,14 +265,12 @@ public class GameItself {
         boolean moveDown = Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S);
         if (!(moveToTheRight && moveToTheLeft)) {
             if (moveToTheLeft) {
-                //player.body.applyLinearImpulse(-speedd, 0, pos.x, pos.y, true);
                 player.body.setLinearVelocity(-100f, player.body.getLinearVelocity().y);
                 player.state = Player.State.Walking;
                 player.facing = Player.Facing.LEFT;
             }
 
             if (moveToTheRight) {
-                //player.body.applyLinearImpulse(speedd, 0, pos.x, pos.y, true);
                 player.body.setLinearVelocity(100f, player.body.getLinearVelocity().y);
                 player.state = Player.State.Walking;
                 player.facing = Player.Facing.RIGHT;
@@ -325,14 +278,12 @@ public class GameItself {
         }
         if (!(moveUp && moveDown)){
             if (moveUp) {
-                //player.body.applyLinearImpulse(0, speedd, pos.x, pos.y, true);
                 player.body.setLinearVelocity(player.body.getLinearVelocity().x, 100f);
                 player.state = Player.State.Walking;
                 player.facing = Player.Facing.UP;
             }
 
             if (moveDown) {
-                //player.body.applyLinearImpulse(0, -speedd, pos.x, pos.y, true);
                 player.body.setLinearVelocity(player.body.getLinearVelocity().x, -100f);
                 player.state = Player.State.Walking;
                 player.facing = Player.Facing.DOWN;
@@ -464,5 +415,52 @@ public class GameItself {
         }
         label.setText(labelText);
     }
+
+    class HUDInputListener extends InputListener {
+
+        @Override
+        public boolean keyUp (InputEvent event, int keycode) {
+            if (keycode == Input.Keys.ESCAPE)
+                if (hudStage.esClosablePopups.notEmpty()){
+                    hudStage.closeInventoryHUD();
+
+                } else
+                    game.setScreen(game.menuScreen);
+            if (keycode == Input.Keys.B){
+                debug = !debug;
+                hudStage.setDebugAll(debug);
+                gameStage.setDebugAll(debug);
+            }
+            if (keycode == Input.Keys.EQUALS){
+                zoom += 0.3f;
+                camera.setToOrtho(false, Gdx.graphics.getWidth() * (1f/tileSide) * (1/zoom), Gdx.graphics.getHeight() * (1f/tileSide) * (1/zoom));
+            }
+            if (keycode == Input.Keys.MINUS){
+                zoom -= 0.3f;
+                camera.setToOrtho(false, Gdx.graphics.getWidth() * (1f/tileSide) * (1/zoom), Gdx.graphics.getHeight() * (1f/tileSide) * (1/zoom));
+            }
+            if (keycode == Input.Keys.R){
+                System.out.println(player.getClosestObject());
+            }
+            if (keycode == Input.Keys.E){
+                if (player.closestObject != null) {
+                    var obj = player.closestObject.getUserData();
+                    if (obj instanceof Door) {
+                        ((Door) obj).doAction();
+                    }
+                    if (obj instanceof Item){
+                        player.pickupItem((Item) obj);
+                        hudStage.updateInvHUD();
+                    }
+                }
+            }
+            if (keycode == Input.Keys.I){
+                hudStage.toggleInventoryHUD();
+            }
+            return true;
+        }
+    }
 }
+
+
 
