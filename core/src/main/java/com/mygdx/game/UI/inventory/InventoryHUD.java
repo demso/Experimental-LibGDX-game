@@ -43,6 +43,8 @@ public class InventoryHUD extends Table {
     public void showItemContextMenu(ItemEntry itemEntry){
         Vector3 mousePosition = hud.getCamera().unproject(new Vector3((float) Gdx.input.getX(), (float) Gdx.input.getY(), 0));
         ContextMenu contextMenu = new ContextMenu(hud,this, itemEntry, mousePosition.x, mousePosition.y);
+
+        invPopups.add(contextMenu);
         hud.esClosablePopups.add(contextMenu);
         hud.addActor(contextMenu);
     }
@@ -68,17 +70,18 @@ public class InventoryHUD extends Table {
     }
 
     public void closeItemContextMenu(ContextMenu contextMenu){
+        invPopups.removeValue(contextMenu, true);
         hud.getActors().removeValue(contextMenu, true);
         if (contextMenu.hideListener != null)
             hud.removeCaptureListener(contextMenu.hideListener);
         hud.esClosablePopups.removeValue(contextMenu, true);
     }
 
-    @Override
-    public void setPosition(float x, float y) {
-        for (Actor invPopup : invPopups){
-            invPopup.setPosition(x-this.getX(), y-this.getY());
-        }
-        super.setPosition(x, y);
-    }
+//    @Override
+//    public void setPosition(float x, float y) {
+//        for (Actor invPopup : invPopups){
+//            invPopup.setPosition(x-this.getX(), y-this.getY());
+//        }
+//        super.setPosition(x, y);
+//    }
 }
