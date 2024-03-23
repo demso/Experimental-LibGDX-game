@@ -5,8 +5,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Event;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
@@ -14,14 +18,17 @@ import com.badlogic.gdx.utils.ArrayMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.*;
+import com.mygdx.game.UI.inventory.ContextMenu;
+import com.mygdx.game.UI.inventory.InventoryHUD;
 import com.mygdx.game.tiledmap.BodyUserData;
 
 public class HUD extends Stage {
     InventoryHUD invHUD;
+    ScrollPane invScroll;
     boolean isInventoryShowed;
-    GameItself gameItself;
+    public GameItself gameItself;
     ObjectMap<Item, ItemInfoPopUp> itemPopups =  new ObjectMap<>();
-    public Array<InventoryHUD> esClosablePopups = new Array<>();
+    public Array<Actor> esClosablePopups = new Array<>();
     public ArrayMap<String, String> debugEntries = new ArrayMap<>();
     Label label;
     Skin skin;
@@ -31,11 +38,30 @@ public class HUD extends Stage {
         gameItself = gi;
         skin = gameItself.skin;
 
+        invHUD = new InventoryHUD(this, gameItself.player, 0,0);
+        invScroll = new ScrollPane(invHUD, skin);
+        ScrollPane.ScrollPaneStyle sps = invScroll.getStyle();
+        sps.background = skin.getDrawable("default-pane");
+        invScroll.setVisible(false);
+        invScroll.setSize(400,300);
+        invScroll.setName("InventoryScrollPane");
+        invScroll.setFadeScrollBars(false);
+        //invScroll.setBackground("default-pane");
+        invScroll.addListener(new InputListener(){
+            @Override
+            public boolean handle(Event e){
+                super.handle(e);
+                return true;
+            }
+        });
+
         label = new Label("", skin);
         label.setFontScale(0.5f);
         label.setWidth(350);
         label.setAlignment(Align.topLeft);
+
         addActor(label);
+        addActor(invScroll);
     }
 
     public void showItemInfoWindow(Item item){
@@ -52,17 +78,32 @@ public class HUD extends Stage {
     }
 
     public void showInventoryHUD(){
-        invHUD = new InventoryHUD(gameItself.player, 0,0);
-        invHUD.setPosition((Gdx.graphics.getWidth()-invHUD.getWidth())/2f,(Gdx.graphics.getHeight()-invHUD.getHeight())/2f, Align.bottomLeft);
-        addActor(invHUD);
+        invHUD.refill();
+        invScroll.setPosition((Gdx.graphics.getWidth()-invScroll.getWidth())/2f,(Gdx.graphics.getHeight()-invScroll.getHeight())/2f, Align.bottomLeft);
+        invScroll.setVisible(true);
+        setScrollFocus(invScroll);
         isInventoryShowed = true;
-        esClosablePopups.add(invHUD);
+        esClosablePopups.add(invScroll);
     }
 
     public void closeInventoryHUD(){
-        getActors().removeValue(invHUD, true);
+        if(invScroll != null)
+            invScroll.setVisible(false);
         isInventoryShowed = false;
-        esClosablePopups.removeValue(invHUD, true);
+        esClosablePopups.removeValue(invScroll, true);
+    }
+
+    public void closeTopPopup(){
+        Actor ac = esClosablePopups.pop();
+        if (ac instanceof ScrollPane && ac.getName().equals(invScroll.getName())){
+            closeInventoryHUD();
+            return;
+        }
+
+        getActors().removeValue(ac, true);
+        if (ac instanceof ContextMenu)
+            removeCaptureListener(((ContextMenu)ac).hideListener);
+
     }
 
     public void toggleInventoryHUD(){
@@ -72,13 +113,16 @@ public class HUD extends Stage {
             showInventoryHUD();
     }
 
-    public void updateInvHUD(){
+    public void updateInvHUDContent(){
         if (invHUD != null)
             invHUD.refill();
     }
 
-    public void updateOnResize(){
-
+    public void updateOnResize(int width, int height){
+        getViewport().update(width, height, true);
+        if (invScroll != null){
+            invScroll.setPosition((Gdx.graphics.getWidth()-invScroll.getWidth())/2f,(Gdx.graphics.getHeight()-invScroll.getHeight())/2f, Align.bottomLeft);
+        }
     }
 
     Body clObj;
@@ -120,4 +164,6 @@ public class HUD extends Stage {
         else
             label.setText("");
     }
+
+
 }

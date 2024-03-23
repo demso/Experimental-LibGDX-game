@@ -3,18 +3,17 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.game.UI.HUD;
 import org.jetbrains.annotations.NotNull;
 
 public class GameScreen implements Screen {
     static GameItself gameItself;
     public SecondGDXGame game;
-    Stage stage;
+    HUD hudStage;
     GameScreen(@NotNull SecondGDXGame game){
         this.game = game;
         gameItself = new GameItself(this);
-        this.stage = gameItself.hudStage;
+        this.hudStage = gameItself.hudStage;
     }
 
     @Override
@@ -26,7 +25,7 @@ public class GameScreen implements Screen {
     }
     @Override
     public void resize(int width, int height) {
-       stage.getViewport().update(width, height, true);
+       hudStage.updateOnResize(width, height);
        gameItself.gameStage.getViewport().update(width , height, false);
        gameItself.camera.setToOrtho(false, width * (1f/GameItself.tileSide) * (1/ gameItself.zoom), height * (1f/GameItself.tileSide) * (1/ gameItself.zoom));
     }
@@ -46,8 +45,9 @@ public class GameScreen implements Screen {
     public void show() {
         InputMultiplexer multiplexer = new InputMultiplexer();
         Gdx.input.setInputProcessor(multiplexer);
+        multiplexer.addProcessor(hudStage);
         multiplexer.addProcessor(gameItself.gameStage);
-        multiplexer.addProcessor(stage);
+
 
         Gdx.input.setInputProcessor(multiplexer);
     }

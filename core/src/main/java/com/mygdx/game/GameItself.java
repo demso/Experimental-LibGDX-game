@@ -30,6 +30,7 @@ import com.mygdx.game.tiledmap.BodyUserData;
 import com.mygdx.game.tiledmap.Door;
 import com.mygdx.game.tiledmap.MyTmxMapLoader;
 import net.dermetfan.gdx.graphics.g2d.Box2DSprite;
+import net.dermetfan.gdx.physics.box2d.Box2DUtils;
 
 public class GameItself {
     final static short PLAYER_CF= 0x0008,
@@ -105,6 +106,16 @@ public class GameItself {
         player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("10mm_fmj", 1)), this, "10mm FMJ bullets"));
         player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("beef", 1)), this, "Beef"));
         player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("watches", 1)), this, "Watches"));
+        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("shotgunammo", 1)), this, "Shotgun ammo"));
+        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("shotgunammo", 1)), this, "Shotgun ammo"));
+        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("shotgunammo", 1)), this, "Shotgun ammo"));
+        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("shotgunammo", 1)), this, "Shotgun ammo"));
+        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("shotgunammo", 1)), this, "Shotgun ammo"));
+        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("shotgunammo", 1)), this, "Shotgun ammo"));
+        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("shotgunammo", 1)), this, "Shotgun ammo"));
+        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("shotgunammo", 1)), this, "Shotgun ammo"));
+        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("shotgunammo", 1)), this, "Shotgun ammo"));
+        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("shotgunammo", 1)), this, "Shotgun ammo"));
         player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("shotgunammo", 1)), this, "Shotgun ammo"));
     }
     void initTextures(){
@@ -325,8 +336,10 @@ public class GameItself {
         rayHandler.updateAndRender();
 
         if (player.closestObject != null) {
+            float w = Box2DUtils.width(player.closestObject);
+            float h = Box2DUtils.height(player.closestObject);
             batch.begin();
-            batch.draw(userSelection, (int)player.closestObject.getPosition().x, (int)player.closestObject.getPosition().y,1,1);
+            batch.draw(userSelection, player.closestObject.getPosition().x-w/2f, player.closestObject.getPosition().y-h/2f, w,h);
             batch.end();
         }
 
@@ -334,9 +347,9 @@ public class GameItself {
         hudStage.draw();
 
         if (debug) {
-//            stage.getBatch().begin();
-//            font.draw(stage.getBatch(), "FPS=" + Gdx.graphics.getFramesPerSecond(), 0, stage.getCamera().viewportHeight - 2);
-//            stage.getBatch().end();
+            hudStage.getBatch().begin();
+            font.draw(hudStage.getBatch(), "FPS=" + Gdx.graphics.getFramesPerSecond(), 0, hudStage.getCamera().viewportHeight - 2);
+            hudStage.getBatch().end();
             //renderDebug();
             debugRendererPh.render(world, camera.combined);
         }
@@ -377,8 +390,7 @@ public class GameItself {
         public boolean keyUp (InputEvent event, int keycode) {
             if (keycode == Input.Keys.ESCAPE)
                 if (hudStage.esClosablePopups.notEmpty()){
-                    hudStage.closeInventoryHUD();
-
+                    hudStage.closeTopPopup();
                 }
                 else game.setScreen(game.menuScreen);
             if (keycode == Input.Keys.B){
@@ -405,7 +417,7 @@ public class GameItself {
                     }
                     if (obj instanceof Item){
                         player.pickupItem((Item) obj);
-                        hudStage.updateInvHUD();
+                        hudStage.updateInvHUDContent();
                     }
                 }
             }

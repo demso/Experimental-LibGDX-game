@@ -1,10 +1,8 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -33,11 +31,6 @@ public class Item extends Box2DSprite {
     public Vector2 position;
 
     ItemInfoPopUp popup;
-
-    Item(TiledMapTile tile){
-        super(tile.getTextureRegion());
-        this.tile = tile;
-    }
 
     Item(TiledMapTile tile, GameItself gi, String itemName){
         super(tile.getTextureRegion());
