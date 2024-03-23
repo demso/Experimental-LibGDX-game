@@ -95,14 +95,18 @@ public class HUD extends Stage {
 
     public void closeTopPopup(){
         Actor ac = esClosablePopups.pop();
+
         if (ac instanceof ScrollPane && ac.getName().equals(invScroll.getName())){
             closeInventoryHUD();
             return;
         }
 
+        if (ac instanceof ContextMenu){
+            invHUD.closeItemContextMenu((ContextMenu) ac);
+            return;
+        }
+
         getActors().removeValue(ac, true);
-        if (ac instanceof ContextMenu)
-            removeCaptureListener(((ContextMenu)ac).hideListener);
 
     }
 
