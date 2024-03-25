@@ -70,6 +70,27 @@ public class ContextMenu extends Table {
 
         this.add(button).growX().align(Align.left);
 
+        this.row().padTop(2);
+
+        button = new Button(getSkin());
+        button.setName("Inventory context menu \"Equip\" button");
+
+        button.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                invHUD.contextAction(ConAction.DESCRIPTION, ContextMenu.this);
+                invHUD.player.equipItem(itemEntry.item);
+                invHUD.closeItemContextMenu(ContextMenu.this);
+            }
+        });
+
+        label = new Label("Equip", getSkin());
+        label.setStyle(ls);
+        button.add(label).expandX().align(Align.left);
+
+        this.add(button).growX().align(Align.left);
+
         pack();
 
         //to avoid sending event to gameStage

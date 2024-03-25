@@ -33,6 +33,8 @@ public class Lwjgl3Launcher {
         config.setTitle("My GDX Game");
         config.setWindowedMode(1000, 700);
         config.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
+        //config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL32,3,2);
+        config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL20, 4, 5);
         return config;
     }
 }

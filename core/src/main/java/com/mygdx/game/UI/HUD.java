@@ -18,13 +18,11 @@ import com.badlogic.gdx.utils.ArrayMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.*;
-import com.mygdx.game.UI.inventory.ContextMenu;
-import com.mygdx.game.UI.inventory.InventoryHUD;
-import com.mygdx.game.tiledmap.BodyUserData;
+import com.mygdx.game.UI.inventory.*;
+import com.mygdx.game.tiledmap.*;
 
 public class HUD extends Stage {
-    InventoryHUD invHUD;
-    ScrollPane invScroll;
+    InventoryScroll invScroll;
     boolean isInventoryShowed;
     public GameItself gameItself;
     ObjectMap<Item, ItemInfoPopUp> itemPopups =  new ObjectMap<>();
@@ -38,22 +36,22 @@ public class HUD extends Stage {
         gameItself = gi;
         skin = gameItself.skin;
 
-        invHUD = new InventoryHUD(this, gameItself.player, 0,0);
-        invScroll = new ScrollPane(invHUD, skin);
-        ScrollPane.ScrollPaneStyle sps = invScroll.getStyle();
-        sps.background = skin.getDrawable("default-pane");
+//        invHUD = new InventoryHUD(this, gameItself.player, 0,0);
+        invScroll = new InventoryScroll(this, gameItself.player);
+//        ScrollPane.ScrollPaneStyle sps = invScroll.getStyle();
+//        sps.background = skin.getDrawable("default-pane");
         invScroll.setVisible(false);
-        invScroll.setSize(400,300);
-        invScroll.setName("InventoryScrollPane");
-        invScroll.setFadeScrollBars(false);
+//        invScroll.setSize(400,300);
+//        invScroll.setName("InventoryScrollPane");
+//        invScroll.setFadeScrollBars(false);
         //invScroll.setBackground("default-pane");
-        invScroll.addListener(new InputListener(){
-            @Override
-            public boolean handle(Event e){
-                super.handle(e);
-                return true;
-            }
-        });
+//        invScroll.addListener(new InputListener(){
+//            @Override
+//            public boolean handle(Event e){
+//                super.handle(e);
+//                return true;
+//            }
+//        });
 
         label = new Label("", skin);
         label.setFontScale(0.5f);
@@ -78,7 +76,7 @@ public class HUD extends Stage {
     }
 
     public void showInventoryHUD(){
-        invHUD.refill();
+        invScroll.refill();
         invScroll.setPosition((Gdx.graphics.getWidth()-invScroll.getWidth())/2f,(Gdx.graphics.getHeight()-invScroll.getHeight())/2f, Align.bottomLeft);
         invScroll.setVisible(true);
         setScrollFocus(invScroll);
@@ -89,6 +87,7 @@ public class HUD extends Stage {
     public void closeInventoryHUD(){
         if(invScroll != null)
             invScroll.setVisible(false);
+        invScroll.onClose();
         isInventoryShowed = false;
         esClosablePopups.removeValue(invScroll, true);
     }
@@ -102,7 +101,7 @@ public class HUD extends Stage {
         }
 
         if (ac instanceof ContextMenu){
-            invHUD.closeItemContextMenu((ContextMenu) ac);
+            invScroll.closeItemContextMenu((ContextMenu) ac);
             return;
         }
 
@@ -118,8 +117,8 @@ public class HUD extends Stage {
     }
 
     public void updateInvHUDContent(){
-        if (invHUD != null)
-            invHUD.refill();
+        if (invScroll != null)
+            invScroll.refill();
     }
 
     public void updateOnResize(int width, int height){

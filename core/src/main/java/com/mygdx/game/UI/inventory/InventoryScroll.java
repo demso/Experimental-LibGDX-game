@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Align;
 import com.mygdx.game.Player;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.UI.HUD;
@@ -20,7 +21,7 @@ public class InventoryScroll extends ScrollPane {
         inventoryHUD = new InventoryHUD(hud, player,0, 0);
         ScrollPane.ScrollPaneStyle sps = this.getStyle();
         sps.background = skin.getDrawable("default-pane");
-
+        setSize(400,300);
         setName("InventoryScrollPane");
         setFadeScrollBars(false);
         //invScroll.setBackground("default-pane");
@@ -31,6 +32,7 @@ public class InventoryScroll extends ScrollPane {
                 return true;
             }
         });
+        setActor(inventoryHUD);
     }
 
     public void refill(){
@@ -41,25 +43,25 @@ public class InventoryScroll extends ScrollPane {
         inventoryHUD.showItemContextMenu(itemEntry);
     }
 
-    public void removeActor(ContextMenu contextMenu){
-        inventoryHUD.removeActor(contextMenu);
-    }
 
     public void putItemFromInventory(ItemEntry itemEntry){
         inventoryHUD.putItemFromInventory(itemEntry);
     }
 
-//    public void contextAction(ContextMenu.ConAction action, ContextMenu contextMenu){
-//        inventoryHUD.contextAction();
-//    }
-
     public void closeItemContextMenu(ContextMenu contextMenu){
         inventoryHUD.closeItemContextMenu(contextMenu);
     }
 
-    @Override
-    public void setPosition(float x, float y) {
+    public void onClose(){
+        inventoryHUD.onClose();
+    }
 
-        super.setPosition(x, y);
+    @Override
+    public void setPosition(float x, float y, int align) {
+        float offsetX = x-this.getX(), offsetY = y-this.getY();
+        for (Actor invPopup : inventoryHUD.invPopups){
+            invPopup.setPosition(invPopup.getX() + offsetX, invPopup.getY() + offsetY);
+        }
+        super.setPosition(x, y, align);
     }
 }

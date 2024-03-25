@@ -49,13 +49,8 @@ public class InventoryHUD extends Table {
         hud.addActor(contextMenu);
     }
 
-    public void removeActor(ContextMenu contextMenu){
-        contextMenu.remove();
-        hud.esClosablePopups.removeValue(contextMenu, true);
-    }
-
     public void putItemFromInventory(ItemEntry itemEntry){
-        player.getInventoryItems().removeValue(itemEntry.item, true);
+        player.removeItemFromInventory(itemEntry.item);
         refill();
         itemEntry.item.allocate(hud.gameItself.world, player.body.getPosition());
     }
@@ -75,6 +70,14 @@ public class InventoryHUD extends Table {
         if (contextMenu.hideListener != null)
             hud.removeCaptureListener(contextMenu.hideListener);
         hud.esClosablePopups.removeValue(contextMenu, true);
+    }
+
+    public void onClose(){
+        for (Actor ac: invPopups){
+            if (ac instanceof ContextMenu){
+                closeItemContextMenu( (ContextMenu) ac);
+            }
+        }
     }
 
 //    @Override
