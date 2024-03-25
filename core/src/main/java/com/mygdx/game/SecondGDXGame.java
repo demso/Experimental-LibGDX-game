@@ -29,7 +29,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 
 public class SecondGDXGame extends Game {
-    public Player player = new Player(this);
+    public Player player;
     SpriteBatch batch;
     static MainMenuScreen menuScreen;
     static GameScreen gameScreen;
@@ -54,6 +54,8 @@ public class SecondGDXGame extends Game {
         skin = new Skin(Gdx.files.internal("vis/skin/x2/uiskin.json"));
         skin.add("default14font", fontRoboto14);
         Button.ButtonStyle bs = skin.get(Button.ButtonStyle.class);
+
+        player = new Player(this);
         menuScreen = new MainMenuScreen(this);
         gameScreen = new GameScreen(this);
         this.setScreen(menuScreen);

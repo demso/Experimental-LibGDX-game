@@ -27,7 +27,7 @@ public class GameScreen implements Screen {
     public void resize(int width, int height) {
        hudStage.updateOnResize(width, height);
        gameItself.gameStage.getViewport().update(width , height, false);
-       gameItself.camera.setToOrtho(false, width * (1f/GameItself.tileSide) * (1/ gameItself.zoom), height * (1f/GameItself.tileSide) * (1/ gameItself.zoom));
+       gameItself.camera.setToOrtho(false, width * (1f/GameItself.TILE_SIDE) * (1/ gameItself.zoom), height * (1f/GameItself.TILE_SIDE) * (1/ gameItself.zoom));
     }
     @Override
     public void pause() {

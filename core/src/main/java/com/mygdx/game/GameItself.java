@@ -1,6 +1,5 @@
 package com.mygdx.game;
 
-import box2dLight.PointLight;
 import box2dLight.RayHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -11,7 +10,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -19,7 +17,6 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectIntMap;
@@ -54,9 +51,6 @@ public class GameItself {
     boolean debug = false;
     Texture textureSheet;
     Texture userSelection;
-    Animation<TextureRegion> walkSide;
-    Animation<TextureRegion> walkUp;
-    Animation<TextureRegion> walkDown;
     float frameDur = 0.1f;
     ShapeRenderer debugRenderer;
     RayHandler rayHandler;
@@ -64,17 +58,13 @@ public class GameItself {
     Array<Body> bodies;
     float accumulator = 0;
     Box2DDebugRenderer debugRendererPh;
-    PointLight light;
     TextureRegion textureRegions[][];
     float zoom = 2 ;
-    float speedd = 5f;
     final String mapToLoad = "worldMap/newmap.tmx";
-    public static final int tileSide = 32;
+    public static final int TILE_SIDE = 32;
     HUD hudStage;
     public Stage gameStage;
-    Label label;
     public ObjectIntMap<String> tilemapa;
-    float rot = 0f;
     ObjectSet<Body> bodiesToDeletion = new ObjectSet<>();
 
     GameItself(GameScreen gameScreen){
@@ -96,7 +86,7 @@ public class GameItself {
         tilemapa = new ObjectIntMap<>();
         map = new MyTmxMapLoader(this).load(mapToLoad);
 
-        renderer = new OrthogonalTiledMapRenderer(map, 1f / tileSide);
+        renderer = new OrthogonalTiledMapRenderer(map, 1f / TILE_SIDE);
         batch = renderer.getBatch();
         debugRendererPh = new Box2DDebugRenderer();
 
@@ -126,27 +116,7 @@ public class GameItself {
 //        }).iterator().next());
     }
     void initTextures(){
-        textureSheet = new Texture(Gdx.files.internal("ClassicRPG_Sheet.png"));
-        textureRegions= TextureRegion.split(textureSheet, 16, 16);
         userSelection = new Texture(Gdx.files.internal("selection.png"));
-
-        TextureRegion[] walkFrames = new TextureRegion[4];
-        int index = 0;
-        for (int i = 0; i < 4; i++)
-            walkFrames[index++] = textureRegions[0][i];
-        walkDown = new Animation<TextureRegion>(frameDur, walkFrames);
-
-        walkFrames = new TextureRegion[4];
-        index = 0;
-        for (int i = 0; i < 4; i++)
-            walkFrames[index++] = textureRegions[1][i];
-        walkSide = new Animation<TextureRegion>(frameDur, walkFrames);
-
-        walkFrames = new TextureRegion[4];
-        index = 0;
-        for (int i = 0; i < 4; i++)
-            walkFrames[index++] = textureRegions[3][i];
-        walkUp = new Animation<TextureRegion>(frameDur, walkFrames);
     }
     void initScene2D(){
         hudStage.addListener(new HUDInputListener());
@@ -239,43 +209,6 @@ public class GameItself {
         boolean moveDown = Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S);
 
         player.inputMove(moveUp, moveDown, moveToTheRight, moveToTheLeft);
-//        if (!(moveToTheRight && moveToTheLeft)) {
-//            if (moveToTheLeft) {
-//                player.body.setLinearVelocity(-100f, player.body.getLinearVelocity().y);
-//                player.state = Player.State.Walking;
-//                player.facing = Player.Facing.LEFT;
-//            }
-//
-//            if (moveToTheRight) {
-//                player.body.setLinearVelocity(100f, player.body.getLinearVelocity().y);
-//                player.state = Player.State.Walking;
-//                player.facing = Player.Facing.RIGHT;
-//            }
-//        }
-//        if (!(moveUp && moveDown)){
-//            if (moveUp) {
-//                player.body.setLinearVelocity(player.body.getLinearVelocity().x, 100f);
-//                player.state = Player.State.Walking;
-//                player.facing = Player.Facing.UP;
-//            }
-//
-//            if (moveDown) {
-//                player.body.setLinearVelocity(player.body.getLinearVelocity().x, -100f);
-//                player.state = Player.State.Walking;
-//                player.facing = Player.Facing.DOWN;
-//            }
-//        }
-//
-//        player.body.setLinearVelocity(player.body.getLinearVelocity().clamp(0,speedd));
-//        if (Math.abs(player.body.getLinearVelocity().len2()) < 0.5f) {
-//            player.state = Player.State.Standing;
-//        }
-//
-//        player.position.x = (player.body.getPosition().x);
-//        player.position.y = (player.body.getPosition().y);
-        //player.sensorBody.setTransform(player.position, 0);
-
-
 
         //UPDATE STAGE
         hudStage.update(debug);
@@ -302,7 +235,7 @@ public class GameItself {
         Box2DSprite.draw(batch, world, true);
         batch.end();
 
-        renderPlayer();
+        player.renderPlayer(renderer.getBatch(), camera);
 
         rayHandler.setCombinedMatrix(camera);
         rayHandler.updateAndRender();
@@ -325,48 +258,6 @@ public class GameItself {
             renderDebug();
             debugRendererPh.render(world, camera.combined);
         }
-    }
-    void renderPlayer(){
-        //player
-        TextureRegion frame = null;
-        switch (player.state) {
-            case Standing:
-                frame = walkDown.getKeyFrame(1);
-                break;
-            case Walking:
-                switch (player.facing) {
-                    case RIGHT:
-                    case LEFT:
-                        frame = walkSide.getKeyFrame(player.stateTime, true);
-                        break;
-                    case UP:
-                        frame = walkUp.getKeyFrame(player.stateTime, true);
-                        break;
-                    case DOWN:
-                        frame = walkDown.getKeyFrame(player.stateTime, true);
-                        break;
-                }
-                break;
-        }
-        Batch batch = renderer.getBatch();
-        batch.begin();
-        if (player.facing == Player.Facing.RIGHT)
-            batch.draw(frame, player.position.x - player.WIDTH/2 + player.WIDTH, player.position.y - player.WIDTH * 1/4, -player.WIDTH, player.HEIGHT);
-        else
-            batch.draw(frame, player.position.x - player.WIDTH/2, player.position.y - player.WIDTH * 1/4, player.WIDTH, player.HEIGHT);
-        if (player.equipedItem != null){
-            TextureRegion tr = player.equipedItem.item.tile.getTextureRegion();
-            float width = 0.5f;
-            float height = 0.5f;
-            float offsetX = 0;
-            float offsetY = 0f;
-            Vector3 mousePos = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-            Vector2 playerPos = player.position;
-            rot = Double.valueOf(Math.toDegrees(Math.atan2(mousePos.y - playerPos.y, mousePos.x - playerPos.x))).floatValue()-34;
-            batch.draw(tr, player.position.x - (tr.getRegionWidth()*width /2f + offsetX)/(float) tileSide, player.position.y - (tr.getRegionHeight()*height/2f + offsetY)/(float) tileSide, tr.getRegionWidth()*width/2f/(float)tileSide, tr.getRegionHeight()*height/2f/ (float) tileSide, width, height, 1,1,rot);
-        }
-
-        batch.end();
     }
 
     public void fireBullet(Player pla){
@@ -451,11 +342,11 @@ public class GameItself {
             }
             if (keycode == Input.Keys.EQUALS){
                 zoom += 0.3f;
-                camera.setToOrtho(false, Gdx.graphics.getWidth() * (1f/tileSide) * (1/zoom), Gdx.graphics.getHeight() * (1f/tileSide) * (1/zoom));
+                camera.setToOrtho(false, Gdx.graphics.getWidth() * (1f/ TILE_SIDE) * (1/zoom), Gdx.graphics.getHeight() * (1f/ TILE_SIDE) * (1/zoom));
             }
             if (keycode == Input.Keys.MINUS){
                 zoom -= 0.3f;
-                camera.setToOrtho(false, Gdx.graphics.getWidth() * (1f/tileSide) * (1/zoom), Gdx.graphics.getHeight() * (1f/tileSide) * (1/zoom));
+                camera.setToOrtho(false, Gdx.graphics.getWidth() * (1f/ TILE_SIDE) * (1/zoom), Gdx.graphics.getHeight() * (1f/ TILE_SIDE) * (1/zoom));
             }
             if (keycode == Input.Keys.R){
                 System.out.println(player.getClosestObject());
@@ -474,12 +365,6 @@ public class GameItself {
             }
             if (keycode == Input.Keys.I){
                 hudStage.toggleInventoryHUD();
-            }
-            if (keycode == Input.Keys.NUMPAD_ADD){
-                rot += 10f;
-            }
-            if (keycode == Input.Keys.NUMPAD_SUBTRACT){
-                rot -= 10f;
             }
             if (keycode == Input.Keys.H){
                 player.freeHands();
