@@ -152,22 +152,24 @@ public class GameItself {
         hudStage.addListener(new HUDInputListener());
     }
     void initPhysics(){
-        world.getBodies(bodies);
+        //world
         world.setContactListener(new ContactListener() {
             static int ll = 0;
             static int llend = 0;
             @Override
             public void beginContact(Contact contact) {
                 ll++;
-                Body[] bodies = new Body[]{contact.getFixtureA().getBody(), contact.getFixtureB().getBody()};
+                Fixture[] fixtures = new Fixture[]{contact.getFixtureA(), contact.getFixtureB()};
                 for (int i = 0; i < 2; i++){
-                    Body thisBody = bodies[i];
-                    Body anotherBody = bodies[(i+1)%2];
+                    Fixture thisFixture = fixtures[i];
+                    Fixture anotherFixture = fixtures[(i+1)%2];
+                    Body thisBody = thisFixture.getBody();
+                    Body anotherBody = anotherFixture.getBody();
                     Object userData = thisBody.getUserData();
                     if (userData instanceof BodyUserName){
                         String bodyUserName = ((BodyUserName) userData).getName();
                         switch (bodyUserName){
-                            case "playerInteractionBubble" -> player.closeObjects.add(anotherBody);
+                            case "player" -> { if (thisFixture.isSensor() && !anotherFixture.isSensor()) player.closeObjects.add(anotherBody); }
                             case "bullet" -> bodiesToDeletion.add(thisBody);
                         }
                     }
@@ -177,12 +179,14 @@ public class GameItself {
             @Override
             public void endContact(Contact contact) {
                 llend++;
+                var fixtureA = contact.getFixtureA();
+                var fixtureB = contact.getFixtureB();
                 var dataA = contact.getFixtureA().getBody().getUserData();
                 var dataB = contact.getFixtureB().getBody().getUserData();
-                if (dataA instanceof BodyUserData && ((BodyUserData) dataA).bodyName.equals("playerInteractionBubble")){
+                if (dataA instanceof BodyUserData && ((BodyUserData) dataA).bodyName.equals("player") && fixtureA.isSensor() && !fixtureB.isSensor()){
                     player.closeObjects.removeValue(contact.getFixtureB().getBody(), true);
                 }
-                if (dataB instanceof BodyUserData && ((BodyUserData) dataB).bodyName.equals("playerInteractionBubble")){
+                if (dataB instanceof BodyUserData && ((BodyUserData) dataB).bodyName.equals("player") && !fixtureA.isSensor() && fixtureB.isSensor()){
                     player.closeObjects.removeValue(contact.getFixtureA().getBody(), true);
                 }
             }
@@ -197,14 +201,6 @@ public class GameItself {
 
             }
         });
-
-        //world
-        Item it = new Item(map.getTileSets().getTile(tilemapa.get("10mm_fmj", 1)), this, "10mm FMJ bullets");
-        it.allocate(world, new Vector2(3.5f,96.5f));
-
-        //player
-        player.initBody(world);
-
         //light
         rayHandler = new RayHandler(world);
         rayHandler.setCombinedMatrix(camera);
@@ -213,15 +209,12 @@ public class GameItself {
         rayHandler.setAmbientLight(0f, 0f, 0f, 1f);
         rayHandler.setBlurNum(1);
 
-        light = new PointLight(rayHandler, 1300, Color.WHITE, 100f, 0, 0);
-        light.setSoft(true);
-        light.setSoftnessLength(2f);
-        light.attachToBody(player.body, 0, 0);
-        light.setIgnoreAttachedBody(true);
-        Filter f = new Filter();
-        f.categoryBits = LIGHT_CF;
-        f.groupIndex = -10;
-        light.setContactFilter(f);
+        //game
+        Item it = new Item(map.getTileSets().getTile(tilemapa.get("10mm_fmj", 1)), this, "10mm FMJ bullets");
+        it.allocate(world, new Vector2(3.5f,96.5f));
+
+        //player
+        player.initBody(world, rayHandler);
     }
 
     private void update(float deltaTime) {
@@ -238,53 +231,51 @@ public class GameItself {
         }
 
         //UPDATE PLAYER
-        if (deltaTime == 0) return;
-        if (deltaTime > 0.1f) deltaTime = 0.1f;
-        player.stateTime += deltaTime;
-        player.body.setLinearVelocity(0,0);
+        player.update(deltaTime);
 
         boolean moveToTheRight = Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D);
         boolean moveToTheLeft = Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A);
         boolean moveUp = Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W);
         boolean moveDown = Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S);
-        if (!(moveToTheRight && moveToTheLeft)) {
-            if (moveToTheLeft) {
-                player.body.setLinearVelocity(-100f, player.body.getLinearVelocity().y);
-                player.state = Player.State.Walking;
-                player.facing = Player.Facing.LEFT;
-            }
 
-            if (moveToTheRight) {
-                player.body.setLinearVelocity(100f, player.body.getLinearVelocity().y);
-                player.state = Player.State.Walking;
-                player.facing = Player.Facing.RIGHT;
-            }
-        }
-        if (!(moveUp && moveDown)){
-            if (moveUp) {
-                player.body.setLinearVelocity(player.body.getLinearVelocity().x, 100f);
-                player.state = Player.State.Walking;
-                player.facing = Player.Facing.UP;
-            }
+        player.inputMove(moveUp, moveDown, moveToTheRight, moveToTheLeft);
+//        if (!(moveToTheRight && moveToTheLeft)) {
+//            if (moveToTheLeft) {
+//                player.body.setLinearVelocity(-100f, player.body.getLinearVelocity().y);
+//                player.state = Player.State.Walking;
+//                player.facing = Player.Facing.LEFT;
+//            }
+//
+//            if (moveToTheRight) {
+//                player.body.setLinearVelocity(100f, player.body.getLinearVelocity().y);
+//                player.state = Player.State.Walking;
+//                player.facing = Player.Facing.RIGHT;
+//            }
+//        }
+//        if (!(moveUp && moveDown)){
+//            if (moveUp) {
+//                player.body.setLinearVelocity(player.body.getLinearVelocity().x, 100f);
+//                player.state = Player.State.Walking;
+//                player.facing = Player.Facing.UP;
+//            }
+//
+//            if (moveDown) {
+//                player.body.setLinearVelocity(player.body.getLinearVelocity().x, -100f);
+//                player.state = Player.State.Walking;
+//                player.facing = Player.Facing.DOWN;
+//            }
+//        }
+//
+//        player.body.setLinearVelocity(player.body.getLinearVelocity().clamp(0,speedd));
+//        if (Math.abs(player.body.getLinearVelocity().len2()) < 0.5f) {
+//            player.state = Player.State.Standing;
+//        }
+//
+//        player.position.x = (player.body.getPosition().x);
+//        player.position.y = (player.body.getPosition().y);
+        //player.sensorBody.setTransform(player.position, 0);
 
-            if (moveDown) {
-                player.body.setLinearVelocity(player.body.getLinearVelocity().x, -100f);
-                player.state = Player.State.Walking;
-                player.facing = Player.Facing.DOWN;
-            }
-        }
 
-        player.body.setLinearVelocity(player.body.getLinearVelocity().clamp(0,speedd));
-        if (Math.abs(player.body.getLinearVelocity().len2()) < 0.5f) {
-            player.state = Player.State.Standing;
-        }
-
-        player.position.x = (player.body.getPosition().x);
-        player.position.y = (player.body.getPosition().y);
-
-        player.sensorBody.setTransform(player.position, 0);
-
-        player.closestObject = player.getClosestObject();
 
         //UPDATE STAGE
         hudStage.update(debug);

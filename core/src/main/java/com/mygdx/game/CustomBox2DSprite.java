@@ -26,7 +26,6 @@ public class CustomBox2DSprite extends Box2DSprite implements BodyUserName {
             draw(batch);
         }
     }
-    @Override
     public void setName(String name){
         this.name = name;
     };

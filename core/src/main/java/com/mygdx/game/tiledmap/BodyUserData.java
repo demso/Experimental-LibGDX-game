@@ -8,7 +8,10 @@ public class BodyUserData implements BodyUserName{
         setName(n);
     }
 
-    @Override
+    public BodyUserData(String n){
+        setName(n);
+    }
+
     public void setName(String name) {
         bodyName = name;
     }
