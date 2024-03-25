@@ -159,8 +159,6 @@ public class GameItself {
             @Override
             public void beginContact(Contact contact) {
                 ll++;
-//                Object dataA = contact.getFixtureA().getBody().getUserData();
-//                Object dataB = contact.getFixtureB().getBody().getUserData();
                 Body[] bodies = new Body[]{contact.getFixtureA().getBody(), contact.getFixtureB().getBody()};
                 for (int i = 0; i < 2; i++){
                     Body thisBody = bodies[i];
@@ -174,18 +172,6 @@ public class GameItself {
                         }
                     }
                 }
-//                if (dataA instanceof BodyUserData && ((BodyUserData) dataA).bodyName.equals("playerInteractionBubble")){
-//                    player.closeObjects.add(contact.getFixtureB().getBody());
-//                }
-//                if (dataB instanceof BodyUserData && ((BodyUserData) dataB).bodyName.equals("playerInteractionBubble")){
-//                    player.closeObjects.add(contact.getFixtureA().getBody());
-//                }
-//                if (dataA instanceof CustomBox2DSprite && ((CustomBox2DSprite) dataA).name.equals("bullet")){
-//                    bodiesToDeletion.add(contact.getFixtureA().getBody());
-//                }
-//                if (dataB instanceof CustomBox2DSprite && ((CustomBox2DSprite) dataB).name.equals("bullet")){
-//                    bodiesToDeletion.add(contact.getFixtureB().getBody());
-//                }
             }
 
             @Override
@@ -330,8 +316,6 @@ public class GameItself {
         rayHandler.setCombinedMatrix(camera);
         rayHandler.updateAndRender();
 
-
-
         if (player.closestObject != null) {
             float w = Box2DUtils.width(player.closestObject);
             float h = Box2DUtils.height(player.closestObject);
@@ -447,15 +431,6 @@ public class GameItself {
             debugRenderer.setColor(Color.RED);
             debugRenderer.line(beginV, endV);
             debugRenderer.setColor(Color.YELLOW);
-//        TiledMapTileLayer layer = (TiledMapTileLayer)map.getLayers().get("layer1");
-//        for (int y = 0; y <= layer.getHeight(); y++) {
-//            for (int x = 0; x <= layer.getWidth(); x++) {
-//                TiledMapTileLayer.Cell cell = layer.getCell(x, y);
-//                if (cell != null) {
-//                    if (camera.frustum.boundsInFrustum(x + 0.5f, y + 0.5f, 0, 1, 1, 0)) debugRenderer.rect(x, y, 1, 1);
-//                }
-//            }
-//        }
             debugRenderer.end();
         }
     }
