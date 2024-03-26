@@ -6,7 +6,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.mygdx.game.GameScreen;
 
-public class Window extends BodyUserData {
+public class Window extends SimpleUserData {
     TiledMapTileLayer.Cell cell;
     TiledMapTile closed;
     TiledMapTile open;

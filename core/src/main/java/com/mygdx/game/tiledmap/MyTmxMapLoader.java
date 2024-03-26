@@ -11,7 +11,6 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
 import com.mygdx.game.GameItself;
-import net.dermetfan.gdx.maps.MapUtils;
 
 public class MyTmxMapLoader extends TmxMapLoader {
     GameItself gameItself;
@@ -236,21 +235,21 @@ public class MyTmxMapLoader extends TmxMapLoader {
                             fullBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
                             fullBody = mymap.world.createBody(fullBodyDef);
                             fullBody.createFixture(fullFixtureDef);
-                            fullBody.setUserData(new BodyUserData(cell, "betonWall"));
+                            fullBody.setUserData(new SimpleUserData(cell, "betonWall"));
                             mymap.staticObjects.add(fullBody);
                             break;
                         case "fullBody":
                             fullBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
                             fullBody = mymap.world.createBody(fullBodyDef);
                             fullBody.createFixture(fullFixtureDef);
-                            fullBody.setUserData(new BodyUserData(cell, "mareFullBody"));
+                            fullBody.setUserData(new SimpleUserData(cell, "mareFullBody"));
                             mymap.staticObjects.add(fullBody);
                             break;
                         case "metalCloset":
                             metalClosetBodyDef.position.set(new Vector2(i+0.5f, j+0.3f));
                             Body metalClosetBody = mymap.world.createBody(metalClosetBodyDef);
                             metalClosetBody.createFixture(metalClosetFixtureDef);
-                            metalClosetBody.setUserData(new BodyUserData(cell, "metalCloset"));
+                            metalClosetBody.setUserData(new SimpleUserData(cell, "metalCloset"));
                             mymap.staticObjects.add(metalClosetBody);
                             break;
                         case "window":
@@ -262,28 +261,28 @@ public class MyTmxMapLoader extends TmxMapLoader {
                                 windowHorBodyDef.position.set(new Vector2(i+0.5f, j+0.95f));
                                 Body windowHorBody = mymap.world.createBody(windowHorBodyDef);
                                 windowHorBody.createFixture(windowHorFixtureDef);
-                                windowHorBody.setUserData(new BodyUserData(cell, "northWindow"));
+                                windowHorBody.setUserData(new SimpleUserData(cell, "northWindow"));
                                 mymap.staticObjects.add(windowHorBody);
                             }
                             else if(southWard){
                                 windowHorBodyDef.position.set(new Vector2(i+0.5f, j+0.05f));
                                 Body windowHorBody = mymap.world.createBody(windowHorBodyDef);
                                 windowHorBody.createFixture(windowHorFixtureDef);
-                                windowHorBody.setUserData(new BodyUserData(cell, "southWindow"));
+                                windowHorBody.setUserData(new SimpleUserData(cell, "southWindow"));
                                 mymap.staticObjects.add(windowHorBody);
                             }
                             else if(westWard){
                                 windowVertBodyDef.position.set(new Vector2(i+0.05f, j+0.5f));
                                 Body windowVertBody = mymap.world.createBody(windowVertBodyDef);
                                 windowVertBody.createFixture(windowVertFixtureDef);
-                                windowVertBody.setUserData(new BodyUserData(cell, "westWindow"));
+                                windowVertBody.setUserData(new SimpleUserData(cell, "westWindow"));
                                 mymap.staticObjects.add(windowVertBody);
                             }
                             else if(eastWard){
                                 windowVertBodyDef.position.set(new Vector2(i+0.95f, j+0.5f));
                                 Body windowVertBody = mymap.world.createBody(windowVertBodyDef);
                                 windowVertBody.createFixture(windowVertFixtureDef);
-                                windowVertBody.setUserData(new BodyUserData(cell, "eastWindow"));
+                                windowVertBody.setUserData(new SimpleUserData(cell, "eastWindow"));
                                 mymap.staticObjects.add(windowVertBody);
                             }
                             break;

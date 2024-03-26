@@ -4,10 +4,8 @@ import box2dLight.RayHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -23,21 +21,25 @@ import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.UI.HUD;
-import com.mygdx.game.tiledmap.BodyUserData;
-import com.mygdx.game.tiledmap.BodyUserName;
+import com.mygdx.game.tiledmap.SimpleUserData;
+import com.mygdx.game.tiledmap.UserData;
 import com.mygdx.game.tiledmap.Door;
 import com.mygdx.game.tiledmap.MyTmxMapLoader;
 import net.dermetfan.gdx.graphics.g2d.Box2DSprite;
 import net.dermetfan.gdx.physics.box2d.Box2DUtils;
 
 public class GameItself {
+    //categoryBits
     final static short
-        PLAYER_CF =             0x0008,
-        PLAYER_CG =             -42,
-        PLAYER_INTERACT_CF =    0x0002,
-        LIGHT_CF =              0x4000,
-        BULLET_CF =             0x0004,
-        ALL_CF =                -1;
+        DEFAULT_CF =            0x0001,                 //00000000 00000001
+        PLAYER_CF =             0x0008,                 //00000000 00001000
+        PLAYER_INTERACT_CF =    0x0002,                 //00000000 00000010
+        LIGHT_CF =              Short.MIN_VALUE,        //10000000 00000000
+        BULLET_CF =             0x0004,                 //00000000 00000100
+        ZOMBIE_CF =             0x0010,                 //00000000 00010000
+        ALL_CF =                -1,                     //11111111 11111111
+
+        PLAYER_CG =             -42;
 
     public SecondGDXGame game;
     public GameScreen gameScreen;
@@ -61,8 +63,9 @@ public class GameItself {
     public static final int TILE_SIDE = 32;
     HUD hudStage;
     public Stage gameStage;
-    public ObjectIntMap<String> tilemapa;
+    public static ObjectIntMap<String> tilemapa;
     ObjectSet<Body> bodiesToDeletion = new ObjectSet<>();
+    float physicsStep = 1/144f;
 
     GameItself(GameScreen gameScreen){
         this.game = gameScreen.game;
@@ -120,6 +123,7 @@ public class GameItself {
     }
     void initPhysics(){
         //world
+//        world.setGravity(new Vector2(0, 5));
         world.setContactListener(new ContactListener() {
             static int ll = 0;
             static int llend = 0;
@@ -133,11 +137,11 @@ public class GameItself {
                     Body thisBody = thisFixture.getBody();
                     Body anotherBody = anotherFixture.getBody();
                     Object userData = thisBody.getUserData();
-                    if (userData instanceof BodyUserName){
-                        String bodyUserName = ((BodyUserName) userData).getName();
+                    if (userData instanceof UserData){
+                        String bodyUserName = ((UserData) userData).getName();
                         switch (bodyUserName){
                             case "player" -> { if (thisFixture.isSensor() && !anotherFixture.isSensor()) player.closeObjects.add(anotherBody); }
-                            case "bullet" -> bodiesToDeletion.add(thisBody);
+                            case "bullet" -> {bodiesToDeletion.add(thisBody); }
                         }
                     }
                 }
@@ -150,10 +154,10 @@ public class GameItself {
                 var fixtureB = contact.getFixtureB();
                 var dataA = contact.getFixtureA().getBody().getUserData();
                 var dataB = contact.getFixtureB().getBody().getUserData();
-                if (dataA instanceof BodyUserData && ((BodyUserData) dataA).bodyName.equals("player") && fixtureA.isSensor() && !fixtureB.isSensor()){
+                if (dataA instanceof SimpleUserData && ((SimpleUserData) dataA).bodyName.equals("player") && fixtureA.isSensor() && !fixtureB.isSensor()){
                     player.closeObjects.removeValue(contact.getFixtureB().getBody(), true);
                 }
-                if (dataB instanceof BodyUserData && ((BodyUserData) dataB).bodyName.equals("player") && !fixtureA.isSensor() && fixtureB.isSensor()){
+                if (dataB instanceof SimpleUserData && ((SimpleUserData) dataB).bodyName.equals("player") && !fixtureA.isSensor() && fixtureB.isSensor()){
                     player.closeObjects.removeValue(contact.getFixtureA().getBody(), true);
                 }
             }
@@ -168,51 +172,6 @@ public class GameItself {
 
             }
         });
-        //border
-//        b2BodyDef myBodyDef;
-//        myBodyDef.type = b2_staticBody;
-//        myBodyDef.position.Set(0, 0);
-//        b2Body* staticBody = m_world->CreateBody(&myBodyDef);
-//
-//        //shape definition
-//        b2PolygonShape polygonShape;
-//
-//        //fixture definition
-//        b2FixtureDef myFixtureDef;
-//        myFixtureDef.shape = &polygonShape;
-//
-//        //add four walls to the static body
-//        b2Vec2 bl(-20, 0);
-//        b2Vec2 br( 20, 0);
-//        b2Vec2 tl(-20,40);
-//        b2Vec2 tr( 20,40);
-//        polygonShape.SetAsEdge( bl, br ); //ground
-//        staticBody->CreateFixture(&myFixtureDef);
-//        polygonShape.SetAsEdge( tl, tr);//ceiling
-//        staticBody->CreateFixture(&myFixtureDef);
-//        polygonShape.SetAsEdge( bl, tl );//left wall
-//        staticBody->CreateFixture(&myFixtureDef);
-//        polygonShape.SetAsEdge( br, tr );//right wall
-//        staticBody->CreateFixture(&myFixtureDef);
-//        BodyDef borderBodyDef = new BodyDef();
-//        borderBodyDef.type = BodyDef.BodyType.StaticBody;
-//        borderBodyDef.position.set(0,0);
-//        Body borderBody = world.createBody(borderBodyDef);
-//        PolygonShape borderShape = new PolygonShape();
-//        FixtureDef borderFixture = new FixtureDef();
-//        borderFixture.shape = borderShape;
-//        Vector2 bl = new Vector2(-20, 0);
-//        Vector2 br = new Vector2(20, 0);
-//        Vector2 tl = new Vector2(-20, 40);
-//        Vector2 tr = new Vector2(20, 40);
-//        borderShape.set(new Vector2[]{bl, br});
-//        borderBody.createFixture(borderFixture);
-//        borderShape.set(new Vector2[]{tl, tr});
-//        borderBody.createFixture(borderFixture);
-//        borderShape.set(new Vector2[]{bl, tl});
-//        borderBody.createFixture(borderFixture);
-//        borderShape.set(new Vector2[]{br, tr});
-//        borderBody.createFixture(borderFixture);
         //light
         rayHandler = new RayHandler(world);
         rayHandler.setCombinedMatrix(camera);
@@ -220,21 +179,21 @@ public class GameItself {
         RayHandler.useDiffuseLight(true);
         rayHandler.setAmbientLight(0f, 0f, 0f, 1f);
         rayHandler.setBlurNum(1);
-
         //game
         Item it = new Item(map.getTileSets().getTile(tilemapa.get("10mm_fmj", 1)), this, "10mm FMJ bullets");
         it.allocate(world, new Vector2(3.5f,96.5f));
-
         //player
         player.initBody(world, rayHandler);
+        //mobs
+        spawnMobs();
     }
     private void update(float deltaTime) {
         //UPDATE PHYSICSSTEP
         float frameTime = Math.min(deltaTime, 0.25f);
         accumulator += frameTime;
-        while (accumulator >= 1/60f) {
-            world.step(1/60f, 8, 3);
-            accumulator -= 1/60f;
+        while (accumulator >= physicsStep) {
+            world.step(physicsStep, 8, 3);
+            accumulator -= physicsStep;
         }
         if (bodiesToDeletion.size != 0) {
             bodiesToDeletion.forEach((Body body) -> world.destroyBody(body));
@@ -300,62 +259,53 @@ public class GameItself {
         }
     }
     public void fireBullet(Player pla){
-        float bulletSpeed = 20f;
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(pla.position);
-        Body body = world.createBody(bodyDef);
-        CircleShape circle = new CircleShape();
-        circle.setRadius(0.04f);
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = circle;
-        fixtureDef.filter.categoryBits = BULLET_CF;
-        fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits & ~LIGHT_CF);
-        body.setBullet(true);
-        body.createFixture(fixtureDef);
-        body.setFixedRotation(true);
-
-        CustomBox2DSprite bSprite = new CustomBox2DSprite(map.getTileSets().getTile(tilemapa.get("bullet", 958)).getTextureRegion(), "bullet");
-        bSprite.setSize(0.5f, 0.5f);
-
-        body.setUserData(bSprite);
-
-        circle.dispose();
         Vector3 mousePos = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
         Vector2 vv = new Vector2(mousePos.x-player.position.x, mousePos.y-player.position.y);
-
-        beginV = body.getPosition();
-        endV = new Vector2(mousePos.x, mousePos.y);
-
-        vv.nor().scl(bulletSpeed);
-        Filter filter = body.getFixtureList().get(0).getFilterData();
-        filter.maskBits = (short) (filter.maskBits & ~LIGHT_CF & ~PLAYER_CF & ~PLAYER_INTERACT_CF);
-        body.getFixtureList().get(0).setFilterData(filter);
-
-        //body.applyForceToCenter(vv, true);
-        body.applyLinearImpulse(vv, body.getPosition(), true);
-        //body.setLinearVelocity(vv);
+        new Bullet(map.getTileSets().getTile(tilemapa.get("bullet", 958)), world, pla.getPosition(), vv);
+//        float bulletSpeed = 200f;
+//        BodyDef bodyDef = new BodyDef();
+//        bodyDef.type = BodyDef.BodyType.DynamicBody;
+//        bodyDef.position.set(pla.position);
+//        Body body = world.createBody(bodyDef);
+//        CircleShape circle = new CircleShape();
+//        circle.setRadius(0.04f);
+//        FixtureDef fixtureDef = new FixtureDef();
+//        fixtureDef.shape = circle;
+//        fixtureDef.density = 1f;
+//        fixtureDef.filter.categoryBits = BULLET_CF;
+//        fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits & ~LIGHT_CF);
+//        body.setBullet(true);
+//        body.createFixture(fixtureDef);
+//        body.setFixedRotation(true);
+//
+//        MassData massData = new MassData();
+//        massData.mass = 0.007f;
+//        massData.center.set(new Vector2(0f,0f));
+//        body.setMassData(massData);
+//
+//        CustomBox2DSprite bSprite = new CustomBox2DSprite(map.getTileSets().getTile(tilemapa.get("bullet", 958)).getTextureRegion(), "bullet");
+//        bSprite.setSize(0.5f, 0.5f);
+//
+//        body.setUserData(bSprite);
+//
+//        circle.dispose();
+//        Vector3 mousePos = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+//        Vector2 vv = new Vector2(mousePos.x-player.position.x, mousePos.y-player.position.y);
+//
+//        beginV = body.getPosition();
+//        endV = new Vector2(mousePos.x, mousePos.y);
+//
+//        vv.nor().scl(bulletSpeed);
+//        Filter filter = body.getFixtureList().get(0).getFilterData();
+//        filter.maskBits = (short) (filter.maskBits & ~LIGHT_CF & ~PLAYER_CF & ~PLAYER_INTERACT_CF);
+//        body.getFixtureList().get(0).setFilterData(filter);
+//
+//        //body.applyForceToCenter(vv, true);
+//        //body.applyLinearImpulse(vv, body.getPosition(), true);
+//        body.setLinearVelocity(vv);
     }
     public void spawnMobs(){
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(new Vector2(5, 85));
-        Body body = world.createBody(bodyDef);
-        CircleShape circle = new CircleShape();
-        circle.setRadius(0.2f);
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = circle;
-        fixtureDef.density = 0.01f;
-        fixtureDef.friction = 0.4f;
-        fixtureDef.restitution = 0.0f;
-        fixtureDef.filter.categoryBits = GameItself.PLAYER_CF;
-        fixtureDef.filter.groupIndex = GameItself.PLAYER_CG;
-        body.createFixture(fixtureDef);
-        circle.dispose();
-
-        body.setFixedRotation(true);
-        body.setUserData(new BodyUserData(this, "zombie"));
-        body.setLinearDamping(2f);
+        new Zombie(map.getTileSets().getTile(tilemapa.get("zombie1", 958)),world, new Vector2(5,85));
 
     }
 

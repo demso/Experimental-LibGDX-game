@@ -13,8 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.game.tiledmap.BodyUserData;
-import com.mygdx.game.tiledmap.BodyUserName;
+import com.mygdx.game.tiledmap.SimpleUserData;
 import org.jetbrains.annotations.Nullable;
 
 public class Player extends Entity {
@@ -76,21 +75,27 @@ public class Player extends Entity {
     public void initBody(World world, RayHandler rayHandler){
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(new Vector2(5, 95));
+        bodyDef.position.set(new Vector2(5, 90));
         Body body = world.createBody(bodyDef);
         CircleShape circle = new CircleShape();
         circle.setRadius(0.2f);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
-        fixtureDef.density = 0.01f;
+        fixtureDef.density = 1f;
         fixtureDef.friction = 0.4f;
         fixtureDef.restitution = 0.0f;
         fixtureDef.filter.categoryBits = GameItself.PLAYER_CF;
         fixtureDef.filter.groupIndex = GameItself.PLAYER_CG;
         body.createFixture(fixtureDef);
         body.setFixedRotation(true);
-        body.setUserData(new BodyUserData(this, "player"));
+        body.setUserData(new SimpleUserData(this, "player"));
         circle.dispose();
+
+        MassData massData = new MassData();
+        massData.mass = 10f;
+        massData.center.set(new Vector2(0f,0f));
+        massData.I = 1f;
+        body.setMassData(massData);
         //sensor
         CircleShape sensorCircle = new CircleShape();
         sensorCircle.setRadius(1f);
@@ -99,11 +104,11 @@ public class Player extends Entity {
         sensorFixtureDef.isSensor = true;
         sensorFixtureDef.filter.categoryBits = GameItself.PLAYER_INTERACT_CF;
         sensorFixtureDef.filter.maskBits = (short) (sensorFixtureDef.filter.maskBits & ~GameItself.PLAYER_CF);
-        body.createFixture(sensorFixtureDef).setUserData(new BodyUserData("playerInteractionBubble"));
+        body.createFixture(sensorFixtureDef).setUserData(new SimpleUserData("playerInteractionBubble"));
         sensorCircle.dispose();
 
         this.body = body;
-        body.setLinearDamping(2);
+        //body.setLinearDamping(2);
 
         PointLight light = new PointLight(rayHandler, 1300, Color.WHITE, 100f, 0, 0);
         light.setSoft(true);
@@ -156,7 +161,6 @@ public class Player extends Entity {
     public void update(float deltaTime){
         if (deltaTime > 0.1f) deltaTime = 0.1f;
         stateTime += deltaTime;
-        body.setLinearVelocity(0,0);
         closestObject = getClosestObject();
         switch (state) {
             case Standing:
@@ -177,43 +181,51 @@ public class Player extends Entity {
                 }
                 break;
         }
+        position.x = (body.getPosition().x);
+        position.y = (body.getPosition().y);
     }
     public void inputMove(boolean moveUp, boolean moveDown, boolean moveToTheRight, boolean moveToTheLeft){
+        Vector2 movingVector = new Vector2();
         if (!(moveToTheRight && moveToTheLeft)) {
             if (moveToTheLeft) {
-                body.setLinearVelocity(-100f, body.getLinearVelocity().y);
+                //body.setLinearVelocity(-100f, body.getLinearVelocity().y);
+                movingVector.set(-100f, movingVector.y);
                 state = Player.State.Walking;
                 facing = Player.Facing.LEFT;
             }
 
             if (moveToTheRight) {
-                body.setLinearVelocity(100f, body.getLinearVelocity().y);
+                //body.setLinearVelocity(100f, body.getLinearVelocity().y);
+                movingVector.set(100f, movingVector.y);
                 state = Player.State.Walking;
                 facing = Player.Facing.RIGHT;
             }
         }
         if (!(moveUp && moveDown)){
             if (moveUp) {
-                body.setLinearVelocity(body.getLinearVelocity().x, 100f);
+                //body.setLinearVelocity(body.getLinearVelocity().x, 100f);
+                movingVector.set(movingVector.x, 100f);
                 state = Player.State.Walking;
                 facing = Player.Facing.UP;
             }
 
             if (moveDown) {
-                body.setLinearVelocity(body.getLinearVelocity().x, -100f);
+                //body.setLinearVelocity(body.getLinearVelocity().x, -100f);
+                movingVector.set(movingVector.x, -100f);
+                //body.applyForceToCenter(body.getLinearVelocity().x, -100f, true);
+                //body.applyLinearImpulse(new Vector2(0, -1), body.getPosition(), true);
                 state = Player.State.Walking;
                 facing = Player.Facing.DOWN;
             }
         }
-        Vector2 vel = body.getLinearVelocity().clamp(0, maxVelocity);
+        Vector2 vel = movingVector.clamp(0, maxVelocity);
         body.setLinearVelocity(vel);
         velocity = vel;
+//        Vector2 vel = movingVector.clamp(0, maxVelocity);
+//        body.applyLinearImpulse(vel, new Vector2(0,0), true);
         if (Math.abs(body.getLinearVelocity().len2()) < 0.5f) {
             state = Player.State.Standing;
         }
-
-        position.x = (body.getPosition().x);
-        position.y = (body.getPosition().y);
     }
     public void renderPlayer(Batch batch, Camera camera){
         //player

@@ -5,9 +5,8 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.mygdx.game.GameItself;
-import com.mygdx.game.tiledmap.BodyUserData;
 
-public class Door extends BodyUserData {
+public class Door extends SimpleUserData {
     TiledMapTileLayer.Cell cell;
     TiledMapTile closed;
     TiledMapTile open;
