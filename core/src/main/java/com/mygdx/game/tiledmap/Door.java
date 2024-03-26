@@ -36,7 +36,7 @@ public class Door extends BodyUserData {
             filtr.maskBits = 0x0002;
         else
             filtr.maskBits = -1;
-        gameItself.game.player.body.getFixtureList().get(0).refilter();
+        gameItself.game.player.getBody().getFixtureList().get(0).refilter();
         cell.setTile(currentTile);
     }
 }

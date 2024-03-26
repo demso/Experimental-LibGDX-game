@@ -37,7 +37,7 @@ public class GameItself {
         PLAYER_INTERACT_CF =    0x0002,
         LIGHT_CF =              0x4000,
         BULLET_CF =             0x0004,
-        ALL_CF =                Short.MAX_VALUE;
+        ALL_CF =                -1;
 
     public SecondGDXGame game;
     public GameScreen gameScreen;
@@ -49,16 +49,13 @@ public class GameItself {
     OrthogonalTiledMapRenderer renderer;
     public OrthographicCamera camera;
     boolean debug = false;
-    Texture textureSheet;
     Texture userSelection;
-    float frameDur = 0.1f;
     ShapeRenderer debugRenderer;
     RayHandler rayHandler;
     public World world;
     Array<Body> bodies;
     float accumulator = 0;
     Box2DDebugRenderer debugRendererPh;
-    TextureRegion textureRegions[][];
     float zoom = 2 ;
     final String mapToLoad = "worldMap/newmap.tmx";
     public static final int TILE_SIDE = 32;
@@ -171,6 +168,51 @@ public class GameItself {
 
             }
         });
+        //border
+//        b2BodyDef myBodyDef;
+//        myBodyDef.type = b2_staticBody;
+//        myBodyDef.position.Set(0, 0);
+//        b2Body* staticBody = m_world->CreateBody(&myBodyDef);
+//
+//        //shape definition
+//        b2PolygonShape polygonShape;
+//
+//        //fixture definition
+//        b2FixtureDef myFixtureDef;
+//        myFixtureDef.shape = &polygonShape;
+//
+//        //add four walls to the static body
+//        b2Vec2 bl(-20, 0);
+//        b2Vec2 br( 20, 0);
+//        b2Vec2 tl(-20,40);
+//        b2Vec2 tr( 20,40);
+//        polygonShape.SetAsEdge( bl, br ); //ground
+//        staticBody->CreateFixture(&myFixtureDef);
+//        polygonShape.SetAsEdge( tl, tr);//ceiling
+//        staticBody->CreateFixture(&myFixtureDef);
+//        polygonShape.SetAsEdge( bl, tl );//left wall
+//        staticBody->CreateFixture(&myFixtureDef);
+//        polygonShape.SetAsEdge( br, tr );//right wall
+//        staticBody->CreateFixture(&myFixtureDef);
+//        BodyDef borderBodyDef = new BodyDef();
+//        borderBodyDef.type = BodyDef.BodyType.StaticBody;
+//        borderBodyDef.position.set(0,0);
+//        Body borderBody = world.createBody(borderBodyDef);
+//        PolygonShape borderShape = new PolygonShape();
+//        FixtureDef borderFixture = new FixtureDef();
+//        borderFixture.shape = borderShape;
+//        Vector2 bl = new Vector2(-20, 0);
+//        Vector2 br = new Vector2(20, 0);
+//        Vector2 tl = new Vector2(-20, 40);
+//        Vector2 tr = new Vector2(20, 40);
+//        borderShape.set(new Vector2[]{bl, br});
+//        borderBody.createFixture(borderFixture);
+//        borderShape.set(new Vector2[]{tl, tr});
+//        borderBody.createFixture(borderFixture);
+//        borderShape.set(new Vector2[]{bl, tl});
+//        borderBody.createFixture(borderFixture);
+//        borderShape.set(new Vector2[]{br, tr});
+//        borderBody.createFixture(borderFixture);
         //light
         rayHandler = new RayHandler(world);
         rayHandler.setCombinedMatrix(camera);
@@ -186,7 +228,6 @@ public class GameItself {
         //player
         player.initBody(world, rayHandler);
     }
-
     private void update(float deltaTime) {
         //UPDATE PHYSICSSTEP
         float frameTime = Math.min(deltaTime, 0.25f);
@@ -213,7 +254,6 @@ public class GameItself {
         //UPDATE STAGE
         hudStage.update(debug);
     }
-
     void render(float deltaTime){
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -259,7 +299,6 @@ public class GameItself {
             debugRendererPh.render(world, camera.combined);
         }
     }
-
     public void fireBullet(Player pla){
         float bulletSpeed = 20f;
         BodyDef bodyDef = new BodyDef();
@@ -297,10 +336,26 @@ public class GameItself {
         body.applyLinearImpulse(vv, body.getPosition(), true);
         //body.setLinearVelocity(vv);
     }
-
-
-
     public void spawnMobs(){
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(new Vector2(5, 85));
+        Body body = world.createBody(bodyDef);
+        CircleShape circle = new CircleShape();
+        circle.setRadius(0.2f);
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = circle;
+        fixtureDef.density = 0.01f;
+        fixtureDef.friction = 0.4f;
+        fixtureDef.restitution = 0.0f;
+        fixtureDef.filter.categoryBits = GameItself.PLAYER_CF;
+        fixtureDef.filter.groupIndex = GameItself.PLAYER_CG;
+        body.createFixture(fixtureDef);
+        circle.dispose();
+
+        body.setFixedRotation(true);
+        body.setUserData(new BodyUserData(this, "zombie"));
+        body.setLinearDamping(2f);
 
     }
 

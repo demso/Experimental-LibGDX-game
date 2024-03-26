@@ -132,7 +132,7 @@ public class HUD extends Stage {
     StringBuilder labelText = new StringBuilder();
     public void drawTileDebugInfo() {
         labelText = new StringBuilder();
-        labelText.append("Player velocity : ").append(gameItself.player.body.getLinearVelocity()).append("\n");
+        labelText.append("Player velocity : ").append(gameItself.player.getBody().getLinearVelocity()).append("\n");
         clObj = gameItself.player.closestObject;
         labelText.append("Closest object : ").append(clObj == null ? null : clObj.getUserData() instanceof BodyUserData ? ((BodyUserData) clObj.getUserData()).bodyName + " " + clObj.getPosition() : clObj.getUserData()).append("\n\n");
         if (debugEntries.size > 0)

@@ -52,7 +52,7 @@ public class InventoryHUD extends Table {
     public void putItemFromInventory(ItemEntry itemEntry){
         player.removeItemFromInventory(itemEntry.item);
         refill();
-        itemEntry.item.allocate(hud.gameItself.world, player.body.getPosition());
+        itemEntry.item.allocate(hud.gameItself.world, player.getBody().getPosition());
     }
 
     public void contextAction(ContextMenu.ConAction action, ContextMenu contextMenu){

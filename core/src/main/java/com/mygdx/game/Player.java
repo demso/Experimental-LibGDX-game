@@ -14,17 +14,18 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.tiledmap.BodyUserData;
+import com.mygdx.game.tiledmap.BodyUserName;
 import org.jetbrains.annotations.Nullable;
 
-public class Player {
+public class Player extends Entity {
     SecondGDXGame game;
     float WIDTH;
     float HEIGHT;
     float maxVelocity = 5f;
     float DAMPING = 0.87f;
-    public Body body;
     Array<Body> closeObjects;
     public Body closestObject;
+
     enum State {
         Standing, Walking
     }
@@ -47,6 +48,9 @@ public class Player {
     Player(SecondGDXGame game){
         this.game = game;
         closeObjects = new Array<>();
+        setEntityType(EntityType.PLAYER);
+        setHp(10);
+        setMaxHp(10);
 
         Texture textureSheet = new Texture(Gdx.files.internal("ClassicRPG_Sheet.png"));
         TextureRegion[][] textureRegions = TextureRegion.split(textureSheet, 16, 16);
@@ -87,7 +91,7 @@ public class Player {
         body.setFixedRotation(true);
         body.setUserData(new BodyUserData(this, "player"));
         circle.dispose();
-
+        //sensor
         CircleShape sensorCircle = new CircleShape();
         sensorCircle.setRadius(1f);
         FixtureDef sensorFixtureDef = new FixtureDef();
@@ -231,5 +235,9 @@ public class Player {
         }
 
         batch.end();
+    }
+    @Override
+    public String getName() {
+        return "player";
     }
 }

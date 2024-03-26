@@ -5,15 +5,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.*;
 import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
 import com.mygdx.game.GameItself;
+import net.dermetfan.gdx.maps.MapUtils;
 
 public class MyTmxMapLoader extends TmxMapLoader {
     GameItself gameItself;
@@ -299,6 +297,27 @@ public class MyTmxMapLoader extends TmxMapLoader {
                     }
                 }
             }
-    }
 
+        BodyDef borderBodyDef = new BodyDef();
+        borderBodyDef.type = BodyDef.BodyType.StaticBody;
+        Vector2 mapSize = new Vector2((int)mymap.getProperties().get("width"),(int) mymap.getProperties().get("width"));
+        borderBodyDef.position.set(0,0);
+        Body borderBody = mymap.world.createBody(borderBodyDef);
+        EdgeShape borderShape = new EdgeShape();
+        FixtureDef borderFixture = new FixtureDef();
+        borderFixture.shape = borderShape;
+        Vector2 bl = new Vector2(0, 0);
+        Vector2 br = new Vector2(mapSize.x, 0);
+        Vector2 tl = new Vector2(0, mapSize.y);
+        Vector2 tr = new Vector2(mapSize.x, mapSize.y);
+        borderShape.set(bl, br);
+        borderBody.createFixture(borderFixture);
+        borderShape.set(tl, tr);
+        borderBody.createFixture(borderFixture);
+        borderShape.set(bl, tl);
+        borderBody.createFixture(borderFixture);
+        borderShape.set(br, tr);
+        borderBody.createFixture(borderFixture);
+
+    }
 }
