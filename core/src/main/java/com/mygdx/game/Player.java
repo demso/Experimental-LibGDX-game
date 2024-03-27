@@ -20,7 +20,7 @@ public class Player extends Entity {
     SecondGDXGame game;
     float WIDTH;
     float HEIGHT;
-    float maxVelocity = 5f;
+    float maxVelocity = 20f;
     float DAMPING = 0.87f;
     Array<Body> closeObjects;
     public Body closestObject;
@@ -200,64 +200,49 @@ public class Player extends Entity {
 
         if (moveUp || moveDown || moveToTheRight || moveToTheLeft){
             wasMoveDown = true;
-//        if (body.getLinearVelocity().len2() > 0.01)
-//        body.setLinearVelocity(body.getLinearVelocity().sub(vel));
-//        vel.set(0,0);
-        if (!(moveToTheRight && moveToTheLeft)) {
-//            if (wasMoveToTheLeft){
-//                otherVelocity.x = body.getLinearVelocity().x + 100f;
-//            }
-//            if (wasMoveToTheRight){
-//                otherVelocity.x = body.getLinearVelocity().x - 100f;
-//            }
-            if (moveToTheLeft) {
-                //body.setLinearVelocity(-100f, body.getLinearVelocity().y);
-                movingVector.set(-100f, movingVector.y);
-                state = Player.State.Walking;
-                facing = Player.Facing.LEFT;
-            }
+    //        if (body.getLinearVelocity().len2() > 0.01)
+    //        body.setLinearVelocity(body.getLinearVelocity().sub(vel));
+            vel.set(0,0);
+            movingVector.set(0,0);
+            if (!(moveToTheRight && moveToTheLeft)) {
+    //            if (wasMoveToTheLeft){
+    //                otherVelocity.x = body.getLinearVelocity().x + 100f;
+    //            }
+    //            if (wasMoveToTheRight){
+    //                otherVelocity.x = body.getLinearVelocity().x - 100f;
+    //            }
+                if (moveToTheLeft) {
+                    movingVector.set(-maxVelocity, movingVector.y);
+                    state = Player.State.Walking;
+                    facing = Player.Facing.LEFT;
+                }
 
-            if (moveToTheRight) {
-                //body.setLinearVelocity(100f, body.getLinearVelocity().y);
-                movingVector.set(100f, movingVector.y);
-                state = Player.State.Walking;
-                facing = Player.Facing.RIGHT;
+                if (moveToTheRight) {
+                    movingVector.set(maxVelocity, movingVector.y);
+                    state = Player.State.Walking;
+                    facing = Player.Facing.RIGHT;
+                }
             }
-        }
-        if (!(moveUp && moveDown)){
-//            if (wasMoveUp){
-//                otherVelocity.y = body.getLinearVelocity().y - 100;
-//            }
-//            if (wasMoveDown){
-//                otherVelocity.y = body.getLinearVelocity().y + 100;
-//            }
-            if (moveUp) {
-                //body.setLinearVelocity(body.getLinearVelocity().x, 100f);
-                movingVector.set(movingVector.x, 100f);
-                state = Player.State.Walking;
-                facing = Player.Facing.UP;
-            }
+            if (!(moveUp && moveDown)){
+                if (moveUp) {
+                    movingVector.set(movingVector.x, maxVelocity);
+                    state = Player.State.Walking;
+                    facing = Player.Facing.UP;
+                }
 
-            if (moveDown) {
-                //body.setLinearVelocity(body.getLinearVelocity().x, -100f);
-                movingVector.set(movingVector.x, -100f);
-                //body.applyForceToCenter(body.getLinearVelocity().x, -100f, true);
-                //body.applyLinearImpulse(new Vector2(0, -1), body.getPosition(), true);
-                state = Player.State.Walking;
-                facing = Player.Facing.DOWN;
+                if (moveDown) {
+                    movingVector.set(movingVector.x, -maxVelocity);
+                    state = Player.State.Walking;
+                    facing = Player.Facing.DOWN;
+                }
             }
-        }
-        vel.set(movingVector.clamp(0, maxVelocity*4));
-        //body.setLinearVelocity(vel);
-            //body.applyForceToCenter(vel, true);
+            vel.set(movingVector.clamp(0, maxVelocity));
             body.applyLinearImpulse(vel, zeroVector, true);
             velocity.set(vel);
-        }
+        }else
 
-
-//        Vector2 vel = movingVector.clamp(0, maxVelocity);
-        //body.applyLinearImpulse(vel, zeroVector, true);
         if (Math.abs(body.getLinearVelocity().len2()) < 0.5f) {
+            body.setLinearVelocity(0f,0f);
             state = Player.State.Standing;
         }
     }
