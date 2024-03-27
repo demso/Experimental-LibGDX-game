@@ -5,7 +5,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
 public class Zombie extends Entity{
-    EntitySprite sprite;
+    CustomBox2DSprite sprite;
+    int damage = 4;
     public Zombie(TiledMapTile tile, World world, Vector2 position){
         setEntityType(EntityType.HOSTILE);
         setHp(10);
@@ -25,7 +26,7 @@ public class Zombie extends Entity{
         fixtureDef.filter.categoryBits = GameItself.ZOMBIE_CF;
         fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits & ~GameItself.LIGHT_CF);
 
-        Body body = world.createBody(bodyDef);
+        body = world.createBody(bodyDef);
         body.createFixture(fixtureDef);
         body.setFixedRotation(true);
 
@@ -34,15 +35,29 @@ public class Zombie extends Entity{
         massData.center.set(new Vector2(0f,0f));
 
         body.setMassData(massData);
-        body.setLinearDamping(2);
+        body.setLinearDamping(10);
         circle.dispose();
 
-        sprite = new EntitySprite(tile.getTextureRegion(), "zombie", this, 1f, 1f);
+        sprite = new CustomBox2DSprite(tile.getTextureRegion(), "zombie", this, 1f, 1f);
 
         body.setUserData(sprite);
     }
+
+    @Override
+    public int hurt(int damage) {
+        int hp = super.hurt(damage);
+        System.out.println(getName() + " is hurt, hp: "+hp);
+        return hp;
+    }
+
     @Override
     public String getName(){
         return "zombie";
+    }
+
+    @Override
+    public void kill() {
+        GameItself.bodiesToDeletion.add(body);
+        System.out.println(getName() + " killed.");
     }
 }

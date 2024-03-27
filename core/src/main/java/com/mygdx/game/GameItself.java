@@ -64,7 +64,7 @@ public class GameItself {
     HUD hudStage;
     public Stage gameStage;
     public static ObjectIntMap<String> tilemapa;
-    ObjectSet<Body> bodiesToDeletion = new ObjectSet<>();
+    public static ObjectSet<Body> bodiesToDeletion = new ObjectSet<>();
     float physicsStep = 1/144f;
 
     GameItself(GameScreen gameScreen){
@@ -137,11 +137,18 @@ public class GameItself {
                     Body thisBody = thisFixture.getBody();
                     Body anotherBody = anotherFixture.getBody();
                     Object userData = thisBody.getUserData();
+                    Object anotherUserData = anotherBody.getUserData();
                     if (userData instanceof UserData){
                         String bodyUserName = ((UserData) userData).getName();
                         switch (bodyUserName){
                             case "player" -> { if (thisFixture.isSensor() && !anotherFixture.isSensor()) player.closeObjects.add(anotherBody); }
-                            case "bullet" -> {bodiesToDeletion.add(thisBody); }
+                            case "bullet" -> {
+                                bodiesToDeletion.add(thisBody);
+                                if (anotherUserData instanceof UserData && ((UserData)anotherUserData).getData() instanceof Zombie){
+                                    Zombie zombie = (Zombie) ((CustomBox2DSprite) anotherUserData).getData();
+                                    zombie.hurt(((Bullet) ((CustomBox2DSprite) userData).getData()).getDamage());
+                                }
+                            }
                         }
                     }
                 }
@@ -208,7 +215,7 @@ public class GameItself {
         boolean moveUp = Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W);
         boolean moveDown = Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S);
 
-        player.inputMove(moveUp, moveDown, moveToTheRight, moveToTheLeft);
+        player.inputMove(moveUp, moveDown, moveToTheRight, moveToTheLeft, deltaTime);
 
         //UPDATE STAGE
         hudStage.update(debug);
@@ -262,51 +269,9 @@ public class GameItself {
         Vector3 mousePos = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
         Vector2 vv = new Vector2(mousePos.x-player.position.x, mousePos.y-player.position.y);
         new Bullet(map.getTileSets().getTile(tilemapa.get("bullet", 958)), world, pla.getPosition(), vv);
-//        float bulletSpeed = 200f;
-//        BodyDef bodyDef = new BodyDef();
-//        bodyDef.type = BodyDef.BodyType.DynamicBody;
-//        bodyDef.position.set(pla.position);
-//        Body body = world.createBody(bodyDef);
-//        CircleShape circle = new CircleShape();
-//        circle.setRadius(0.04f);
-//        FixtureDef fixtureDef = new FixtureDef();
-//        fixtureDef.shape = circle;
-//        fixtureDef.density = 1f;
-//        fixtureDef.filter.categoryBits = BULLET_CF;
-//        fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits & ~LIGHT_CF);
-//        body.setBullet(true);
-//        body.createFixture(fixtureDef);
-//        body.setFixedRotation(true);
-//
-//        MassData massData = new MassData();
-//        massData.mass = 0.007f;
-//        massData.center.set(new Vector2(0f,0f));
-//        body.setMassData(massData);
-//
-//        CustomBox2DSprite bSprite = new CustomBox2DSprite(map.getTileSets().getTile(tilemapa.get("bullet", 958)).getTextureRegion(), "bullet");
-//        bSprite.setSize(0.5f, 0.5f);
-//
-//        body.setUserData(bSprite);
-//
-//        circle.dispose();
-//        Vector3 mousePos = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-//        Vector2 vv = new Vector2(mousePos.x-player.position.x, mousePos.y-player.position.y);
-//
-//        beginV = body.getPosition();
-//        endV = new Vector2(mousePos.x, mousePos.y);
-//
-//        vv.nor().scl(bulletSpeed);
-//        Filter filter = body.getFixtureList().get(0).getFilterData();
-//        filter.maskBits = (short) (filter.maskBits & ~LIGHT_CF & ~PLAYER_CF & ~PLAYER_INTERACT_CF);
-//        body.getFixtureList().get(0).setFilterData(filter);
-//
-//        //body.applyForceToCenter(vv, true);
-//        //body.applyLinearImpulse(vv, body.getPosition(), true);
-//        body.setLinearVelocity(vv);
     }
     public void spawnMobs(){
         new Zombie(map.getTileSets().getTile(tilemapa.get("zombie1", 958)),world, new Vector2(5,85));
-
     }
 
     Vector2 beginV;

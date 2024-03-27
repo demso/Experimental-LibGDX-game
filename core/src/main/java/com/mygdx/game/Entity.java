@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.mygdx.game.tiledmap.UserData;
 
-public class Entity implements UserName {
+public abstract class Entity implements UserName {
     public enum EntityType {
         PLAYER("Player"),
         NEUTRAL("Neutral"),
@@ -28,7 +28,8 @@ public class Entity implements UserName {
     public Entity(){}
     public int hurt(int damage){
         hp = Math.max(0, hp-damage);
-        if (hp == 0) isAlive = false;
+        if (hp == 0)
+            kill();
         return hp;
     }
     public void setHp(int hp) {
@@ -72,4 +73,5 @@ public class Entity implements UserName {
     public String getName() {
         return entityType + " Entity";
     }
+    public abstract void kill();
 }

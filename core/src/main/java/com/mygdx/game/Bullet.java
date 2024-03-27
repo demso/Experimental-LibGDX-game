@@ -7,10 +7,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 
-public class Bullet{
+public class Bullet implements UserName {
     CustomBox2DSprite sprite;
     Body body;
     Vector2 moveVec;
+    int damage = 3;
     public Bullet(TiledMapTile tile, World world, Vector2 position, Vector2 target) {
         float bulletSpeed = 200f;
         BodyDef bodyDef = new BodyDef();
@@ -47,7 +48,16 @@ public class Bullet{
         body.setLinearVelocity(moveVec);
     }
 
+    public int getDamage(){
+        return damage;
+    }
+
     public Vector2 getPosition(){
         return body.getPosition();
+    }
+
+    @Override
+    public String getName() {
+        return "bullet";
     }
 }

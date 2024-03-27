@@ -92,7 +92,7 @@ public class Player extends Entity {
         circle.dispose();
 
         MassData massData = new MassData();
-        massData.mass = 10f;
+        massData.mass = 60f;
         massData.center.set(new Vector2(0f,0f));
         massData.I = 1f;
         body.setMassData(massData);
@@ -108,7 +108,7 @@ public class Player extends Entity {
         sensorCircle.dispose();
 
         this.body = body;
-        //body.setLinearDamping(2);
+        body.setLinearDamping(12);
 
         PointLight light = new PointLight(rayHandler, 1300, Color.WHITE, 100f, 0, 0);
         light.setSoft(true);
@@ -184,9 +184,32 @@ public class Player extends Entity {
         position.x = (body.getPosition().x);
         position.y = (body.getPosition().y);
     }
-    public void inputMove(boolean moveUp, boolean moveDown, boolean moveToTheRight, boolean moveToTheLeft){
-        Vector2 movingVector = new Vector2();
+
+
+    Vector2 movingVector = new Vector2();
+    Vector2 vel = new Vector2();
+    Vector2 zeroVector = new Vector2(0, 0);
+    boolean wasMoveDown;
+    public void inputMove(boolean moveUp, boolean moveDown, boolean moveToTheRight, boolean moveToTheLeft, float deltaTime){
+//        if(wasMoveDown){
+//            body.setLinearVelocity(0,0);
+//            vel.set(0,0);
+//            wasMoveDown = false;
+//            velocity.set(vel);
+//        }
+
+        if (moveUp || moveDown || moveToTheRight || moveToTheLeft){
+            wasMoveDown = true;
+//        if (body.getLinearVelocity().len2() > 0.01)
+//        body.setLinearVelocity(body.getLinearVelocity().sub(vel));
+//        vel.set(0,0);
         if (!(moveToTheRight && moveToTheLeft)) {
+//            if (wasMoveToTheLeft){
+//                otherVelocity.x = body.getLinearVelocity().x + 100f;
+//            }
+//            if (wasMoveToTheRight){
+//                otherVelocity.x = body.getLinearVelocity().x - 100f;
+//            }
             if (moveToTheLeft) {
                 //body.setLinearVelocity(-100f, body.getLinearVelocity().y);
                 movingVector.set(-100f, movingVector.y);
@@ -202,6 +225,12 @@ public class Player extends Entity {
             }
         }
         if (!(moveUp && moveDown)){
+//            if (wasMoveUp){
+//                otherVelocity.y = body.getLinearVelocity().y - 100;
+//            }
+//            if (wasMoveDown){
+//                otherVelocity.y = body.getLinearVelocity().y + 100;
+//            }
             if (moveUp) {
                 //body.setLinearVelocity(body.getLinearVelocity().x, 100f);
                 movingVector.set(movingVector.x, 100f);
@@ -218,11 +247,16 @@ public class Player extends Entity {
                 facing = Player.Facing.DOWN;
             }
         }
-        Vector2 vel = movingVector.clamp(0, maxVelocity);
-        body.setLinearVelocity(vel);
-        velocity = vel;
+        vel.set(movingVector.clamp(0, maxVelocity*4));
+        //body.setLinearVelocity(vel);
+            //body.applyForceToCenter(vel, true);
+            body.applyLinearImpulse(vel, zeroVector, true);
+            velocity.set(vel);
+        }
+
+
 //        Vector2 vel = movingVector.clamp(0, maxVelocity);
-//        body.applyLinearImpulse(vel, new Vector2(0,0), true);
+        //body.applyLinearImpulse(vel, zeroVector, true);
         if (Math.abs(body.getLinearVelocity().len2()) < 0.5f) {
             state = Player.State.Standing;
         }
@@ -251,5 +285,10 @@ public class Player extends Entity {
     @Override
     public String getName() {
         return "player";
+    }
+
+    @Override
+    public void kill() {
+
     }
 }
