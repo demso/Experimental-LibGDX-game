@@ -290,7 +290,8 @@ public class MyTmxMapLoader extends TmxMapLoader {
                             fullBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
                             fullBody = mymap.world.createBody(fullBodyDef);
                             fullBody.createFixture(fullFixtureDef);
-                            fullBody.setUserData(new Door(gameItself,cell, fullBody, map.getTileSets().getTileSet("normalTerrain").getTile(160), map.getTileSets().getTileSet("normalTerrain").getTile(110), i, j));
+                            TiledMapTileSet ts = map.getTileSets().getTileSet("normal_terrain");
+                            fullBody.setUserData(new Door(gameItself,cell, fullBody, map.getTileSets().getTile(13409), map.getTileSets().getTile(13358), i, j));
                             mymap.staticObjects.add(fullBody);
                             break;
                     }

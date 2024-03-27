@@ -3,6 +3,7 @@ package com.mygdx.game;
 import box2dLight.PointLight;
 import box2dLight.RayHandler;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -200,17 +201,9 @@ public class Player extends Entity {
 
         if (moveUp || moveDown || moveToTheRight || moveToTheLeft){
             wasMoveDown = true;
-    //        if (body.getLinearVelocity().len2() > 0.01)
-    //        body.setLinearVelocity(body.getLinearVelocity().sub(vel));
             vel.set(0,0);
             movingVector.set(0,0);
             if (!(moveToTheRight && moveToTheLeft)) {
-    //            if (wasMoveToTheLeft){
-    //                otherVelocity.x = body.getLinearVelocity().x + 100f;
-    //            }
-    //            if (wasMoveToTheRight){
-    //                otherVelocity.x = body.getLinearVelocity().x - 100f;
-    //            }
                 if (moveToTheLeft) {
                     movingVector.set(-maxVelocity, movingVector.y);
                     state = Player.State.Walking;
@@ -236,13 +229,15 @@ public class Player extends Entity {
                     facing = Player.Facing.DOWN;
                 }
             }
-            vel.set(movingVector.clamp(0, maxVelocity));
+            if (Gdx.input.isKeyPressed(Input.Keys.C))
+                vel.set(movingVector.clamp(0, maxVelocity).scl(0.5f));
+            else if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT))
+                vel.set(movingVector.clamp(0, maxVelocity).scl(1.5f));
+            else vel.set(movingVector.clamp(0, maxVelocity));
             body.applyLinearImpulse(vel, zeroVector, true);
             velocity.set(vel);
-        }else
-
-        if (Math.abs(body.getLinearVelocity().len2()) < 0.5f) {
-            body.setLinearVelocity(0f,0f);
+        } if (Math.abs(body.getLinearVelocity().len2()) < 0.5f) {
+            //body.setLinearVelocity(0f,0f);
             state = Player.State.Standing;
         }
     }

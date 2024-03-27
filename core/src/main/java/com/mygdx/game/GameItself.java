@@ -25,6 +25,7 @@ import com.mygdx.game.tiledmap.SimpleUserData;
 import com.mygdx.game.tiledmap.UserData;
 import com.mygdx.game.tiledmap.Door;
 import com.mygdx.game.tiledmap.MyTmxMapLoader;
+import com.strongjoshua.console.GUIConsole;
 import net.dermetfan.gdx.graphics.g2d.Box2DSprite;
 import net.dermetfan.gdx.physics.box2d.Box2DUtils;
 
@@ -59,13 +60,16 @@ public class GameItself {
     float accumulator = 0;
     Box2DDebugRenderer debugRendererPh;
     float zoom = 2 ;
-    final String mapToLoad = "worldMap/newmap.tmx";
+    final String mapToLoad = "newWorldMap/newmap.tmx";
     public static final int TILE_SIDE = 32;
     HUD hudStage;
     public Stage gameStage;
     public static ObjectIntMap<String> tilemapa;
     public static ObjectSet<Body> bodiesToDeletion = new ObjectSet<>();
     float physicsStep = 1/144f;
+    public static GUIConsole console;
+    ShapeRenderer shapeRenderer;
+    Vector3 mousePos;
 
     GameItself(GameScreen gameScreen){
         this.game = gameScreen.game;
@@ -75,6 +79,7 @@ public class GameItself {
         this.skin = game.skin;
 
         debugRenderer = new ShapeRenderer();
+        shapeRenderer = new ShapeRenderer();
         bodies = new Array<>();
         world = new World(new Vector2(0, 0), true);
         hudStage = new HUD(this, new ScreenViewport(), game.batch);
@@ -96,15 +101,25 @@ public class GameItself {
         game.player.HEIGHT = 0.8f;
         player.position.set(5,95);
 
+        initStatic();
         initTextures();
         initScene2D();
         initPhysics();
+
+        console = new GUIConsole(true);
+        console.setNoHoverAlpha(0.5f);
+        console.setCommandExecutor(new ConsoleCommands(this));
 
         player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("10mm_fmj", 958)), this, "10mm FMJ bullets"));
         player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("beef", 958)), this, "Beef"));
         player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("watches", 958)), this, "Watches"));
         player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("shotgunammo", 958)), this, "Shotgun ammo"));
         player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("deagle_44", 958)), this, "Deagle .44"));
+
+        spawnMobs();
+
+        //console.setVisible(true);
+
 //        player.equipItem(player.getInventoryItems().select(new Predicate<Item>() {
 //            @Override
 //            public boolean evaluate(Item arg0) {
@@ -192,7 +207,10 @@ public class GameItself {
         //player
         player.initBody(world, rayHandler);
         //mobs
-        spawnMobs();
+    }
+    void initStatic(){
+        TileResolver.init(tilemapa, map.getTileSets());
+        MobsFactory.init(world);
     }
     private void update(float deltaTime) {
         //UPDATE PHYSICSSTEP
@@ -243,6 +261,14 @@ public class GameItself {
 
         player.renderPlayer(renderer.getBatch(), camera);
 
+        //mousePos = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+        shapeRenderer.setProjectionMatrix(hudStage.getBatch().getProjectionMatrix());
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.WHITE);
+        shapeRenderer.line( hudStage.getWidth()/2f, hudStage.getHeight()/2f, Gdx.input.getX(), hudStage.getHeight()-Gdx.input.getY());
+        shapeRenderer.setColor(Color.YELLOW);
+        shapeRenderer.end();
+
         rayHandler.setCombinedMatrix(camera);
         rayHandler.updateAndRender();
 
@@ -264,6 +290,8 @@ public class GameItself {
             renderDebug();
             debugRendererPh.render(world, camera.combined);
         }
+
+        console.draw();
     }
     public void fireBullet(Player pla){
         Vector3 mousePos = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
@@ -271,7 +299,7 @@ public class GameItself {
         new Bullet(map.getTileSets().getTile(tilemapa.get("bullet", 958)), world, pla.getPosition(), vv);
     }
     public void spawnMobs(){
-        new Zombie(map.getTileSets().getTile(tilemapa.get("zombie1", 958)),world, new Vector2(5,85));
+        MobsFactory.spawnZombie(5, 85);
     }
 
     Vector2 beginV;
@@ -288,14 +316,10 @@ public class GameItself {
     }
 
     class HUDInputListener extends InputListener {
-        static boolean ctrl = false;
         @Override
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
             super.touchDown(event, x, y, pointer, button);
-            if (event.getKeyCode() == Input.Keys.CONTROL_LEFT){
-                ctrl = true;
-            }
-            return true;
+            return false;
         }
 
         @Override
@@ -343,14 +367,7 @@ public class GameItself {
                 if (player.equipedItem != null && player.equipedItem.itemName.equals("Deagle .44"))
                     fireBullet(player);
             }
-            if (event.getKeyCode() == Input.Keys.CONTROL_LEFT){
-                ctrl = false;
-            }
-            if (event.getKeyCode() == Input.Keys.CONTROL_LEFT){
-                ctrl = false;
-            }
-
-            return true;
+            return false;
         }
     }
 }

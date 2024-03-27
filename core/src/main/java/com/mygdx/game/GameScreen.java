@@ -26,6 +26,7 @@ public class GameScreen implements Screen {
     @Override
     public void resize(int width, int height) {
        hudStage.updateOnResize(width, height);
+       gameItself.console.refresh(true);
        gameItself.gameStage.getViewport().update(width , height, false);
        gameItself.camera.setToOrtho(false, width * (1f/GameItself.TILE_SIDE) * (1/ gameItself.zoom), height * (1f/GameItself.TILE_SIDE) * (1/ gameItself.zoom));
     }
@@ -44,11 +45,11 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         InputMultiplexer multiplexer = new InputMultiplexer();
-        Gdx.input.setInputProcessor(multiplexer);
         multiplexer.addProcessor(hudStage);
         multiplexer.addProcessor(gameItself.gameStage);
 
-
         Gdx.input.setInputProcessor(multiplexer);
+
+        gameItself.console.resetInputProcessing();
     }
 }
