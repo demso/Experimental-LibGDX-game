@@ -18,8 +18,6 @@ import com.mygdx.game.behaviours.PlayerCollisionBehaviour;
 import com.mygdx.game.tiledmap.SimpleUserData;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
-import dev.lyze.gdxUnBox2d.behaviours.BehaviourAdapter;
-import dev.lyze.gdxUnBox2d.behaviours.fixtures.CreateBoxFixtureBehaviour;
 import org.jetbrains.annotations.Nullable;
 
 public class Player extends Entity {

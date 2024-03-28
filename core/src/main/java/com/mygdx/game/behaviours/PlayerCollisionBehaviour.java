@@ -74,7 +74,7 @@ public class PlayerCollisionBehaviour extends BehaviourAdapter {
             return;
         }
         float minDist = Float.MAX_VALUE;
-        float dist = 0;
+        float dist;
         for (Body closeBody : closeBodies) {
             dist = playerBody.getPosition().dst2(closeBody.getPosition());
             if (dist < minDist){

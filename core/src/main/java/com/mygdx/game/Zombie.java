@@ -11,12 +11,11 @@ import dev.lyze.gdxUnBox2d.behaviours.SoutBehaviour;
 public class Zombie extends Entity{
     CustomBox2DSprite sprite;
     int damage = 4;
+    GameObject zombieObject;
     public Zombie(TiledMapTile tile, World world, Vector2 position){
         setEntityType(EntityType.HOSTILE);
         setHp(10);
         setMaxHp(10);
-
-        GameObject zombieObject = new GameObject("zombie", GameItself.unbox);
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -45,19 +44,18 @@ public class Zombie extends Entity{
         body.setUserData(this);
         circle.dispose();
 
+        body.setUserData(this);
+
+        zombieObject = new GameObject(getName(), GameItself.unbox);
+
         new Box2dBehaviour(body, zombieObject);
-        new SpriteBehaviour(zombieObject,tile.getTextureRegion(), GameConstants.ZOMBIE_RO);
+        new SpriteBehaviour(zombieObject, tile.getTextureRegion(), GameConstants.ZOMBIE_RO);
         new SoutBehaviour("zombieLogger", false, zombieObject);
-//
-//        sprite = new CustomBox2DSprite(tile.getTextureRegion(), "zombie", this, 1f, 1f);
-//
-//        body.setUserData(sprite);
     }
 
     @Override
     public int hurt(int damage) {
         int hp = super.hurt(damage);
-        System.out.println(getName() + " is hurt, hp: "+hp);
         return hp;
     }
 
@@ -68,7 +66,6 @@ public class Zombie extends Entity{
 
     @Override
     public void kill() {
-        GameItself.bodiesToDeletion.add(body);
-        System.out.println(getName() + " killed.");
+        zombieObject.destroy();
     }
 }

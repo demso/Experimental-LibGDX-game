@@ -57,7 +57,7 @@ public class GameItself {
     Texture userSelection;
     ShapeRenderer debugRenderer;
     RayHandler rayHandler;
-    public World world;
+    public static World world;
     Array<Body> bodies;
     float accumulator = 0;
     Box2DDebugRenderer debugRendererPh;
@@ -162,7 +162,6 @@ public class GameItself {
 //                    if (userData instanceof UserData){
 //                        String bodyUserName = ((UserData) userData).getName();
 //                        switch (bodyUserName){
-//                            case "player" -> { if (thisFixture.isSensor() && !anotherFixture.isSensor()) player.closeObjects.add(anotherBody); }
 //                            case "bullet" -> {
 //                                bodiesToDeletion.add(thisBody);
 //                                if (anotherUserData instanceof UserData && ((UserData)anotherUserData).getData() instanceof Zombie){
@@ -177,19 +176,8 @@ public class GameItself {
 //
 //            @Override
 //            public void endContact(Contact contact) {
-//                llend++;
-//                var fixtureA = contact.getFixtureA();
-//                var fixtureB = contact.getFixtureB();
-//                var dataA = contact.getFixtureA().getBody().getUserData();
-//                var dataB = contact.getFixtureB().getBody().getUserData();
-//                if (dataA instanceof SimpleUserData && ((SimpleUserData) dataA).bodyName.equals("player") && fixtureA.isSensor() && !fixtureB.isSensor()){
-//                    player.closeObjects.removeValue(contact.getFixtureB().getBody(), true);
-//                }
-//                if (dataB instanceof SimpleUserData && ((SimpleUserData) dataB).bodyName.equals("player") && !fixtureA.isSensor() && fixtureB.isSensor()){
-//                    player.closeObjects.removeValue(contact.getFixtureA().getBody(), true);
-//                }
 //            }
-//sssssssssss
+//
 //            @Override
 //            public void preSolve(Contact contact, Manifold oldManifold) {
 //
@@ -326,7 +314,6 @@ public class GameItself {
             debugRenderer.end();
         }
     }
-
     class HUDInputListener extends InputListener {
         @Override
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {

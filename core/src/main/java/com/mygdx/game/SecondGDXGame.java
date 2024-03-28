@@ -36,8 +36,10 @@ public class SecondGDXGame extends Game {
     public static Skin skin;
     static BitmapFont font;
     public static BitmapFont fontRoboto14;
+    public static HandyHelper helper;
     @Override
     public void create() {
+
         batch = new SpriteBatch();
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Xolonium-Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -58,6 +60,7 @@ public class SecondGDXGame extends Game {
         player = new Player(this);
         menuScreen = new MainMenuScreen(this);
         gameScreen = new GameScreen(this);
+        helper = new HandyHelper();
         this.setScreen(menuScreen);
     }
 }
