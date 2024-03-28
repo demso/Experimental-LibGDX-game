@@ -10,7 +10,7 @@ public class ConsoleCommands extends CommandExecutor {
         this.gameItself = gameItself;
     }
     @ConsoleDoc(description = "Spawns mobs.") public final void spawnMobs () {
-        gameItself.spawnMobs();
+        gameItself.tester();
     }
 
     @ConsoleDoc(description = "Spawns certain mob.") public final void spawnMob (String name, float x, float y) {

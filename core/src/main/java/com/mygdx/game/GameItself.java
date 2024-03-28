@@ -16,14 +16,11 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.Cullable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.UI.HUD;
-import com.mygdx.game.tiledmap.SimpleUserData;
-import com.mygdx.game.tiledmap.UserData;
 import com.mygdx.game.tiledmap.Door;
 import com.mygdx.game.tiledmap.MyTmxMapLoader;
 import com.strongjoshua.console.GUIConsole;
@@ -68,7 +65,7 @@ public class GameItself {
     public Stage gameStage;
     public static ObjectIntMap<String> tilemapa;
     public static ObjectSet<Body> bodiesToDeletion = new ObjectSet<>();
-    float physicsStep = 1/144f;
+    float physicsStep = 1/100f;
     public static GUIConsole console;
     ShapeRenderer shapeRenderer;
     public static UnBox unbox;
@@ -116,25 +113,15 @@ public class GameItself {
         console.setNoHoverAlpha(0.5f);
         console.setCommandExecutor(new ConsoleCommands(this));
 
-        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("10mm_fmj", 958)), this, "10mm FMJ bullets"));
-        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("beef", 958)), this, "Beef"));
-        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("watches", 958)), this, "Watches"));
-        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("shotgunammo", 958)), this, "Shotgun ammo"));
-        player.addItemToInventory(new Item(map.getTileSets().getTile(tilemapa.get("deagle_44", 958)), this, "Deagle .44"));
-
-        spawnMobs();
-
-        //console.setVisible(true);
-
-//        player.equipItem(player.getInventoryItems().select(new Predicate<Item>() {
-//            @Override
-//            public boolean evaluate(Item arg0) {
-//                if (arg0.itemName.equals("Deagle .44"))
-//                    return true;
-//                else
-//                    return false;
-//            }
-//        }).iterator().next());
+        tester();
+    }
+    public void tester(){
+        player.addItemToInventory(new Item(TileResolver.getTile("10mm_fmj"), this, "10mm FMJ bullets"));
+        player.addItemToInventory(new Item(TileResolver.getTile("beef"), this, "Beef"));
+        player.addItemToInventory(new Item(TileResolver.getTile("watches"), this, "Watches"));
+        player.addItemToInventory(new Item(TileResolver.getTile("shotgunammo"), this, "Shotgun ammo"));
+        player.addItemToInventory(new Item(TileResolver.getTile("deagle_44"), this, "Deagle .44"));
+        MobsFactory.spawnZombie(5, 85);
     }
     void initTextures(){
         userSelection = new Texture(Gdx.files.internal("selection.png"));
@@ -143,51 +130,6 @@ public class GameItself {
         hudStage.addListener(new HUDInputListener());
     }
     void initPhysics(){
-        //world
-//        world.setGravity(new Vector2(0, 5));
-//        world.setContactListener(new ContactListener() {
-//            static int ll = 0;
-//            static int llend = 0;
-//            @Override
-//            public void beginContact(Contact contact) {
-//                ll++;
-//                Fixture[] fixtures = new Fixture[]{contact.getFixtureA(), contact.getFixtureB()};
-//                for (int i = 0; i < 2; i++){
-//                    Fixture thisFixture = fixtures[i];
-//                    Fixture anotherFixture = fixtures[(i+1)%2];
-//                    Body thisBody = thisFixture.getBody();
-//                    Body anotherBody = anotherFixture.getBody();
-//                    Object userData = thisBody.getUserData();
-//                    Object anotherUserData = anotherBody.getUserData();
-//                    if (userData instanceof UserData){
-//                        String bodyUserName = ((UserData) userData).getName();
-//                        switch (bodyUserName){
-//                            case "bullet" -> {
-//                                bodiesToDeletion.add(thisBody);
-//                                if (anotherUserData instanceof UserData && ((UserData)anotherUserData).getData() instanceof Zombie){
-//                                    Zombie zombie = (Zombie) ((CustomBox2DSprite) anotherUserData).getData();
-//                                    zombie.hurt(((Bullet) ((CustomBox2DSprite) userData).getData()).getDamage());
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void endContact(Contact contact) {
-//            }
-//
-//            @Override
-//            public void preSolve(Contact contact, Manifold oldManifold) {
-//
-//            }
-//
-//            @Override
-//            public void postSolve(Contact contact, ContactImpulse impulse) {
-//
-//            }
-//        });
         //light
         rayHandler = new RayHandler(world);
         rayHandler.setCombinedMatrix(camera);
@@ -196,7 +138,7 @@ public class GameItself {
         rayHandler.setAmbientLight(0f, 0f, 0f, 1f);
         rayHandler.setBlurNum(1);
         //game
-        Item it = new Item(map.getTileSets().getTile(tilemapa.get("10mm_fmj", 1)), this, "10mm FMJ bullets");
+        Item it = new Item(TileResolver.getTile("10mm_fmj"), this, "10mm FMJ bullets");
         it.allocate(world, new Vector2(3.5f,96.5f));
         //player
         player.initBody(world, rayHandler);
@@ -207,13 +149,6 @@ public class GameItself {
         MobsFactory.init(world);
     }
     private void update(float deltaTime) {
-        //UPDATE PHYSICSSTEP
-//        float frameTime = Math.min(deltaTime, 0.25f);
-//        accumulator += frameTime;
-//        while (accumulator >= physicsStep) {
-//            world.step(physicsStep, 8, 3);
-//            accumulator -= physicsStep;
-//        }
         if (bodiesToDeletion.size != 0) {
             bodiesToDeletion.forEach((Body body) -> world.destroyBody(body));
             bodiesToDeletion.clear();
@@ -259,7 +194,6 @@ public class GameItself {
         gameStage.act(deltaTime);
         gameStage.draw();
 
-        //mousePos = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
         shapeRenderer.setProjectionMatrix(hudStage.getBatch().getProjectionMatrix());
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(Color.WHITE);
@@ -296,10 +230,7 @@ public class GameItself {
     public void fireBullet(Player pla){
         Vector3 mousePos = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
         Vector2 vv = new Vector2(mousePos.x-player.position.x, mousePos.y-player.position.y);
-        new Bullet(map.getTileSets().getTile(tilemapa.get("bullet", 958)), world, pla.getPosition(), vv);
-    }
-    public void spawnMobs(){
-        MobsFactory.spawnZombie(5, 85);
+        new Bullet(TileResolver.getTile("bullet"), world, pla.getPosition(), vv);
     }
 
     Vector2 beginV;

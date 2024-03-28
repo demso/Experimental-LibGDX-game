@@ -1,5 +1,6 @@
 package com.mygdx.game.tiledmap;
 
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.game.GameItself;
@@ -108,5 +109,36 @@ public class BodyTileResolver {
         body.setUserData(userData);
 
         return body;
+    }
+
+    public Body transparentFullBody(float x, float y, Object userData){
+        BodyDef transparentBodyDef = new BodyDef();
+        PolygonShape transparentBox = new PolygonShape();
+        FixtureDef transparentFixtureDef = new FixtureDef();
+        transparentBox.setAsBox(x, y);
+        transparentFixtureDef.shape = transparentBox;
+        transparentFixtureDef.filter.groupIndex = -10;
+
+        Body body = world.createBody(transparentBodyDef);
+        body.createFixture(transparentFixtureDef);
+        body.setUserData(userData);
+
+        return body;
+    }
+
+    public Direction getDirection(TiledMapTileLayer.Cell cell){
+        boolean southWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_0 && cell.getFlipVertically() && cell.getFlipVertically();
+        boolean northWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_0 && !cell.getFlipVertically() && !cell.getFlipVertically();
+        boolean eastWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_270 && !cell.getFlipVertically() && !cell.getFlipVertically();
+        boolean westWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_90 && !cell.getFlipVertically() && !cell.getFlipVertically();
+        if (northWard)
+            return Direction.NORTH;
+        if (southWard)
+            return Direction.SOUTH;
+        if (westWard)
+            return Direction.WEST;
+        if (eastWard)
+            return Direction.EAST;
+        return Direction.NORTH;
     }
 }

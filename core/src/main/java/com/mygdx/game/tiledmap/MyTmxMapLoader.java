@@ -40,11 +40,6 @@ public class MyTmxMapLoader extends TmxMapLoader {
 
         MyTiledMap map = loadTiledMap(tmxFile, parameter, new ImageResolver.DirectImageResolver(textures));
         map.setOwnedResources(textures.values().toArray());
-        map.getTileSets().forEach(tiledMapTiles -> tiledMapTiles.forEach(tiledMapTile -> {
-            String tileName = tiledMapTile.getProperties().get("name", String.class);
-            if (tileName != null)
-                gameItself.tilemapa.put(tileName, tiledMapTile.getId());
-        }));
 
         return map;
     }
@@ -144,45 +139,16 @@ public class MyTmxMapLoader extends TmxMapLoader {
         }
         runOnEndOfLoadTiled = null;
 
+        //load tile resolver
+        map.getTileSets().forEach(tiledMapTiles -> tiledMapTiles.forEach(tiledMapTile -> {
+            String tileName = tiledMapTile.getProperties().get("name", String.class);
+            if (tileName != null)
+                gameItself.tilemapa.put(tileName, tiledMapTile.getId());
+        }));
+
         initPhysics();
 
         return (MyTiledMap) map;
-    }
-
-    @Override
-    protected void loadTileLayer (TiledMap map, MapLayers parentLayers, XmlReader.Element element) {
-        if (element.getName().equals("layer")) {
-            int width = element.getIntAttribute("width", 0);
-            int height = element.getIntAttribute("height", 0);
-            int tileWidth = map.getProperties().get("tilewidth", Integer.class);
-            int tileHeight = map.getProperties().get("tileheight", Integer.class);
-            TiledMapTileLayer layer = new TiledMapTileLayer(width, height, tileWidth, tileHeight);
-
-            loadBasicLayerInfo(layer, element);
-
-            int[] ids = getTileIds(element, width, height);
-            TiledMapTileSets tilesets = map.getTileSets();
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    int id = ids[y * width + x];
-                    boolean flipHorizontally = ((id & FLAG_FLIP_HORIZONTALLY) != 0);
-                    boolean flipVertically = ((id & FLAG_FLIP_VERTICALLY) != 0);
-                    boolean flipDiagonally = ((id & FLAG_FLIP_DIAGONALLY) != 0);
-
-                    TiledMapTile tile = tilesets.getTile(id & ~MASK_CLEAR);
-                    if (tile != null) {
-                        TiledMapTileLayer.Cell cell = createTileLayerCell(flipHorizontally, flipVertically, flipDiagonally);
-                        cell.setTile(tile);
-                        layer.setCell(x, flipY ? height - 1 - y : y, cell);
-                    }
-                }
-            }
-            XmlReader.Element properties = element.getChildByName("properties");
-            if (properties != null) {
-                loadProperties(layer.getProperties(), properties);
-            }
-            parentLayers.add(layer);
-        }
     }
 
     void initPhysics(){
@@ -192,41 +158,6 @@ public class MyTmxMapLoader extends TmxMapLoader {
 
         BodyTileResolver bodyResolver = new BodyTileResolver(mymap.world);
 
-        BodyDef fullBodyDef = new BodyDef();
-        PolygonShape fullBox = new PolygonShape();
-        FixtureDef fullFixtureDef = new FixtureDef();
-        fullBox.setAsBox(0.5f, 0.5f);
-        fullFixtureDef.shape = fullBox;
-        fullFixtureDef.filter.groupIndex = 0;
-
-        BodyDef metalClosetBodyDef = new BodyDef();
-        PolygonShape metalClosetBox = new PolygonShape();
-        FixtureDef metalClosetFixtureDef = new FixtureDef();
-        metalClosetBox.setAsBox(0.33f, 0.25f);
-        metalClosetFixtureDef.shape = metalClosetBox;
-        metalClosetFixtureDef.filter.groupIndex = 0;
-
-        BodyDef windowVertBodyDef = new BodyDef();
-        PolygonShape windowVertBox = new PolygonShape();
-        FixtureDef windowVertFixtureDef = new FixtureDef();
-        windowVertBox.setAsBox(0.05f, 0.5f);
-        windowVertFixtureDef.shape = windowVertBox;
-        windowVertFixtureDef.filter.groupIndex = -10;
-
-        BodyDef windowHorBodyDef = new BodyDef();
-        PolygonShape windowHorBox = new PolygonShape();
-        FixtureDef windowHorFixtureDef = new FixtureDef();
-        windowHorBox.setAsBox(0.5f, 0.05f);
-        windowHorFixtureDef.shape = windowHorBox;
-        windowHorFixtureDef.filter.groupIndex = -10;
-
-        BodyDef transparentBodyDef = new BodyDef();
-        PolygonShape transparentBox = new PolygonShape();
-        FixtureDef transparentFixtureDef = new FixtureDef();
-        transparentBox.setAsBox(0.5f, 0.5f);
-        transparentFixtureDef.shape = transparentBox;
-        transparentFixtureDef.filter.groupIndex = -10;
-
         for(var i = 0; i < obstaclesLayer.getWidth(); i++)
             for(var j = 0; j < obstaclesLayer.getHeight(); j++){
                 var cell = obstaclesLayer.getCell(i, j);
@@ -234,86 +165,48 @@ public class MyTmxMapLoader extends TmxMapLoader {
                     var tileProperties = cell.getTile().getProperties();
                     Body body = null;
                     String bodyType = tileProperties.get("body type", null,  String.class);
-                    if (bodyType != null){
-                        try{
-                        body = bodyResolver.resolveBody(i+0.5f, j+0.5f, new SimpleUserData(cell, bodyType), BodyTileResolver.Type.valueOf(bodyType));
-                        }catch (Exception e) {
-                            SecondGDXGame.helper.log("[MyTmxMapLoader] Wrong body type when reading \"body type\" property of the tile "
-                                + cell.getTile().getProperties().get("type", "notype", String.class) + " "
-                                + cell.getTile().getProperties().get("name", "noname", String.class) + " "
-                                + bodyType + " at "
-                                + i + " "
-                                + j + " ");
-                        }
-                    } else {
-                        switch (cell.getTile().getProperties().get("type").toString()) {
-                            case "wall":
-                                body = bodyResolver.fullBody(i + 0.5f, j + 0.5f, new SimpleUserData(cell, "betonWall"));
-                                mymap.staticObjects.add(body);
-                                break;
-                            case "fullBody":
-                                body = bodyResolver.fullBody(i + 0.5f, j + 0.5f, new SimpleUserData(cell, "mereFullBody"));
-                                mymap.staticObjects.add(body);
-                                break;
-                            case "metalCloset":
-//                                metalClosetBodyDef.position.set(new Vector2(i + 0.5f, j + 0.3f));
-//                                body = mymap.world.createBody(metalClosetBodyDef);
-//                                body.createFixture(metalClosetFixtureDef);
-//                                body.setUserData(new SimpleUserData(cell, "metalCloset"));
-                                body = bodyResolver.resolveBody(i + 0.5f, j + 0.3f, new SimpleUserData(cell, "metalCloset"), BodyTileResolver.Type.METAL_CLOSET_BODY);
-                                mymap.staticObjects.add(body);
-                                break;
-                            case "window":
-                                boolean southWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_0 && cell.getFlipVertically() && cell.getFlipVertically();
-                                boolean northWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_0 && !cell.getFlipVertically() && !cell.getFlipVertically();
-                                boolean eastWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_270 && !cell.getFlipVertically() && !cell.getFlipVertically();
-                                boolean westWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_90 && !cell.getFlipVertically() && !cell.getFlipVertically();
-                                if (northWard) {
-//                                    windowHorBodyDef.position.set(new Vector2(i + 0.5f, j + 0.95f));
-//                                    body = mymap.world.createBody(windowHorBodyDef);
-//                                    body.createFixture(windowHorFixtureDef);
-//                                    body.setUserData(new SimpleUserData(cell, "northWindow"));
-                                    body = bodyResolver.resolveBody(i + 0.5f, j + 0.95f, new SimpleUserData(cell, "northWindow"), BodyTileResolver.Type.WINDOW, BodyTileResolver.Direction.NORTH);
-                                    mymap.staticObjects.add(body);
-                                } else if (southWard) {
-//                                    windowHorBodyDef.position.set(new Vector2(i + 0.5f, j + 0.05f));
-//                                    body = mymap.world.createBody(windowHorBodyDef);
-//                                    body.createFixture(windowHorFixtureDef);
-//                                    body.setUserData(new SimpleUserData(cell, "southWindow"));
-                                    body = bodyResolver.resolveBody(i + 0.5f, j + 0.05f, new SimpleUserData(cell, "southWindow"), BodyTileResolver.Type.WINDOW, BodyTileResolver.Direction.SOUTH);
-                                    mymap.staticObjects.add(body);
-                                } else if (westWard) {
-//                                    windowVertBodyDef.position.set(new Vector2(i + 0.05f, j + 0.5f));
-//                                    body = mymap.world.createBody(windowVertBodyDef);
-//                                    body.createFixture(windowVertFixtureDef);
-//                                    body.setUserData(new SimpleUserData(cell, "westWindow"));
-                                    body = bodyResolver.resolveBody(i + 0.05f, j + 0.5f, new SimpleUserData(cell, "westWindow"), BodyTileResolver.Type.WINDOW, BodyTileResolver.Direction.WEST);
-                                    mymap.staticObjects.add(body);
-                                } else if (eastWard) {
-//                                    windowVertBodyDef.position.set(new Vector2(i + 0.95f, j + 0.5f));
-//                                    body = mymap.world.createBody(windowVertBodyDef);
-//                                    body.createFixture(windowVertFixtureDef);
-//                                    body.setUserData(new SimpleUserData(cell, "eastWindow"));
-                                    body = bodyResolver.resolveBody(i + 0.95f, j + 0.5f, new SimpleUserData(cell, "eastWindow"), BodyTileResolver.Type.WINDOW, BodyTileResolver.Direction.EAST);
-                                    mymap.staticObjects.add(body);
+                    try{
+                        BodyTileResolver.Direction direction = bodyResolver.getDirection(cell);
+                        if (bodyType != null){
+                            body = bodyResolver.resolveBody(i+0.5f, j+0.5f, new SimpleUserData(cell, bodyType), BodyTileResolver.Type.valueOf(bodyType), direction);
+                        } else {
+                            switch (cell.getTile().getProperties().get("type").toString()) {
+                                case "wall" -> body = bodyResolver.fullBody(i + 0.5f, j + 0.5f, new SimpleUserData(cell, "betonWall"));
+                                case "fullBody" -> body = bodyResolver.fullBody(i + 0.5f, j + 0.5f, new SimpleUserData(cell, "mereFullBody"));
+                                case "metalCloset" -> body = bodyResolver.resolveBody(i + 0.5f, j + 0.3f, new SimpleUserData(cell, "metalCloset"), BodyTileResolver.Type.METAL_CLOSET_BODY);
+                                case "window" -> {
+                                    switch (direction) {
+                                        case NORTH ->
+                                            body = bodyResolver.resolveBody(i + 0.5f, j + 0.95f, new SimpleUserData(cell, "northWindow"), BodyTileResolver.Type.WINDOW, BodyTileResolver.Direction.NORTH);
+                                        case SOUTH ->
+                                            body = bodyResolver.resolveBody(i + 0.5f, j + 0.05f, new SimpleUserData(cell, "southWindow"), BodyTileResolver.Type.WINDOW, BodyTileResolver.Direction.SOUTH);
+                                        case WEST ->
+                                            body = bodyResolver.resolveBody(i + 0.05f, j + 0.5f, new SimpleUserData(cell, "westWindow"), BodyTileResolver.Type.WINDOW, BodyTileResolver.Direction.WEST);
+                                        case EAST ->
+                                            body = bodyResolver.resolveBody(i + 0.95f, j + 0.5f, new SimpleUserData(cell, "eastWindow"), BodyTileResolver.Type.WINDOW, BodyTileResolver.Direction.EAST);
+                                    }
                                 }
-                                break;
-                            case "door":
-//                                fullBodyDef.position.set(new Vector2(i + 0.5f, j + 0.5f));
-//                                body = mymap.world.createBody(fullBodyDef);
-//                                body.createFixture(fullFixtureDef);
-//                                TiledMapTileSet ts = map.getTileSets().getTileSet("normal_terrain");
-//                                body.setUserData(new Door(gameItself, cell, body, map.getTileSets().getTile(13409), map.getTileSets().getTile(13358), i, j));
-                                body = bodyResolver.resolveBody(i + 0.5f, j + 0.5f, null, BodyTileResolver.Type.FULL_BODY);
-                                body.setUserData(new Door(gameItself, cell, body, map.getTileSets().getTile(13409), map.getTileSets().getTile(13358), i, j));
-                                mymap.staticObjects.add(body);
-                                break;
+                                case "door" -> {
+                                    body = bodyResolver.resolveBody(i + 0.5f, j + 0.5f, null, BodyTileResolver.Type.FULL_BODY);
+                                    body.setUserData(new Door(gameItself, cell, body, map.getTileSets().getTile(13409), map.getTileSets().getTile(13358), i, j));
+                                }
+                            }
                         }
+                    }catch (Exception e) {
+                        SecondGDXGame.helper.log("[MyTmxMapLoader] Problem with creating tile \n"
+                            + cell.getTile().getProperties().get("type", "notype", String.class) + " "
+                            + cell.getTile().getProperties().get("name", "noname", String.class) + " "
+                            + bodyType + " at "
+                            + i + " "
+                            + j + " \n"
+                            + e.getLocalizedMessage());
                     }
                     if (body != null){
                         GameObject object = new GameObject(GameItself.unbox);
                         object.setName(((UserName)body.getUserData()).getName());
                         new Box2dBehaviour(body, object);
+
+                        mymap.staticObjects.add(body);
                     }
                 }
             }

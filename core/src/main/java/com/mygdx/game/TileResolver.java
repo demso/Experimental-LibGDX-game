@@ -17,10 +17,15 @@ public class TileResolver {
     }
 
     public static TiledMapTile getTile(String id){
+        if (!isInited()) return tilesets.getTile(NO_TILE_ID);
+        return tilesets.getTile(tilemapa.get(id, NO_TILE_ID));
+    }
+
+    private static boolean isInited(){
         if (!inited){
-            System.out.println("TileResolver not initialised.");
-            return null;
+            SecondGDXGame.helper.log("[TileResolver] TileResolver not initialised.");
+            return false;
         }
-       return tilesets.getTile(tilemapa.get(id, NO_TILE_ID));
+        return true;
     }
 }
