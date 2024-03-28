@@ -11,6 +11,9 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
 import com.mygdx.game.GameItself;
+import com.mygdx.game.UserName;
+import dev.lyze.gdxUnBox2d.Box2dBehaviour;
+import dev.lyze.gdxUnBox2d.GameObject;
 
 public class MyTmxMapLoader extends TmxMapLoader {
     GameItself gameItself;
@@ -223,34 +226,33 @@ public class MyTmxMapLoader extends TmxMapLoader {
         transparentFixtureDef.shape = transparentBox;
         transparentFixtureDef.filter.groupIndex = -10;
 
-        Body fullBody;
-
         for(var i = 0; i < obstaclesLayer.getWidth(); i++)
             for(var j = 0; j < obstaclesLayer.getHeight(); j++){
                 var cell = obstaclesLayer.getCell(i, j);
                 if (cell != null && cell.getTile().getProperties().get("type") != null){
                     var df = cell.getTile().getProperties();
+                    Body body = null;
                     switch (cell.getTile().getProperties().get("type").toString()){
                         case "wall":
                             fullBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
-                            fullBody = mymap.world.createBody(fullBodyDef);
-                            fullBody.createFixture(fullFixtureDef);
-                            fullBody.setUserData(new SimpleUserData(cell, "betonWall"));
-                            mymap.staticObjects.add(fullBody);
+                            body = mymap.world.createBody(fullBodyDef);
+                            body.createFixture(fullFixtureDef);
+                            body.setUserData(new SimpleUserData(cell, "betonWall"));
+                            mymap.staticObjects.add(body);
                             break;
                         case "fullBody":
                             fullBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
-                            fullBody = mymap.world.createBody(fullBodyDef);
-                            fullBody.createFixture(fullFixtureDef);
-                            fullBody.setUserData(new SimpleUserData(cell, "mareFullBody"));
-                            mymap.staticObjects.add(fullBody);
+                            body = mymap.world.createBody(fullBodyDef);
+                            body.createFixture(fullFixtureDef);
+                            body.setUserData(new SimpleUserData(cell, "mareFullBody"));
+                            mymap.staticObjects.add(body);
                             break;
                         case "metalCloset":
                             metalClosetBodyDef.position.set(new Vector2(i+0.5f, j+0.3f));
-                            Body metalClosetBody = mymap.world.createBody(metalClosetBodyDef);
-                            metalClosetBody.createFixture(metalClosetFixtureDef);
-                            metalClosetBody.setUserData(new SimpleUserData(cell, "metalCloset"));
-                            mymap.staticObjects.add(metalClosetBody);
+                            body = mymap.world.createBody(metalClosetBodyDef);
+                            body.createFixture(metalClosetFixtureDef);
+                            body.setUserData(new SimpleUserData(cell, "metalCloset"));
+                            mymap.staticObjects.add(body);
                             break;
                         case "window":
                             boolean southWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_0 && cell.getFlipVertically() && cell.getFlipVertically();
@@ -259,41 +261,46 @@ public class MyTmxMapLoader extends TmxMapLoader {
                             boolean westWard = cell.getRotation() == TiledMapTileLayer.Cell.ROTATE_90 && !cell.getFlipVertically() && !cell.getFlipVertically();
                             if(northWard){
                                 windowHorBodyDef.position.set(new Vector2(i+0.5f, j+0.95f));
-                                Body windowHorBody = mymap.world.createBody(windowHorBodyDef);
-                                windowHorBody.createFixture(windowHorFixtureDef);
-                                windowHorBody.setUserData(new SimpleUserData(cell, "northWindow"));
-                                mymap.staticObjects.add(windowHorBody);
+                                body = mymap.world.createBody(windowHorBodyDef);
+                                body.createFixture(windowHorFixtureDef);
+                                body.setUserData(new SimpleUserData(cell, "northWindow"));
+                                mymap.staticObjects.add(body);
                             }
                             else if(southWard){
                                 windowHorBodyDef.position.set(new Vector2(i+0.5f, j+0.05f));
-                                Body windowHorBody = mymap.world.createBody(windowHorBodyDef);
-                                windowHorBody.createFixture(windowHorFixtureDef);
-                                windowHorBody.setUserData(new SimpleUserData(cell, "southWindow"));
-                                mymap.staticObjects.add(windowHorBody);
+                                body = mymap.world.createBody(windowHorBodyDef);
+                                body.createFixture(windowHorFixtureDef);
+                                body.setUserData(new SimpleUserData(cell, "southWindow"));
+                                mymap.staticObjects.add(body);
                             }
                             else if(westWard){
                                 windowVertBodyDef.position.set(new Vector2(i+0.05f, j+0.5f));
-                                Body windowVertBody = mymap.world.createBody(windowVertBodyDef);
-                                windowVertBody.createFixture(windowVertFixtureDef);
-                                windowVertBody.setUserData(new SimpleUserData(cell, "westWindow"));
-                                mymap.staticObjects.add(windowVertBody);
+                                body = mymap.world.createBody(windowVertBodyDef);
+                                body.createFixture(windowVertFixtureDef);
+                                body.setUserData(new SimpleUserData(cell, "westWindow"));
+                                mymap.staticObjects.add(body);
                             }
                             else if(eastWard){
                                 windowVertBodyDef.position.set(new Vector2(i+0.95f, j+0.5f));
-                                Body windowVertBody = mymap.world.createBody(windowVertBodyDef);
-                                windowVertBody.createFixture(windowVertFixtureDef);
-                                windowVertBody.setUserData(new SimpleUserData(cell, "eastWindow"));
-                                mymap.staticObjects.add(windowVertBody);
+                                body = mymap.world.createBody(windowVertBodyDef);
+                                body.createFixture(windowVertFixtureDef);
+                                body.setUserData(new SimpleUserData(cell, "eastWindow"));
+                                mymap.staticObjects.add(body);
                             }
                             break;
                         case "door":
                             fullBodyDef.position.set(new Vector2(i+0.5f, j+0.5f));
-                            fullBody = mymap.world.createBody(fullBodyDef);
-                            fullBody.createFixture(fullFixtureDef);
+                            body = mymap.world.createBody(fullBodyDef);
+                            body.createFixture(fullFixtureDef);
                             TiledMapTileSet ts = map.getTileSets().getTileSet("normal_terrain");
-                            fullBody.setUserData(new Door(gameItself,cell, fullBody, map.getTileSets().getTile(13409), map.getTileSets().getTile(13358), i, j));
-                            mymap.staticObjects.add(fullBody);
+                            body.setUserData(new Door(gameItself,cell, body, map.getTileSets().getTile(13409), map.getTileSets().getTile(13358), i, j));
+                            mymap.staticObjects.add(body);
                             break;
+                    }
+                    if (body != null){
+                        GameObject object = new GameObject(GameItself.unbox);
+                        object.setName(((UserName)body.getUserData()).getName());
+                        new Box2dBehaviour(body, object);
                     }
                 }
             }

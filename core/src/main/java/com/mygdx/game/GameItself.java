@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.Cullable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.ObjectSet;
@@ -26,6 +27,7 @@ import com.mygdx.game.tiledmap.UserData;
 import com.mygdx.game.tiledmap.Door;
 import com.mygdx.game.tiledmap.MyTmxMapLoader;
 import com.strongjoshua.console.GUIConsole;
+import dev.lyze.gdxUnBox2d.UnBox;
 import net.dermetfan.gdx.graphics.g2d.Box2DSprite;
 import net.dermetfan.gdx.physics.box2d.Box2DUtils;
 
@@ -69,7 +71,7 @@ public class GameItself {
     float physicsStep = 1/144f;
     public static GUIConsole console;
     ShapeRenderer shapeRenderer;
-    Vector3 mousePos;
+    public static UnBox unbox;
 
     GameItself(GameScreen gameScreen){
         this.game = gameScreen.game;
@@ -78,13 +80,17 @@ public class GameItself {
         this.font = game.font;
         this.skin = game.skin;
 
+
         debugRenderer = new ShapeRenderer();
         shapeRenderer = new ShapeRenderer();
         bodies = new Array<>();
         world = new World(new Vector2(0, 0), true);
+        unbox = new UnBox(world);
+        unbox.getOptions().setTimeStep(physicsStep);
         hudStage = new HUD(this, new ScreenViewport(), game.batch);
         camera = new OrthographicCamera();
         gameStage = new Stage(new ScreenViewport(camera));
+
 
         camera.setToOrtho(false, 30, 20);
 
@@ -139,61 +145,61 @@ public class GameItself {
     void initPhysics(){
         //world
 //        world.setGravity(new Vector2(0, 5));
-        world.setContactListener(new ContactListener() {
-            static int ll = 0;
-            static int llend = 0;
-            @Override
-            public void beginContact(Contact contact) {
-                ll++;
-                Fixture[] fixtures = new Fixture[]{contact.getFixtureA(), contact.getFixtureB()};
-                for (int i = 0; i < 2; i++){
-                    Fixture thisFixture = fixtures[i];
-                    Fixture anotherFixture = fixtures[(i+1)%2];
-                    Body thisBody = thisFixture.getBody();
-                    Body anotherBody = anotherFixture.getBody();
-                    Object userData = thisBody.getUserData();
-                    Object anotherUserData = anotherBody.getUserData();
-                    if (userData instanceof UserData){
-                        String bodyUserName = ((UserData) userData).getName();
-                        switch (bodyUserName){
-                            case "player" -> { if (thisFixture.isSensor() && !anotherFixture.isSensor()) player.closeObjects.add(anotherBody); }
-                            case "bullet" -> {
-                                bodiesToDeletion.add(thisBody);
-                                if (anotherUserData instanceof UserData && ((UserData)anotherUserData).getData() instanceof Zombie){
-                                    Zombie zombie = (Zombie) ((CustomBox2DSprite) anotherUserData).getData();
-                                    zombie.hurt(((Bullet) ((CustomBox2DSprite) userData).getData()).getDamage());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void endContact(Contact contact) {
-                llend++;
-                var fixtureA = contact.getFixtureA();
-                var fixtureB = contact.getFixtureB();
-                var dataA = contact.getFixtureA().getBody().getUserData();
-                var dataB = contact.getFixtureB().getBody().getUserData();
-                if (dataA instanceof SimpleUserData && ((SimpleUserData) dataA).bodyName.equals("player") && fixtureA.isSensor() && !fixtureB.isSensor()){
-                    player.closeObjects.removeValue(contact.getFixtureB().getBody(), true);
-                }
-                if (dataB instanceof SimpleUserData && ((SimpleUserData) dataB).bodyName.equals("player") && !fixtureA.isSensor() && fixtureB.isSensor()){
-                    player.closeObjects.removeValue(contact.getFixtureA().getBody(), true);
-                }
-            }
-
-            @Override
-            public void preSolve(Contact contact, Manifold oldManifold) {
-
-            }
-
-            @Override
-            public void postSolve(Contact contact, ContactImpulse impulse) {
-
-            }
-        });
+//        world.setContactListener(new ContactListener() {
+//            static int ll = 0;
+//            static int llend = 0;
+//            @Override
+//            public void beginContact(Contact contact) {
+//                ll++;
+//                Fixture[] fixtures = new Fixture[]{contact.getFixtureA(), contact.getFixtureB()};
+//                for (int i = 0; i < 2; i++){
+//                    Fixture thisFixture = fixtures[i];
+//                    Fixture anotherFixture = fixtures[(i+1)%2];
+//                    Body thisBody = thisFixture.getBody();
+//                    Body anotherBody = anotherFixture.getBody();
+//                    Object userData = thisBody.getUserData();
+//                    Object anotherUserData = anotherBody.getUserData();
+//                    if (userData instanceof UserData){
+//                        String bodyUserName = ((UserData) userData).getName();
+//                        switch (bodyUserName){
+//                            case "player" -> { if (thisFixture.isSensor() && !anotherFixture.isSensor()) player.closeObjects.add(anotherBody); }
+//                            case "bullet" -> {
+//                                bodiesToDeletion.add(thisBody);
+//                                if (anotherUserData instanceof UserData && ((UserData)anotherUserData).getData() instanceof Zombie){
+//                                    Zombie zombie = (Zombie) ((CustomBox2DSprite) anotherUserData).getData();
+//                                    zombie.hurt(((Bullet) ((CustomBox2DSprite) userData).getData()).getDamage());
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void endContact(Contact contact) {
+//                llend++;
+//                var fixtureA = contact.getFixtureA();
+//                var fixtureB = contact.getFixtureB();
+//                var dataA = contact.getFixtureA().getBody().getUserData();
+//                var dataB = contact.getFixtureB().getBody().getUserData();
+//                if (dataA instanceof SimpleUserData && ((SimpleUserData) dataA).bodyName.equals("player") && fixtureA.isSensor() && !fixtureB.isSensor()){
+//                    player.closeObjects.removeValue(contact.getFixtureB().getBody(), true);
+//                }
+//                if (dataB instanceof SimpleUserData && ((SimpleUserData) dataB).bodyName.equals("player") && !fixtureA.isSensor() && fixtureB.isSensor()){
+//                    player.closeObjects.removeValue(contact.getFixtureA().getBody(), true);
+//                }
+//            }
+//sssssssssss
+//            @Override
+//            public void preSolve(Contact contact, Manifold oldManifold) {
+//
+//            }
+//
+//            @Override
+//            public void postSolve(Contact contact, ContactImpulse impulse) {
+//
+//            }
+//        });
         //light
         rayHandler = new RayHandler(world);
         rayHandler.setCombinedMatrix(camera);
@@ -214,12 +220,12 @@ public class GameItself {
     }
     private void update(float deltaTime) {
         //UPDATE PHYSICSSTEP
-        float frameTime = Math.min(deltaTime, 0.25f);
-        accumulator += frameTime;
-        while (accumulator >= physicsStep) {
-            world.step(physicsStep, 8, 3);
-            accumulator -= physicsStep;
-        }
+//        float frameTime = Math.min(deltaTime, 0.25f);
+//        accumulator += frameTime;
+//        while (accumulator >= physicsStep) {
+//            world.step(physicsStep, 8, 3);
+//            accumulator -= physicsStep;
+//        }
         if (bodiesToDeletion.size != 0) {
             bodiesToDeletion.forEach((Body body) -> world.destroyBody(body));
             bodiesToDeletion.clear();
@@ -237,29 +243,33 @@ public class GameItself {
 
         //UPDATE STAGE
         hudStage.update(debug);
+
+        //CAMERA UPDATE
+        camera.position.x = player.position.x;
+        camera.position.y = player.position.y;
+        camera.update();
     }
     void render(float deltaTime){
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        unbox.preRender(deltaTime);
+
         update(deltaTime);
-
-        camera.position.x = player.position.x;
-        camera.position.y = player.position.y;
-
-        camera.update();
 
         renderer.setView(camera);
         renderer.render();
 
-        gameStage.act(deltaTime);
-        gameStage.draw();
-
         batch.begin();
         Box2DSprite.draw(batch, world, true);
-        batch.end();
+
+        unbox.render(batch);
 
         player.renderPlayer(renderer.getBatch(), camera);
+        batch.end();
+
+        gameStage.act(deltaTime);
+        gameStage.draw();
 
         //mousePos = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
         shapeRenderer.setProjectionMatrix(hudStage.getBatch().getProjectionMatrix());
@@ -279,6 +289,8 @@ public class GameItself {
             batch.draw(userSelection, player.closestObject.getPosition().x-w/2f, player.closestObject.getPosition().y-h/2f, w,h);
             batch.end();
         }
+
+        unbox.postRender();
 
         hudStage.act(deltaTime);
         hudStage.draw();

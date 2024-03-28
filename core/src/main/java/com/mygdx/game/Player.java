@@ -14,16 +14,21 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.behaviours.PlayerCollisionBehaviour;
 import com.mygdx.game.tiledmap.SimpleUserData;
+import dev.lyze.gdxUnBox2d.Box2dBehaviour;
+import dev.lyze.gdxUnBox2d.GameObject;
+import dev.lyze.gdxUnBox2d.behaviours.BehaviourAdapter;
+import dev.lyze.gdxUnBox2d.behaviours.fixtures.CreateBoxFixtureBehaviour;
 import org.jetbrains.annotations.Nullable;
 
 public class Player extends Entity {
     SecondGDXGame game;
     float WIDTH;
     float HEIGHT;
-    float maxVelocity = 20f;
+    float maxVelocity = 40f;
     float DAMPING = 0.87f;
-    Array<Body> closeObjects;
+    public Array<Body> closeObjects;
     public Body closestObject;
 
     enum State {
@@ -48,6 +53,7 @@ public class Player extends Entity {
     Player(SecondGDXGame game){
         this.game = game;
         closeObjects = new Array<>();
+
         setEntityType(EntityType.PLAYER);
         setHp(10);
         setMaxHp(10);
@@ -89,18 +95,14 @@ public class Player extends Entity {
         fixtureDef.filter.groupIndex = GameItself.PLAYER_CG;
         body.createFixture(fixtureDef);
         body.setFixedRotation(true);
-        body.setUserData(new SimpleUserData(this, "player"));
+        body.setUserData(this);
         circle.dispose();
 
-        MassData massData = new MassData();
-        massData.mass = 60f;
-        massData.center.set(new Vector2(0f,0f));
-        massData.I = 1f;
-        body.setMassData(massData);
         //sensor
         CircleShape sensorCircle = new CircleShape();
         sensorCircle.setRadius(1f);
         FixtureDef sensorFixtureDef = new FixtureDef();
+        sensorFixtureDef.density = 0.00001f;
         sensorFixtureDef.shape = sensorCircle;
         sensorFixtureDef.isSensor = true;
         sensorFixtureDef.filter.categoryBits = GameItself.PLAYER_INTERACT_CF;
@@ -111,6 +113,11 @@ public class Player extends Entity {
         this.body = body;
         body.setLinearDamping(12);
 
+        GameObject playerObject = new GameObject(getName(), GameItself.unbox);
+
+        new Box2dBehaviour(body, playerObject);
+        new PlayerCollisionBehaviour(playerObject);
+
         PointLight light = new PointLight(rayHandler, 1300, Color.WHITE, 100f, 0, 0);
         light.setSoft(true);
         light.setSoftnessLength(2f);
@@ -120,21 +127,15 @@ public class Player extends Entity {
         f.categoryBits = GameItself.LIGHT_CF;
         f.groupIndex = -10;
         light.setContactFilter(f);
+
+        MassData massData = new MassData();
+        massData.mass = 60f;
+        massData.center.set(new Vector2(0f,0f));
+        body.setMassData(massData);
     }
     @Nullable
     Body getClosestObject(){
-        Body co = null;
-        float minDist = Float.MAX_VALUE;
-        float dist = 0;
-        for (Body closeObject : closeObjects) {
-            dist = body.getPosition().dst2(closeObject.getPosition());
-            if (dist < minDist){
-                co = closeObject;
-                minDist = dist;
-            }
-
-        }
-        return co;
+        return closestObject;
     }
     public void pickupItem(Item item){
         item.pickup();
@@ -162,7 +163,7 @@ public class Player extends Entity {
     public void update(float deltaTime){
         if (deltaTime > 0.1f) deltaTime = 0.1f;
         stateTime += deltaTime;
-        closestObject = getClosestObject();
+        //closestObject = getClosestObject();
         switch (state) {
             case Standing:
                 currentFrame = walkDown.getKeyFrame(1);
@@ -190,17 +191,8 @@ public class Player extends Entity {
     Vector2 movingVector = new Vector2();
     Vector2 vel = new Vector2();
     Vector2 zeroVector = new Vector2(0, 0);
-    boolean wasMoveDown;
     public void inputMove(boolean moveUp, boolean moveDown, boolean moveToTheRight, boolean moveToTheLeft, float deltaTime){
-//        if(wasMoveDown){
-//            body.setLinearVelocity(0,0);
-//            vel.set(0,0);
-//            wasMoveDown = false;
-//            velocity.set(vel);
-//        }
-
         if (moveUp || moveDown || moveToTheRight || moveToTheLeft){
-            wasMoveDown = true;
             vel.set(0,0);
             movingVector.set(0,0);
             if (!(moveToTheRight && moveToTheLeft)) {
@@ -243,7 +235,6 @@ public class Player extends Entity {
     }
     public void renderPlayer(Batch batch, Camera camera){
         //player
-        batch.begin();
         if (facing == Facing.RIGHT)
             batch.draw(currentFrame, position.x - WIDTH/2 + WIDTH, position.y - WIDTH * 1/4, -WIDTH, HEIGHT);
         else
@@ -259,8 +250,6 @@ public class Player extends Entity {
             float rotation = Double.valueOf(Math.toDegrees(Math.atan2(mousePos.y - playerPos.y, mousePos.x - playerPos.x))).floatValue()-34;
             batch.draw(tileTextureRegion, position.x - (tileTextureRegion.getRegionWidth()*width /2f + offsetX)/(float) GameItself.TILE_SIDE, position.y - (tileTextureRegion.getRegionHeight()*height/2f + offsetY)/(float) GameItself.TILE_SIDE, tileTextureRegion.getRegionWidth()*width/2f/(float)GameItself.TILE_SIDE, tileTextureRegion.getRegionHeight()*height/2f/ (float) GameItself.TILE_SIDE, width, height, 1,1,rotation);
         }
-
-        batch.end();
     }
     @Override
     public String getName() {
@@ -270,5 +259,9 @@ public class Player extends Entity {
     @Override
     public void kill() {
 
+    }
+
+    public void addCloseBody(Body closeBody){
+        closeObjects.add(closeBody);
     }
 }

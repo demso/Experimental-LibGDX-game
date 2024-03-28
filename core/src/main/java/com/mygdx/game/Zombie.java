@@ -3,6 +3,10 @@ package com.mygdx.game;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.mygdx.game.behaviours.SpriteBehaviour;
+import dev.lyze.gdxUnBox2d.Box2dBehaviour;
+import dev.lyze.gdxUnBox2d.GameObject;
+import dev.lyze.gdxUnBox2d.behaviours.SoutBehaviour;
 
 public class Zombie extends Entity{
     CustomBox2DSprite sprite;
@@ -11,6 +15,8 @@ public class Zombie extends Entity{
         setEntityType(EntityType.HOSTILE);
         setHp(10);
         setMaxHp(10);
+
+        GameObject zombieObject = new GameObject("zombie", GameItself.unbox);
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -36,11 +42,16 @@ public class Zombie extends Entity{
 
         body.setMassData(massData);
         body.setLinearDamping(10);
+        body.setUserData(this);
         circle.dispose();
 
-        sprite = new CustomBox2DSprite(tile.getTextureRegion(), "zombie", this, 1f, 1f);
-
-        body.setUserData(sprite);
+        new Box2dBehaviour(body, zombieObject);
+        new SpriteBehaviour(zombieObject,tile.getTextureRegion(), GameConstants.ZOMBIE_RO);
+        new SoutBehaviour("zombieLogger", false, zombieObject);
+//
+//        sprite = new CustomBox2DSprite(tile.getTextureRegion(), "zombie", this, 1f, 1f);
+//
+//        body.setUserData(sprite);
     }
 
     @Override
