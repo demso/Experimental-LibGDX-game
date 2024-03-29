@@ -156,6 +156,7 @@ public class MyTmxMapLoader extends TmxMapLoader {
         MapLayers mlayers = mymap.getLayers();
         var obstaclesLayer = (TiledMapTileLayer) mlayers.get("obstacles");
 
+
         BodyTileResolver bodyResolver = new BodyTileResolver(mymap.world);
 
         for(var i = 0; i < obstaclesLayer.getWidth(); i++)

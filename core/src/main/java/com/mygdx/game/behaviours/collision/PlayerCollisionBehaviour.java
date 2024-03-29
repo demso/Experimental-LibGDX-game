@@ -45,7 +45,6 @@ public class PlayerCollisionBehaviour extends CollisionBehaviour<Player> {
                 data.closestObject = closeBody;
                 minDist = dist;
             }
-
         }
     }
 

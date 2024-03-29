@@ -21,7 +21,6 @@ public abstract class Entity implements UserName {
         }
     }
     public enum Kind {
-
         ZOMBIE,
         PLAYER
     }
