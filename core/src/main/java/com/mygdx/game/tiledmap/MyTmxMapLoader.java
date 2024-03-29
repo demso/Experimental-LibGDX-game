@@ -165,8 +165,8 @@ public class MyTmxMapLoader extends TmxMapLoader {
                     var tileProperties = cell.getTile().getProperties();
                     Body body = null;
                     String bodyType = tileProperties.get("body type", null,  String.class);
+                    BodyTileResolver.Direction direction = bodyResolver.getDirection(cell);
                     try{
-                        BodyTileResolver.Direction direction = bodyResolver.getDirection(cell);
                         if (bodyType != null){
                             body = bodyResolver.resolveBody(i+0.5f, j+0.5f, new SimpleUserData(cell, bodyType), BodyTileResolver.Type.valueOf(bodyType), direction);
                         } else {
@@ -193,11 +193,12 @@ public class MyTmxMapLoader extends TmxMapLoader {
                             }
                         }
                     }catch (Exception e) {
-                        SecondGDXGame.helper.log("[MyTmxMapLoader] Problem with creating tile \n"
-                            + cell.getTile().getProperties().get("type", "notype", String.class) + " "
-                            + cell.getTile().getProperties().get("name", "noname", String.class) + " "
-                            + bodyType + " at "
-                            + i + " "
+                        SecondGDXGame.helper.log("[MyTmxMapLoader] Problem with creating tile \n Type: "
+                            + cell.getTile().getProperties().get("type", "notype", String.class) + ", name "
+                            + cell.getTile().getProperties().get("name", "noname", String.class) + ",  body type "
+                            + bodyType + ", direction "
+                            + direction + " at x: "
+                            + i + ", y: "
                             + j + " \n"
                             + e.getLocalizedMessage());
                     }

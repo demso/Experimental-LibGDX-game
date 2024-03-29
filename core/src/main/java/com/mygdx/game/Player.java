@@ -14,7 +14,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.game.behaviours.PlayerCollisionBehaviour;
+import com.mygdx.game.behaviours.collision.PlayerCollisionBehaviour;
 import com.mygdx.game.tiledmap.SimpleUserData;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
@@ -52,7 +52,8 @@ public class Player extends Entity {
         this.game = game;
         closeObjects = new Array<>();
 
-        setEntityType(EntityType.PLAYER);
+        setFriendliness(Friendliness.PLAYER);
+        setKind(Kind.PLAYER);
         setHp(10);
         setMaxHp(10);
 
@@ -78,9 +79,7 @@ public class Player extends Entity {
         walkUp = new Animation<TextureRegion>(frameDuration, walkFrames);
     }
     public void initBody(World world, RayHandler rayHandler){
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(new Vector2(5, 90));
+        BodyDef bodyDef = MobsFactory.bodyDef(5, 90, BodyDef.BodyType.DynamicBody);
         Body body = world.createBody(bodyDef);
         CircleShape circle = new CircleShape();
         circle.setRadius(0.2f);
@@ -256,7 +255,14 @@ public class Player extends Entity {
 
     @Override
     public void kill() {
+        super.kill();
+        SecondGDXGame.helper.log("Oh no im killed!");
+    }
 
+    public void revive(){
+        setHp(getMaxHp());
+        isAlive = true;
+        SecondGDXGame.helper.log("Player revived");
     }
 
     public void addCloseBody(Body closeBody){

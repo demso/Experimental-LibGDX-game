@@ -1,7 +1,10 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.utils.Array;
 import com.strongjoshua.console.CommandExecutor;
 import com.strongjoshua.console.annotation.ConsoleDoc;
+
+import java.util.function.Consumer;
 
 public class ConsoleCommands extends CommandExecutor {
     GameItself gameItself;
@@ -13,7 +16,21 @@ public class ConsoleCommands extends CommandExecutor {
         gameItself.tester();
     }
 
-    @ConsoleDoc(description = "Spawns certain mob.") public final void spawnMob (String name, float x, float y) {
-        MobsFactory.spawnEntity("zombie", x, y);
+    @ConsoleDoc(description = "Spawns certain mob.", paramDescriptions = {"mob type", "x", "y"})
+    public final void spawnMob (MobsFactory.Type type, float x, float y) {
+        MobsFactory.spawnEntity(type, x, y);
+    }
+
+    @ConsoleDoc(description = "Get types of mob.") public final void mobTypes () {
+        StringBuilder logs = new StringBuilder();
+
+        new Array<MobsFactory.Type>(MobsFactory.Type.values()).forEach(new Consumer<MobsFactory.Type>() {
+            @Override
+            public void accept(MobsFactory.Type type) {
+                logs.append(type).append("\n");
+            }
+        });
+
+        console.log(logs.toString());
     }
 }

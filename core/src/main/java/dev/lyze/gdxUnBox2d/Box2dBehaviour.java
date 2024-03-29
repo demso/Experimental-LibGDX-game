@@ -39,7 +39,6 @@ public class Box2dBehaviour extends BehaviourAdapter {
 
     public Box2dBehaviour(Body body, GameObject gameObject) {
         super(gameObject);
-
         bodyDef = null;
         getUnBox().overrideObject(this, this.body = body);
     }

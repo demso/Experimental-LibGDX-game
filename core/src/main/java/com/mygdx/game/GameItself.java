@@ -65,7 +65,7 @@ public class GameItself {
     public Stage gameStage;
     public static ObjectIntMap<String> tilemapa;
     public static ObjectSet<Body> bodiesToDeletion = new ObjectSet<>();
-    float physicsStep = 1/100f;
+    float physicsStep;
     public static GUIConsole console;
     ShapeRenderer shapeRenderer;
     public static UnBox unbox;
@@ -77,6 +77,7 @@ public class GameItself {
         this.font = game.font;
         this.skin = game.skin;
 
+        physicsStep = 1/75f;
 
         debugRenderer = new ShapeRenderer();
         shapeRenderer = new ShapeRenderer();
@@ -245,6 +246,7 @@ public class GameItself {
             debugRenderer.end();
         }
     }
+
     class HUDInputListener extends InputListener {
         @Override
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -273,6 +275,10 @@ public class GameItself {
                 camera.setToOrtho(false, Gdx.graphics.getWidth() * (1f/ TILE_SIDE) * (1/zoom), Gdx.graphics.getHeight() * (1f/ TILE_SIDE) * (1/zoom));
             }
             if (keycode == Input.Keys.R){
+                if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                    player.revive();
+                    return false;
+                }
                 System.out.println(player.getClosestObject());
             }
             if (keycode == Input.Keys.E){

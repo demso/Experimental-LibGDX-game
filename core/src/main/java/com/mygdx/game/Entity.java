@@ -2,16 +2,17 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.mygdx.game.tiledmap.UserData;
+import lombok.Getter;
+import lombok.Setter;
 
 public abstract class Entity implements UserName {
-    public enum EntityType {
+    public enum Friendliness {
         PLAYER("Player"),
         NEUTRAL("Neutral"),
         FRIENDLY("Friendly"),
         HOSTILE("Hostile");
         final String name;
-        EntityType(String n){
+        Friendliness(String n){
             name = n;
         }
         @Override
@@ -19,11 +20,17 @@ public abstract class Entity implements UserName {
             return name;
         }
     }
-    int hp = 1;
-    int maxHp = 1;
+    public enum Kind {
+        ZOMBIE,
+        PLAYER
+    }
+    @Getter int hp = 1;
+    @Getter int maxHp = 1;
     boolean isAlive = true;
-    Body body;
-    EntityType entityType = EntityType.NEUTRAL;
+
+    @Setter @Getter Body body;
+    @Setter @Getter Friendliness friendliness = Friendliness.NEUTRAL;
+    @Getter @Setter Kind kind;
 
     public Entity(){}
     public int hurt(int damage){
@@ -37,29 +44,13 @@ public abstract class Entity implements UserName {
         if (this.hp == 0)
             isAlive = false;
     }
-    public int getHp() {
-        return hp;
-    }
+
     public void setMaxHp(int maxHp) {
         this.maxHp = Math.max(0, maxHp);
         if (this.hp == 0)
             isAlive = false;
     }
-    public int getMaxHp() {
-        return maxHp;
-    }
-    public Body getBody() {
-        return body;
-    }
-    public void setBody(Body body) {
-        this.body = body;
-    }
-    public EntityType getEntityType() {
-        return entityType;
-    }
-    public void setEntityType(EntityType entityType) {
-        this.entityType = entityType;
-    }
+
     public boolean isAlive(){
         return isAlive;
     }
@@ -71,7 +62,9 @@ public abstract class Entity implements UserName {
     }
     @Override
     public String getName() {
-        return entityType + " Entity";
+        return friendliness + " Entity";
     }
-    public abstract void kill();
+    public void kill(){
+        isAlive = false;
+    };
 }

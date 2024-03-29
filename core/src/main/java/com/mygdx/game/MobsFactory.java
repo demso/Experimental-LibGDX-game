@@ -1,9 +1,25 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 
 public class MobsFactory {
+    enum Type {
+        ZOMBIE("ZOMBIE");
+
+        String name;
+        Type(String name){
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+    }
+
     static World world;
     static boolean inited = false;
     private static Vector2 tempPosition = new Vector2();
@@ -19,12 +35,28 @@ public class MobsFactory {
         return zombie;
     }
 
-    public static Entity spawnEntity(String name, float x, float y){
+    public static Entity spawnEntity(Type type, float x, float y){
         Entity entity = null;
-        switch (name){
-            case "zombie" -> entity = spawnZombie(x, y);
+        switch (type){
+            case ZOMBIE -> entity = spawnZombie(x, y);
         }
         return entity;
+    }
+
+    public static BodyDef bodyDef(float x, float y, BodyDef.BodyType type){
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.position.set(x, y);
+        bodyDef.type = type;
+        bodyDef.active = false;
+        return bodyDef;
+    }
+    public static BodyDef bodyDef(float x, float y, BodyDef.BodyType type, boolean bullet){
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.position.set(x, y);
+        bodyDef.type = type;
+        bodyDef.active = false;
+        bodyDef.bullet = bullet;
+        return bodyDef;
     }
 
 }

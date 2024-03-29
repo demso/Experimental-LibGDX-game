@@ -12,12 +12,14 @@ public class AdditionalBodyInfoBehaviour extends BehaviourAdapter {
     boolean isBullet, isRotating;
     MassData massData;
     UserName userData;
-    public AdditionalBodyInfoBehaviour(GameObject gameObject, boolean isBullet, boolean isRotating, MassData massData, UserName userData){
+    float linearDumping;
+    public AdditionalBodyInfoBehaviour(GameObject gameObject, boolean isBullet, boolean isRotating, MassData massData, UserName userData, float linearDumping){
         super(gameObject);
         this.isBullet = isBullet;
         this.isRotating = isRotating;
         this.massData = massData;
         this.userData = userData;
+        this.linearDumping = linearDumping;
     }
 
     @Override
@@ -26,6 +28,7 @@ public class AdditionalBodyInfoBehaviour extends BehaviourAdapter {
         Body body = getGameObject().getBox2dBehaviour().getBody();
         body.setBullet(isBullet);
         body.setFixedRotation(isRotating);
+        body.setLinearDamping(linearDumping);
         body.setUserData(userData);
         body.setMassData(massData);
     }

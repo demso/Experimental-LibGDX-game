@@ -59,12 +59,9 @@
  </tile>
  <tile id="4138" type="wall">
   <properties>
+   <property name="body type" value="FULL_BODY"/>
    <property name="name" value="betonwall2"/>
   </properties>
-  <objectgroup draworder="index" id="2">
-   <object id="1" type="rec2" x="6.19118" y="15.5304" width="11.9626" height="12.0676"/>
-   <object id="2" type="rec1" x="11.7527" y="5.56157" width="12.8021" height="17.7341"/>
-  </objectgroup>
  </tile>
  <tile id="4139" type="wall">
   <properties>
