@@ -20,9 +20,12 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.UI.HUD;
-import com.mygdx.game.behaviours.PlayerHandler;
+import com.mygdx.game.entities.player.PlayerHandler;
+import com.mygdx.game.entities.Bullet;
+import com.mygdx.game.entities.Item;
 import com.mygdx.game.entities.MobsFactory;
-import com.mygdx.game.entities.Player;
+import com.mygdx.game.entities.player.Player;
+import com.mygdx.game.entities.player.PlayerConstructor;
 import com.mygdx.game.tiledmap.Door;
 import com.mygdx.game.tiledmap.MyTmxMapLoader;
 import com.strongjoshua.console.GUIConsole;
@@ -30,19 +33,8 @@ import dev.lyze.gdxUnBox2d.UnBox;
 import net.dermetfan.gdx.graphics.g2d.Box2DSprite;
 import net.dermetfan.gdx.physics.box2d.Box2DUtils;
 
-public class GameItself {
-    //categoryBits
-//    final static short
-//        DEFAULT_CF =            0x0001,                 //00000000 00000001
-//        PLAYER_CF =             0x0008,                 //00000000 00001000
-//        PLAYER_INTERACT_CF =    0x0002,                 //00000000 00000010
-//        LIGHT_CF =              Short.MIN_VALUE,        //10000000 00000000
-//        BULLET_CF =             0x0004,                 //00000000 00000100
-//        ZOMBIE_CF =             0x0010,                 //00000000 00010000
-//        ALL_CF =                -1,                     //11111111 11111111
-//
-//        PLAYER_CG =             -42;
-    public static GameItself Instance;
+public class GameState {
+    public static GameState Instance;
 
     public SecondGDXGame game;
     public GameScreen gameScreen;
@@ -56,14 +48,14 @@ public class GameItself {
     boolean debug = false;
     Texture userSelection;
     ShapeRenderer debugRenderer;
-    RayHandler rayHandler;
+    public RayHandler rayHandler;
     public static World world;
     Array<Body> bodies;
     Box2DDebugRenderer debugRendererPh;
     float zoom = 2 ;
     final String mapToLoad = "newWorldMap/newmap.tmx";
     public static final int TILE_SIDE = 32;
-    HUD hudStage;
+    public HUD hudStage;
     public Stage gameStage;
     public static ObjectSet<Body> bodiesToDeletion = new ObjectSet<>();
     float physicsStep;
@@ -71,10 +63,9 @@ public class GameItself {
     ShapeRenderer shapeRenderer;
     public static UnBox unbox;
 
-    GameItself(GameScreen gameScreen){
+    GameState(GameScreen gameScreen){
         this.game = gameScreen.game;
         this.gameScreen = gameScreen;
-        this.player = game.player;
         this.font = game.font;
         this.skin = game.skin;
 
@@ -100,13 +91,11 @@ public class GameItself {
 
         renderer.setView(camera);
 
-        game.player.WIDTH = 0.8f;
-        game.player.HEIGHT = 0.8f;
-        //player.position.set(5,95);
-
         initTextures();
         initScene2D();
         initPhysics();
+
+        player = new PlayerConstructor().createPlayer(this);
 
         console = new GUIConsole(true);
         console.setNoHoverAlpha(0.5f);
@@ -141,7 +130,7 @@ public class GameItself {
         Item it = new Item(TileResolver.getTile("10mm_fmj"), this, "10mm FMJ bullets");
         it.allocate(new Vector2(3.5f,96.5f));
         //player
-        player.initBody(world, rayHandler);
+        //player.initBody(world, rayHandler);
         //mobs
     }
 

@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
-import com.mygdx.game.Item;
+import com.mygdx.game.entities.Item;
 import com.mygdx.game.SecondGDXGame;
 
 public class ItemEntry extends Button {

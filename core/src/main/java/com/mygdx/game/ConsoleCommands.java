@@ -8,13 +8,13 @@ import com.strongjoshua.console.annotation.ConsoleDoc;
 import java.util.function.Consumer;
 
 public class ConsoleCommands extends CommandExecutor {
-    GameItself gameItself;
-    public ConsoleCommands(GameItself gameItself){
+    GameState gameState;
+    public ConsoleCommands(GameState gameState){
         super();
-        this.gameItself = gameItself;
+        this.gameState = gameState;
     }
     @ConsoleDoc(description = "Spawns mobs.") public final void spawnMobs () {
-        gameItself.tester();
+        gameState.tester();
     }
 
     @ConsoleDoc(description = "Spawns certain mob.", paramDescriptions = {"mob type", "x", "y"})

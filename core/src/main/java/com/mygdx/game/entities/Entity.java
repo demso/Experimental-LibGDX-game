@@ -27,7 +27,7 @@ public abstract class Entity implements BodyData {
     }
     @Getter int hp = 1;
     @Getter int maxHp = 1;
-    boolean isAlive = true;
+    protected boolean isAlive = true;
 
     @Setter @Getter Body body;
     @Setter @Getter Friendliness friendliness = Friendliness.NEUTRAL;

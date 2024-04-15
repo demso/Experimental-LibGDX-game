@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.entities;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.math.Vector2;
@@ -9,6 +9,10 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Null;
+import com.mygdx.game.BodyData;
+import com.mygdx.game.BodyResolver;
+import com.mygdx.game.GameState;
+import com.mygdx.game.Globals;
 import com.mygdx.game.behaviours.SpriteBehaviour;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
@@ -19,7 +23,7 @@ public class Item implements BodyData {
     public Table mouseHandler;
     public Item item;
 
-    public GameItself gameItself;
+    public GameState gameState;
     public String tileName = "Item name.";
     public String itemName = "10мм FMJ";
     public String description = "First you must develop a Skin that implements all the widgets you plan to use in your layout. You can't use a widget if it doesn't have a valid style. Do this how you would usually develop a Skin in Scene Composer.";
@@ -27,11 +31,11 @@ public class Item implements BodyData {
     public float spiteHeight = 0.7f;
     GameObject GO;
 
-    Item(TiledMapTile tile, GameItself gi, String itemName){
+    public Item(TiledMapTile tile, GameState gi, String itemName){
         this.tile = tile;
         this.item = this;
         this.tileName = tile.getProperties().get("name", "no_name", String.class);
-        this.gameItself = gi;
+        this.gameState = gi;
         this.itemName = itemName;
 
         mouseHandler = new Table();
@@ -41,21 +45,21 @@ public class Item implements BodyData {
             @Override
             public void enter (InputEvent event, float x, float y, int pointer, @Null Actor fromActor) {
                 super.enter(event, x, y, pointer, fromActor);
-                gameItself.hudStage.debugEntries.put(tileName + "_ClickListener", "Pointing at "+tileName+ " at "+getPosition());
-                gameItself.hudStage.showItemInfoWindow(item);
+                gameState.hudStage.debugEntries.put(tileName + "_ClickListener", "Pointing at "+tileName+ " at "+getPosition());
+                gameState.hudStage.showItemInfoWindow(item);
             }
 
             @Override
             public void exit (InputEvent event, float x, float y, int pointer, @Null Actor toActor) {
                 super.exit(event, x, y, pointer, toActor);
-                gameItself.hudStage.debugEntries.removeKey(tileName + "_ClickListener");
-                gameItself.hudStage.hideItemInfoWindow(item);
+                gameState.hudStage.debugEntries.removeKey(tileName + "_ClickListener");
+                gameState.hudStage.hideItemInfoWindow(item);
             }
         });
 
-        gameItself.gameStage.addActor(mouseHandler);
+        gameState.gameStage.addActor(mouseHandler);
 
-        GO = new GameObject("bullet", false, GameItself.unbox);
+        GO = new GameObject("bullet", false, GameState.unbox);
         new SpriteBehaviour(GO, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RO);
     }
 
@@ -69,7 +73,7 @@ public class Item implements BodyData {
 
     public void removeFromWorld(){
         if (mouseHandler != null){
-            gameItself.gameStage.getActors().removeValue(mouseHandler, true);
+            gameState.gameStage.getActors().removeValue(mouseHandler, true);
         }
         if (physicalBody != null){
             clearPhysicalBody();

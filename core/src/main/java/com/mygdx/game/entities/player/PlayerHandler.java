@@ -1,4 +1,4 @@
-package com.mygdx.game.behaviours;
+package com.mygdx.game.entities.player;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -8,8 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.mygdx.game.GameItself;
-import com.mygdx.game.entities.Player;
+import com.mygdx.game.GameState;
 import dev.lyze.gdxUnBox2d.GameObject;
 import dev.lyze.gdxUnBox2d.behaviours.BehaviourAdapter;
 
@@ -109,19 +108,19 @@ public class PlayerHandler extends BehaviourAdapter {
             float height = 0.5f;
             float offsetX = 0;
             float offsetY = 0f;
-            Vector3 mousePos = GameItself.Instance.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+            Vector3 mousePos = GameState.Instance.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
             float rotation = Double.valueOf(Math.toDegrees(Math.atan2(mousePos.y - player.getPosition().y, mousePos.x - player.getPosition().x))).floatValue()-34;
-            batch.draw(tileTextureRegion, player.getPosition().x - (tileTextureRegion.getRegionWidth()*width /2f + offsetX)/(float) GameItself.TILE_SIDE, player.getPosition().y -
-                    (tileTextureRegion.getRegionHeight()*height/2f + offsetY)/(float) GameItself.TILE_SIDE,
-                    tileTextureRegion.getRegionWidth()*width/2f/(float)GameItself.TILE_SIDE,
-                    tileTextureRegion.getRegionHeight()*height/2f/ (float) GameItself.TILE_SIDE,
+            batch.draw(tileTextureRegion, player.getPosition().x - (tileTextureRegion.getRegionWidth()*width /2f + offsetX)/(float) GameState.TILE_SIDE, player.getPosition().y -
+                    (tileTextureRegion.getRegionHeight()*height/2f + offsetY)/(float) GameState.TILE_SIDE,
+                    tileTextureRegion.getRegionWidth()*width/2f/(float) GameState.TILE_SIDE,
+                    tileTextureRegion.getRegionHeight()*height/2f/ (float) GameState.TILE_SIDE,
                     width, height, 1,1,rotation);
         }
     }
 
     @Override
     public void fixedUpdate() {
-        if (moveUp || moveDown || moveToTheRight || moveToTheLeft){
+        if (player.isAlive() && (moveUp || moveDown || moveToTheRight || moveToTheLeft)){
             vel.set(0,0);
             movingVector.set(0,0);
             if (!(moveToTheRight && moveToTheLeft)) {

@@ -3,9 +3,8 @@ package com.mygdx.game.entities;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.mygdx.game.Constants;
+import com.mygdx.game.GameState;
 import com.mygdx.game.Globals;
-import com.mygdx.game.GameItself;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.behaviours.SpriteBehaviour;
 import com.mygdx.game.behaviours.ZombieAIBehaviour;
@@ -35,8 +34,8 @@ public class Zombie extends Entity{
         fixtureDef.density = 1f;
         fixtureDef.friction = 0.01f;
         fixtureDef.restitution = 0.01f;
-        fixtureDef.filter.categoryBits = Constants.ZOMBIE_CF;
-        fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits & ~Constants.LIGHT_CF);
+        fixtureDef.filter.categoryBits = Globals.ZOMBIE_CF;
+        fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits & ~Globals.LIGHT_CF);
 
         body = world.createBody(bodyDef);
         body.createFixture(fixtureDef);
@@ -51,7 +50,7 @@ public class Zombie extends Entity{
         body.setUserData(this);
         circle.dispose();
 
-        zombieObject = new GameObject(getName(), GameItself.unbox);
+        zombieObject = new GameObject(getName(), GameState.unbox);
 
         new Box2dBehaviour(body, zombieObject);
         new SpriteBehaviour(zombieObject, tile.getTextureRegion(), Globals.ZOMBIE_RO);

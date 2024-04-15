@@ -5,7 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.mygdx.game.entities.Player;
+import com.mygdx.game.entities.player.Player;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.UI.HUD;
 
@@ -17,7 +17,7 @@ public class InventoryScroll extends ScrollPane {
     public InventoryScroll(HUD hud, Player player) {
         super(null, SecondGDXGame.skin);
         skin = SecondGDXGame.skin;
-        inventoryHUD = new InventoryHUD(hud, player,0, 0);
+        inventoryHUD = new InventoryHUD(hud,0, 0);
         ScrollPane.ScrollPaneStyle sps = this.getStyle();
         sps.background = skin.getDrawable("default-pane");
         setSize(400,300);

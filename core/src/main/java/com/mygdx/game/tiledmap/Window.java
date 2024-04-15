@@ -4,6 +4,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Filter;
+import com.mygdx.game.GameState;
 import com.mygdx.game.GameScreen;
 
 public class Window extends SimpleUserData {
@@ -33,7 +34,7 @@ public class Window extends SimpleUserData {
             filtr.maskBits = 0x0002;
         else
             filtr.maskBits = -1;
-        game.game.player.getBody().getFixtureList().get(0).refilter();
+        GameState.player.getBody().getFixtureList().get(0).refilter();
         cell.setTile(currentTile);
     }
 }

@@ -2,7 +2,7 @@ package com.mygdx.game.behaviours;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.mygdx.game.GameItself;
+import com.mygdx.game.GameState;
 import com.mygdx.game.entities.Zombie;
 import dev.lyze.gdxUnBox2d.GameObject;
 import dev.lyze.gdxUnBox2d.behaviours.BehaviourAdapter;
@@ -21,7 +21,7 @@ public class ZombieAIBehaviour extends BehaviourAdapter {
 
     @Override
     public void fixedUpdate() {
-        Vector2 moveVec = GameItself.player.getPosition();
+        Vector2 moveVec = GameState.player.getPosition();
         moveVec = moveVec.set(moveVec.x - body.getPosition().x, moveVec.y - body.getPosition().y).nor();
         body.applyLinearImpulse(moveVec.scl(zombie.getSpeed()), zeroVector, true);
     }

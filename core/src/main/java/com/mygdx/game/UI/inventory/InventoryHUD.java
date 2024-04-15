@@ -8,22 +8,20 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.*;
 import com.mygdx.game.UI.HUD;
-import com.mygdx.game.entities.Player;
+import com.mygdx.game.entities.Item;
 
 public class InventoryHUD extends Table {
     HUD hud;
-    Player player;
     Array<Actor> invPopups = new Array<>();
-    public InventoryHUD(HUD hud, Player player, float x, float y){
+    public InventoryHUD(HUD hud, float x, float y){
         super(SecondGDXGame.skin);
-        this.player = player;
         this.hud = hud;
         //this.setFillParent(true);
         this.setTouchable(Touchable.enabled);
         this.setBackground("default-pane");
         //this.setSize(400,300);
 
-        refill();
+        //refill();
 
         this.align(Align.top);
         this.pad(5);
@@ -33,7 +31,7 @@ public class InventoryHUD extends Table {
     public void refill(){
         this.clearChildren();
         ItemEntry itemEntry;
-        for (Item curItem : player.getInventoryItems()){
+        for (Item curItem : GameState.player.getInventoryItems()){
             itemEntry = new ItemEntry(this, curItem);
             add(itemEntry).growX().align(Align.left);
 
@@ -51,9 +49,9 @@ public class InventoryHUD extends Table {
     }
 
     public void putItemFromInventory(ItemEntry itemEntry){
-        player.removeItemFromInventory(itemEntry.item);
+        GameState.player.removeItemFromInventory(itemEntry.item);
         refill();
-        itemEntry.item.allocate(player.getBody().getPosition());
+        itemEntry.item.allocate(GameState.player.getBody().getPosition());
     }
 
     public void contextAction(ContextMenu.ConAction action, ContextMenu contextMenu){

@@ -15,10 +15,10 @@ import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
 public class MyTmxMapLoader extends TmxMapLoader {
-    GameItself gameItself;
-    public MyTmxMapLoader(GameItself gameItself){
+    GameState gameState;
+    public MyTmxMapLoader(GameState gameState){
         super();
-        this.gameItself = gameItself;
+        this.gameState = gameState;
     }
 
     @Override
@@ -44,7 +44,7 @@ public class MyTmxMapLoader extends TmxMapLoader {
 
     @Override
     protected MyTiledMap loadTiledMap (FileHandle tmxFile, TmxMapLoader.Parameters parameter, ImageResolver imageResolver) {
-        this.map = new MyTiledMap(gameItself);
+        this.map = new MyTiledMap(gameState);
         this.idToObject = new IntMap<>();
         this.runOnEndOfLoadTiled = new Array<>();
 
@@ -186,7 +186,7 @@ public class MyTmxMapLoader extends TmxMapLoader {
                                 }
                                 case "door" -> {
                                     body = BodyResolver.resolveBody(i + 0.5f, j + 0.5f, null, BodyResolver.Type.FULL_BODY, null);
-                                    body.setUserData(new Door(gameItself, cell, body, map.getTileSets().getTile(13409), map.getTileSets().getTile(13358), i, j));
+                                    body.setUserData(new Door(gameState, cell, body, map.getTileSets().getTile(13409), map.getTileSets().getTile(13358), i, j));
                                 }
                             }
                         }
@@ -201,7 +201,7 @@ public class MyTmxMapLoader extends TmxMapLoader {
                             + e.getLocalizedMessage());
                     }
                     if (body != null){
-                        GameObject object = new GameObject(GameItself.unbox);
+                        GameObject object = new GameObject(GameState.unbox);
                         object.setName(((BodyData)body.getUserData()).getName());
                         new Box2dBehaviour(body, object);
 
@@ -232,7 +232,7 @@ public class MyTmxMapLoader extends TmxMapLoader {
         borderShape.set(br, tr);
         borderBody.createFixture(borderFixture);
 
-        GameObject bordersObject = new GameObject("borderBody", GameItself.unbox);
+        GameObject bordersObject = new GameObject("borderBody", GameState.unbox);
 
         new Box2dBehaviour(borderBody, bordersObject);
 

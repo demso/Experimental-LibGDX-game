@@ -3,11 +3,10 @@ package com.mygdx.game;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.mygdx.game.GameItself;
 import com.mygdx.game.entities.MobsFactory;
 
 public class BodyResolver {
-    static World world = GameItself.world;
+    static World world = GameState.world;
     public enum Type {
         FULL_BODY,
         METAL_CLOSET_BODY,
@@ -145,8 +144,8 @@ public class BodyResolver {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
         fixtureDef.density = 1f;
-        fixtureDef.filter.categoryBits = Constants.BULLET_CF;
-        fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits & ~Constants.LIGHT_CF & ~Constants.PLAYER_CF & ~Constants.PLAYER_INTERACT_CF);
+        fixtureDef.filter.categoryBits = Globals.BULLET_CF;
+        fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits & ~Globals.LIGHT_CF & ~Globals.PLAYER_CF & ~Globals.PLAYER_INTERACT_CF);
         circle.dispose();
         body.createFixture(fixtureDef);
         body.setFixedRotation(true);

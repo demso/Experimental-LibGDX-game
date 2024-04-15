@@ -3,7 +3,7 @@ package com.mygdx.game.entities;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
-import com.mygdx.game.GameItself;
+import com.mygdx.game.GameState;
 import com.mygdx.game.TileResolver;
 
 public class MobsFactory {
@@ -22,7 +22,7 @@ public class MobsFactory {
 
     }
 
-    static World world = GameItself.world;
+    static World world = GameState.world;
     private static Vector2 tempPosition = new Vector2();
 
     public static Zombie spawnZombie(float x, float y){

@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.mygdx.game.GameState;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.UI.HUD;
 
@@ -80,7 +81,7 @@ public class ContextMenu extends Table {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 invHUD.contextAction(ConAction.DESCRIPTION, ContextMenu.this);
-                invHUD.player.equipItem(itemEntry.item);
+                GameState.player.equipItem(itemEntry.item);
                 invHUD.closeItemContextMenu(ContextMenu.this);
             }
         });

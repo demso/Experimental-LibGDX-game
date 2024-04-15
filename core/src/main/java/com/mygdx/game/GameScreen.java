@@ -7,19 +7,19 @@ import com.mygdx.game.UI.HUD;
 import org.jetbrains.annotations.NotNull;
 
 public class GameScreen implements Screen {
-    static GameItself gameItself;
+    static GameState gameState;
     public SecondGDXGame game;
     HUD hudStage;
     GameScreen(@NotNull SecondGDXGame game){
         this.game = game;
-        gameItself = new GameItself(this);
-        GameItself.Instance = gameItself;
-        this.hudStage = gameItself.hudStage;
+        gameState = new GameState(this);
+        GameState.Instance = gameState;
+        this.hudStage = gameState.hudStage;
     }
 
     @Override
     public void render (float deltaTime) {
-       gameItself.render(deltaTime);
+       gameState.render(deltaTime);
     }
     @Override
     public void dispose () {
@@ -27,9 +27,9 @@ public class GameScreen implements Screen {
     @Override
     public void resize(int width, int height) {
        hudStage.updateOnResize(width, height);
-       gameItself.console.refresh(true);
-       gameItself.gameStage.getViewport().update(width , height, false);
-       gameItself.camera.setToOrtho(false, width * (1f/GameItself.TILE_SIDE) * (1/ gameItself.zoom), height * (1f/GameItself.TILE_SIDE) * (1/ gameItself.zoom));
+       gameState.console.refresh(true);
+       gameState.gameStage.getViewport().update(width , height, false);
+       gameState.camera.setToOrtho(false, width * (1f/ GameState.TILE_SIDE) * (1/ gameState.zoom), height * (1f/ GameState.TILE_SIDE) * (1/ gameState.zoom));
     }
     @Override
     public void pause() {
@@ -47,10 +47,10 @@ public class GameScreen implements Screen {
     public void show() {
         InputMultiplexer multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(hudStage);
-        multiplexer.addProcessor(gameItself.gameStage);
+        multiplexer.addProcessor(gameState.gameStage);
 
         Gdx.input.setInputProcessor(multiplexer);
 
-        gameItself.console.resetInputProcessing();
+        gameState.console.resetInputProcessing();
     }
 }

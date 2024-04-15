@@ -4,7 +4,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Filter;
-import com.mygdx.game.GameItself;
+import com.mygdx.game.GameState;
 
 public class Door extends SimpleUserData {
     TiledMapTileLayer.Cell cell;
@@ -12,13 +12,13 @@ public class Door extends SimpleUserData {
     TiledMapTile open;
     TiledMapTile currentTile;
     Body physicalBody;
-    GameItself gameItself;
+    GameState gameState;
     float x;
     float y;
     boolean isOpen = false;
-    public Door(GameItself gameItself, TiledMapTileLayer.Cell cell, Body body, TiledMapTile open, TiledMapTile closed, float x, float y){
+    public Door(GameState gameState, TiledMapTileLayer.Cell cell, Body body, TiledMapTile open, TiledMapTile closed, float x, float y){
         super(cell,"door");
-        this.gameItself = gameItself;
+        this.gameState = gameState;
         this.cell = cell;
         this.open = open;
         this.closed = closed;
@@ -35,7 +35,7 @@ public class Door extends SimpleUserData {
             filtr.maskBits = 0x0002;
         else
             filtr.maskBits = -1;
-        gameItself.game.player.getBody().getFixtureList().get(0).refilter();
+        GameState.player.getBody().getFixtureList().get(0).refilter();
         cell.setTile(currentTile);
     }
 }

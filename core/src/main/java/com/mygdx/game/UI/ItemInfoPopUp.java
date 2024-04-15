@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.mygdx.game.*;
+import com.mygdx.game.entities.Item;
 
 public class ItemInfoPopUp extends Table {
     Image itemImage;

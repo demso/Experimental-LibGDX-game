@@ -17,25 +17,26 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.*;
 import com.mygdx.game.UI.inventory.*;
+import com.mygdx.game.entities.Item;
 import com.mygdx.game.tiledmap.*;
 
 public class HUD extends Stage {
     InventoryScroll invScroll;
     boolean isInventoryShowed;
-    public GameItself gameItself;
+    public GameState gameState;
     ObjectMap<Item, ItemInfoPopUp> itemPopups =  new ObjectMap<>();
     public Array<Actor> esClosablePopups = new Array<>();
     public ArrayMap<String, String> debugEntries = new ArrayMap<>();
     Label label;
     Skin skin;
 
-    public HUD(GameItself gi, ScreenViewport screenViewport, SpriteBatch batch) {
+    public HUD(GameState gi, ScreenViewport screenViewport, SpriteBatch batch) {
         super(screenViewport, batch);
-        gameItself = gi;
-        skin = gameItself.skin;
+        gameState = gi;
+        skin = gameState.skin;
 
 //        invHUD = new InventoryHUD(this, gameItself.player, 0,0);
-        invScroll = new InventoryScroll(this, gameItself.player);
+        invScroll = new InventoryScroll(this, gameState.player);
 //        ScrollPane.ScrollPaneStyle sps = invScroll.getStyle();
 //        sps.background = skin.getDrawable("default-pane");
         invScroll.setVisible(false);
@@ -63,7 +64,7 @@ public class HUD extends Stage {
     public void showItemInfoWindow(Item item){
         getActors().removeValue(itemPopups.get(item), true);
         Vector3 mousePosition = getCamera().unproject(new Vector3((float) Gdx.input.getX(), (float) Gdx.input.getY(), 0));
-        Vector3 itemPos = getCamera().unproject(gameItself.gameStage.getCamera().project(new Vector3(item.getPosition(), 0)));
+        Vector3 itemPos = getCamera().unproject(gameState.gameStage.getCamera().project(new Vector3(item.getPosition(), 0)));
         ItemInfoPopUp popup = new ItemInfoPopUp(item,itemPos.x,Gdx.graphics.getHeight()-itemPos.y);
         addActor(popup);
         itemPopups.put(item, popup);
@@ -130,17 +131,17 @@ public class HUD extends Stage {
     StringBuilder labelText = new StringBuilder();
     public void drawTileDebugInfo() {
         labelText = new StringBuilder();
-        labelText.append("Player velocity : ").append(gameItself.player.getBody().getLinearVelocity()).append("\n");
-        clObj = gameItself.player.closestObject;
+        labelText.append("Player velocity : ").append(gameState.player.getBody().getLinearVelocity()).append("\n");
+        clObj = gameState.player.closestObject;
         labelText.append("Closest object : ").append(clObj == null ? null : clObj.getUserData() instanceof SimpleUserData ? ((SimpleUserData) clObj.getUserData()).bodyName + " " + clObj.getPosition() : clObj.getUserData()).append("\n\n");
         if (debugEntries.size > 0)
             debugEntries.values().forEach((kall) -> labelText.append(kall).append("\n\n"));
         Vector3 mouse_position = new Vector3(0,0,0);
-        Vector3 tilePosition = gameItself.camera.unproject(mouse_position.set((float) Gdx.input.getX(), (float) Gdx.input.getY(), 0));
+        Vector3 tilePosition = gameState.camera.unproject(mouse_position.set((float) Gdx.input.getX(), (float) Gdx.input.getY(), 0));
         int tileX = (int)Math.floor(tilePosition.x);
         int tileY = (int)Math.floor(tilePosition.y);
-        for (var x = 0; x < gameItself.map.getLayers().size(); x++){
-            TiledMapTileLayer currentLayer = (TiledMapTileLayer)gameItself.map.getLayers().get(x);
+        for (var x = 0; x < gameState.map.getLayers().size(); x++){
+            TiledMapTileLayer currentLayer = (TiledMapTileLayer) gameState.map.getLayers().get(x);
             TiledMapTileLayer.Cell mcell = currentLayer.getCell(tileX, tileY);
 
             if(mcell != null){

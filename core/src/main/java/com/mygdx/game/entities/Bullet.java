@@ -1,16 +1,17 @@
-package com.mygdx.game;
+package com.mygdx.game.entities;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.mygdx.game.BodyData;
+import com.mygdx.game.BodyResolver;
+import com.mygdx.game.GameState;
+import com.mygdx.game.Globals;
 import com.mygdx.game.behaviours.collision.BulletCollisionBehaviour;
 import com.mygdx.game.behaviours.SpriteBehaviour;
-import com.mygdx.game.entities.MobsFactory;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 import lombok.Getter;
-
-import static com.mygdx.game.GameItself.world;
 
 public class Bullet implements BodyData {
     GameObject bulletObject;
@@ -21,7 +22,7 @@ public class Bullet implements BodyData {
         float bulletSpeed = 200f;
         body = BodyResolver.bulletBody(position.x, position.y, this);
 
-        bulletObject = new GameObject(getName(), GameItself.unbox);
+        bulletObject = new GameObject(getName(), GameState.unbox);
 
         new Box2dBehaviour(body, bulletObject);
         new SpriteBehaviour(bulletObject, 0.5f, 0.5f, tile.getTextureRegion(), Globals.DEFAULT_RO);

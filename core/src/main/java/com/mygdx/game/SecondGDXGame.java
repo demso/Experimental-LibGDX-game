@@ -5,10 +5,10 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.mygdx.game.entities.Player;
+import com.mygdx.game.entities.player.Player;
+import com.mygdx.game.entities.player.PlayerConstructor;
 
 public class SecondGDXGame extends Game {
-    public Player player;
     SpriteBatch batch;
     static MainMenuScreen menuScreen;
     static GameScreen gameScreen;
@@ -35,7 +35,6 @@ public class SecondGDXGame extends Game {
         skin.add("default14font", fontRoboto14);
         Button.ButtonStyle bs = skin.get(Button.ButtonStyle.class);
 
-        player = new Player(this);
         menuScreen = new MainMenuScreen(this);
         gameScreen = new GameScreen(this);
         helper = new HandyHelper();
