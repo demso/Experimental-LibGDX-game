@@ -17,10 +17,12 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.UI.HUD;
+import com.mygdx.game.behaviours.PlayerHandler;
+import com.mygdx.game.entities.MobsFactory;
+import com.mygdx.game.entities.Player;
 import com.mygdx.game.tiledmap.Door;
 import com.mygdx.game.tiledmap.MyTmxMapLoader;
 import com.strongjoshua.console.GUIConsole;
@@ -30,24 +32,25 @@ import net.dermetfan.gdx.physics.box2d.Box2DUtils;
 
 public class GameItself {
     //categoryBits
-    final static short
-        DEFAULT_CF =            0x0001,                 //00000000 00000001
-        PLAYER_CF =             0x0008,                 //00000000 00001000
-        PLAYER_INTERACT_CF =    0x0002,                 //00000000 00000010
-        LIGHT_CF =              Short.MIN_VALUE,        //10000000 00000000
-        BULLET_CF =             0x0004,                 //00000000 00000100
-        ZOMBIE_CF =             0x0010,                 //00000000 00010000
-        ALL_CF =                -1,                     //11111111 11111111
-
-        PLAYER_CG =             -42;
+//    final static short
+//        DEFAULT_CF =            0x0001,                 //00000000 00000001
+//        PLAYER_CF =             0x0008,                 //00000000 00001000
+//        PLAYER_INTERACT_CF =    0x0002,                 //00000000 00000010
+//        LIGHT_CF =              Short.MIN_VALUE,        //10000000 00000000
+//        BULLET_CF =             0x0004,                 //00000000 00000100
+//        ZOMBIE_CF =             0x0010,                 //00000000 00010000
+//        ALL_CF =                -1,                     //11111111 11111111
+//
+//        PLAYER_CG =             -42;
+    public static GameItself Instance;
 
     public SecondGDXGame game;
     public GameScreen gameScreen;
-    public Player player;
+    public static Player player;
     public Skin skin;
     BitmapFont font;
     Batch batch;
-    public TiledMap map;
+    public static TiledMap map;
     OrthogonalTiledMapRenderer renderer;
     public OrthographicCamera camera;
     boolean debug = false;
@@ -56,14 +59,12 @@ public class GameItself {
     RayHandler rayHandler;
     public static World world;
     Array<Body> bodies;
-    float accumulator = 0;
     Box2DDebugRenderer debugRendererPh;
     float zoom = 2 ;
     final String mapToLoad = "newWorldMap/newmap.tmx";
     public static final int TILE_SIDE = 32;
     HUD hudStage;
     public Stage gameStage;
-    public static ObjectIntMap<String> tilemapa;
     public static ObjectSet<Body> bodiesToDeletion = new ObjectSet<>();
     float physicsStep;
     public static GUIConsole console;
@@ -77,7 +78,7 @@ public class GameItself {
         this.font = game.font;
         this.skin = game.skin;
 
-        physicsStep = 1/75f;
+        physicsStep = 1/60f;
 
         debugRenderer = new ShapeRenderer();
         shapeRenderer = new ShapeRenderer();
@@ -89,10 +90,8 @@ public class GameItself {
         camera = new OrthographicCamera();
         gameStage = new Stage(new ScreenViewport(camera));
 
-
         camera.setToOrtho(false, 30, 20);
 
-        tilemapa = new ObjectIntMap<>();
         map = new MyTmxMapLoader(this).load(mapToLoad);
 
         renderer = new OrthogonalTiledMapRenderer(map, 1f / TILE_SIDE);
@@ -103,9 +102,8 @@ public class GameItself {
 
         game.player.WIDTH = 0.8f;
         game.player.HEIGHT = 0.8f;
-        player.position.set(5,95);
+        //player.position.set(5,95);
 
-        initStatic();
         initTextures();
         initScene2D();
         initPhysics();
@@ -134,21 +132,19 @@ public class GameItself {
         //light
         rayHandler = new RayHandler(world);
         rayHandler.setCombinedMatrix(camera);
-        RayHandler.setGammaCorrection(true);
-        RayHandler.useDiffuseLight(true);
+        RayHandler.useDiffuseLight(true );
         rayHandler.setAmbientLight(0f, 0f, 0f, 1f);
-        rayHandler.setBlurNum(1);
+        rayHandler.setBlur(true);
+        rayHandler.setBlurNum(3);
+
         //game
         Item it = new Item(TileResolver.getTile("10mm_fmj"), this, "10mm FMJ bullets");
-        it.allocate(world, new Vector2(3.5f,96.5f));
+        it.allocate(new Vector2(3.5f,96.5f));
         //player
         player.initBody(world, rayHandler);
         //mobs
     }
-    void initStatic(){
-        TileResolver.init(tilemapa, map.getTileSets());
-        MobsFactory.init(world);
-    }
+
     private void update(float deltaTime) {
         if (bodiesToDeletion.size != 0) {
             bodiesToDeletion.forEach((Body body) -> world.destroyBody(body));
@@ -156,21 +152,20 @@ public class GameItself {
         }
 
         //UPDATE PLAYER
-        player.update(deltaTime);
+        //player.update(deltaTime);
 
         boolean moveToTheRight = Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D);
         boolean moveToTheLeft = Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A);
         boolean moveUp = Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W);
         boolean moveDown = Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S);
 
-        player.inputMove(moveUp, moveDown, moveToTheRight, moveToTheLeft, deltaTime);
+        //player.inputMove(moveUp, moveDown, moveToTheRight, moveToTheLeft, deltaTime);
 
         //UPDATE STAGE
         hudStage.update(debug);
 
         //CAMERA UPDATE
-        camera.position.x = player.position.x;
-        camera.position.y = player.position.y;
+        camera.position.set(player.getPosition(), 0);
         camera.update();
     }
     void render(float deltaTime){
@@ -189,7 +184,7 @@ public class GameItself {
 
         unbox.render(batch);
 
-        player.renderPlayer(renderer.getBatch(), camera);
+        //player.renderPlayer(renderer.getBatch(), camera);
         batch.end();
 
         gameStage.act(deltaTime);
@@ -230,8 +225,8 @@ public class GameItself {
     }
     public void fireBullet(Player pla){
         Vector3 mousePos = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-        Vector2 vv = new Vector2(mousePos.x-player.position.x, mousePos.y-player.position.y);
-        new Bullet(TileResolver.getTile("bullet"), world, pla.getPosition(), vv);
+        Vector2 vv = new Vector2(mousePos.x-player.getPosition().x, mousePos.y-player.getPosition().y);
+        new Bullet(TileResolver.getTile("bullet"), pla.getPosition(), vv);
     }
 
     Vector2 beginV;
@@ -302,6 +297,35 @@ public class GameItself {
             if (keycode == Input.Keys.T){
                 if (player.equipedItem != null && player.equipedItem.itemName.equals("Deagle .44"))
                     fireBullet(player);
+            }
+            if (keycode == Input.Keys.W || keycode == Input.Keys.UP){
+                player.playerObject.getBehaviour(PlayerHandler.class).moveUp = false;
+            }
+            if (keycode == Input.Keys.S || keycode == Input.Keys.DOWN){
+                player.playerObject.getBehaviour(PlayerHandler.class).moveDown = false;
+            }
+            if (keycode == Input.Keys.A || keycode == Input.Keys.LEFT){
+                player.playerObject.getBehaviour(PlayerHandler.class).moveToTheLeft = false;
+            }
+            if (keycode == Input.Keys.D || keycode == Input.Keys.RIGHT){
+                player.playerObject.getBehaviour(PlayerHandler.class).moveToTheRight = false;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean keyDown(InputEvent event, int keycode) {
+            if (keycode == Input.Keys.W || keycode == Input.Keys.UP){
+                player.playerObject.getBehaviour(PlayerHandler.class).moveUp = true;
+            }
+            if (keycode == Input.Keys.S || keycode == Input.Keys.DOWN){
+                player.playerObject.getBehaviour(PlayerHandler.class).moveDown = true;
+            }
+            if (keycode == Input.Keys.A || keycode == Input.Keys.LEFT){
+                player.playerObject.getBehaviour(PlayerHandler.class).moveToTheLeft = true;
+            }
+            if (keycode == Input.Keys.D || keycode == Input.Keys.RIGHT){
+                player.playerObject.getBehaviour(PlayerHandler.class).moveToTheRight = true;
             }
             return false;
         }
