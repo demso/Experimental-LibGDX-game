@@ -5,15 +5,16 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.mygdx.game.entities.player.Player;
-import com.mygdx.game.entities.player.PlayerConstructor;
+import com.mygdx.game.gamestate.HandyHelper;
+import com.mygdx.game.screens.GameScreen;
+import com.mygdx.game.screens.MainMenuScreen;
 
 public class SecondGDXGame extends Game {
-    SpriteBatch batch;
-    static MainMenuScreen menuScreen;
-    static GameScreen gameScreen;
+    public SpriteBatch batch;
+    public static MainMenuScreen menuScreen;
+    public static GameScreen gameScreen;
     public static Skin skin;
-    static BitmapFont font;
+    public static BitmapFont font;
     public static BitmapFont fontRoboto14;
     public static HandyHelper helper;
     @Override

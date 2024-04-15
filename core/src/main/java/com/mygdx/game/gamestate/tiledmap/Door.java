@@ -1,0 +1,42 @@
+package com.mygdx.game.gamestate.tiledmap;
+
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Filter;
+import com.mygdx.game.gamestate.GameState;
+import com.mygdx.game.gamestate.objects.bodies.userdata.SimpleUserData;
+
+public class Door extends SimpleUserData {
+    TiledMapTileLayer.Cell cell;
+    TiledMapTile closed;
+    TiledMapTile open;
+    TiledMapTile currentTile;
+    Body physicalBody;
+    GameState gameState;
+    float x;
+    float y;
+    boolean isOpen = false;
+    public Door(GameState gameState, TiledMapTileLayer.Cell cell, Body body, TiledMapTile open, TiledMapTile closed, float x, float y){
+        super(cell,"door");
+        this.gameState = gameState;
+        this.cell = cell;
+        this.open = open;
+        this.closed = closed;
+        physicalBody = body;
+        this.x = x;
+        this.y = y;
+    }
+
+    public void doAction() {
+        isOpen = !isOpen;
+        currentTile = isOpen ? open : closed;
+        Filter filtr = physicalBody.getFixtureList().get(0).getFilterData();
+        if (isOpen)
+            filtr.maskBits = 0x0002;
+        else
+            filtr.maskBits = -1;
+        GameState.Instance.player.getBody().getFixtureList().get(0).refilter();
+        cell.setTile(currentTile);
+    }
+}
