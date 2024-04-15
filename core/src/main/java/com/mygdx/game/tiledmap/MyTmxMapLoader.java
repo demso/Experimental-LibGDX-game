@@ -10,9 +10,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
-import com.mygdx.game.GameItself;
-import com.mygdx.game.SecondGDXGame;
-import com.mygdx.game.UserName;
+import com.mygdx.game.*;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
@@ -143,10 +141,12 @@ public class MyTmxMapLoader extends TmxMapLoader {
         map.getTileSets().forEach(tiledMapTiles -> tiledMapTiles.forEach(tiledMapTile -> {
             String tileName = tiledMapTile.getProperties().get("name", String.class);
             if (tileName != null)
-                gameItself.tilemapa.put(tileName, tiledMapTile.getId());
+                TileResolver.tilemapa.put(tileName, tiledMapTile.getId());
         }));
 
         initPhysics();
+
+        TileResolver.tilesets = map.getTileSets();
 
         return (MyTiledMap) map;
     }
@@ -156,9 +156,6 @@ public class MyTmxMapLoader extends TmxMapLoader {
         MapLayers mlayers = mymap.getLayers();
         var obstaclesLayer = (TiledMapTileLayer) mlayers.get("obstacles");
 
-
-        BodyTileResolver bodyResolver = new BodyTileResolver(mymap.world);
-
         for(var i = 0; i < obstaclesLayer.getWidth(); i++)
             for(var j = 0; j < obstaclesLayer.getHeight(); j++){
                 var cell = obstaclesLayer.getCell(i, j);
@@ -166,29 +163,29 @@ public class MyTmxMapLoader extends TmxMapLoader {
                     var tileProperties = cell.getTile().getProperties();
                     Body body = null;
                     String bodyType = tileProperties.get("body type", null,  String.class);
-                    BodyTileResolver.Direction direction = bodyResolver.getDirection(cell);
+                    BodyResolver.Direction direction = BodyResolver.getDirection(cell);
                     try{
                         if (bodyType != null){
-                            body = bodyResolver.resolveBody(i+0.5f, j+0.5f, new SimpleUserData(cell, bodyType), BodyTileResolver.Type.valueOf(bodyType), direction);
+                            body = BodyResolver.resolveBody(i+0.5f, j+0.5f, new SimpleUserData(cell, bodyType), BodyResolver.Type.valueOf(bodyType), direction);
                         } else {
                             switch (cell.getTile().getProperties().get("type").toString()) {
-                                case "wall" -> body = bodyResolver.fullBody(i + 0.5f, j + 0.5f, new SimpleUserData(cell, "betonWall"));
-                                case "fullBody" -> body = bodyResolver.fullBody(i + 0.5f, j + 0.5f, new SimpleUserData(cell, "mereFullBody"));
-                                case "metalCloset" -> body = bodyResolver.resolveBody(i + 0.5f, j + 0.3f, new SimpleUserData(cell, "metalCloset"), BodyTileResolver.Type.METAL_CLOSET_BODY);
+                                case "wall" -> body = BodyResolver.fullBody(i + 0.5f, j + 0.5f, new SimpleUserData(cell, "betonWall"));
+                                case "fullBody" -> body = BodyResolver.fullBody(i + 0.5f, j + 0.5f, new SimpleUserData(cell, "mereFullBody"));
+                                case "metalCloset" -> body = BodyResolver.resolveBody(i + 0.5f, j + 0.3f, new SimpleUserData(cell, "metalCloset"), BodyResolver.Type.METAL_CLOSET_BODY, null);
                                 case "window" -> {
                                     switch (direction) {
                                         case NORTH ->
-                                            body = bodyResolver.resolveBody(i + 0.5f, j + 0.95f, new SimpleUserData(cell, "northWindow"), BodyTileResolver.Type.WINDOW, BodyTileResolver.Direction.NORTH);
+                                            body = BodyResolver.resolveBody(i + 0.5f, j + 0.95f, new SimpleUserData(cell, "northWindow"), BodyResolver.Type.WINDOW, BodyResolver.Direction.NORTH);
                                         case SOUTH ->
-                                            body = bodyResolver.resolveBody(i + 0.5f, j + 0.05f, new SimpleUserData(cell, "southWindow"), BodyTileResolver.Type.WINDOW, BodyTileResolver.Direction.SOUTH);
+                                            body = BodyResolver.resolveBody(i + 0.5f, j + 0.05f, new SimpleUserData(cell, "southWindow"), BodyResolver.Type.WINDOW, BodyResolver.Direction.SOUTH);
                                         case WEST ->
-                                            body = bodyResolver.resolveBody(i + 0.05f, j + 0.5f, new SimpleUserData(cell, "westWindow"), BodyTileResolver.Type.WINDOW, BodyTileResolver.Direction.WEST);
+                                            body = BodyResolver.resolveBody(i + 0.05f, j + 0.5f, new SimpleUserData(cell, "westWindow"), BodyResolver.Type.WINDOW, BodyResolver.Direction.WEST);
                                         case EAST ->
-                                            body = bodyResolver.resolveBody(i + 0.95f, j + 0.5f, new SimpleUserData(cell, "eastWindow"), BodyTileResolver.Type.WINDOW, BodyTileResolver.Direction.EAST);
+                                            body = BodyResolver.resolveBody(i + 0.95f, j + 0.5f, new SimpleUserData(cell, "eastWindow"), BodyResolver.Type.WINDOW, BodyResolver.Direction.EAST);
                                     }
                                 }
                                 case "door" -> {
-                                    body = bodyResolver.resolveBody(i + 0.5f, j + 0.5f, null, BodyTileResolver.Type.FULL_BODY);
+                                    body = BodyResolver.resolveBody(i + 0.5f, j + 0.5f, null, BodyResolver.Type.FULL_BODY, null);
                                     body.setUserData(new Door(gameItself, cell, body, map.getTileSets().getTile(13409), map.getTileSets().getTile(13358), i, j));
                                 }
                             }
@@ -205,7 +202,7 @@ public class MyTmxMapLoader extends TmxMapLoader {
                     }
                     if (body != null){
                         GameObject object = new GameObject(GameItself.unbox);
-                        object.setName(((UserName)body.getUserData()).getName());
+                        object.setName(((BodyData)body.getUserData()).getName());
                         new Box2dBehaviour(body, object);
 
                         mymap.staticObjects.add(body);

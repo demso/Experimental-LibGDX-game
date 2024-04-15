@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.*;
 import com.mygdx.game.UI.HUD;
+import com.mygdx.game.entities.Player;
 
 public class InventoryHUD extends Table {
     HUD hud;
@@ -52,7 +53,7 @@ public class InventoryHUD extends Table {
     public void putItemFromInventory(ItemEntry itemEntry){
         player.removeItemFromInventory(itemEntry.item);
         refill();
-        itemEntry.item.allocate(hud.gameItself.world, player.getBody().getPosition());
+        itemEntry.item.allocate(player.getBody().getPosition());
     }
 
     public void contextAction(ContextMenu.ConAction action, ContextMenu contextMenu){

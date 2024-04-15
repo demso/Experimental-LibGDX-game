@@ -1,6 +1,10 @@
 package com.mygdx.game.tiledmap;
 
-public class SimpleUserData implements UserData {
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.mygdx.game.BodyData;
+
+public class SimpleUserData implements BodyData {
     Object data;
     public String bodyName;
     public SimpleUserData(Object d, String n){

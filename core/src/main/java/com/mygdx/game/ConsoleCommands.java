@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.entities.MobsFactory;
 import com.strongjoshua.console.CommandExecutor;
 import com.strongjoshua.console.annotation.ConsoleDoc;
 

@@ -63,7 +63,7 @@ public class HUD extends Stage {
     public void showItemInfoWindow(Item item){
         getActors().removeValue(itemPopups.get(item), true);
         Vector3 mousePosition = getCamera().unproject(new Vector3((float) Gdx.input.getX(), (float) Gdx.input.getY(), 0));
-        Vector3 itemPos = getCamera().unproject(gameItself.gameStage.getCamera().project(new Vector3(item.position, 0)));
+        Vector3 itemPos = getCamera().unproject(gameItself.gameStage.getCamera().project(new Vector3(item.getPosition(), 0)));
         ItemInfoPopUp popup = new ItemInfoPopUp(item,itemPos.x,Gdx.graphics.getHeight()-itemPos.y);
         addActor(popup);
         itemPopups.put(item, popup);

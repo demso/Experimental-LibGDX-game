@@ -1,11 +1,12 @@
-package com.mygdx.game;
+package com.mygdx.game.entities;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.mygdx.game.BodyData;
 import lombok.Getter;
 import lombok.Setter;
 
-public abstract class Entity implements UserName {
+public abstract class Entity implements BodyData {
     public enum Friendliness {
         PLAYER("Player"),
         NEUTRAL("Neutral"),
@@ -33,6 +34,7 @@ public abstract class Entity implements UserName {
     @Getter @Setter Kind kind;
 
     public Entity(){}
+
     public int hurt(int damage){
         hp = Math.max(0, hp-damage);
         if (hp == 0)

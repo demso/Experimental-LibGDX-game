@@ -5,8 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.Align;
-import com.mygdx.game.Player;
+import com.mygdx.game.entities.Player;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.UI.HUD;
 

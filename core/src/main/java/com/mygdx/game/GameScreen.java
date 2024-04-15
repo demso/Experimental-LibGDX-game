@@ -13,6 +13,7 @@ public class GameScreen implements Screen {
     GameScreen(@NotNull SecondGDXGame game){
         this.game = game;
         gameItself = new GameItself(this);
+        GameItself.Instance = gameItself;
         this.hudStage = gameItself.hudStage;
     }
 

@@ -1,8 +1,8 @@
 package com.mygdx.game.behaviours.collision;
 
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.mygdx.game.*;
+import com.mygdx.game.entities.Zombie;
 import dev.lyze.gdxUnBox2d.Behaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 

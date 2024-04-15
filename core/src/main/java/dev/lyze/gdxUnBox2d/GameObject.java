@@ -9,7 +9,7 @@ import lombok.Setter;
  * Main game object of the UnBox library. Holds a Box2D body and behaviours.
  */
 public final class GameObject {
-    @Getter private final UnBox unBox;
+    @Getter protected final UnBox unBox;
 
     /**
      * When the game object is enabled all its behaviours receive event calls.
@@ -19,7 +19,7 @@ public final class GameObject {
     /**
      * A simple name for the game object.
      */
-    @Getter @Setter private String name;
+    @Getter @Setter protected String name;
 
     /**
      * Lifecycle state of the game object.
@@ -88,6 +88,9 @@ public final class GameObject {
      */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+
+        if (unBox.gameObjects.get(this) == null)
+            return;
 
         for (Behaviour behaviour : unBox.gameObjects.get(this)) {
             if (enabled)

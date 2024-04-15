@@ -1,9 +1,14 @@
-package com.mygdx.game;
+package com.mygdx.game.entities;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.mygdx.game.Constants;
+import com.mygdx.game.Globals;
+import com.mygdx.game.GameItself;
+import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.behaviours.SpriteBehaviour;
+import com.mygdx.game.behaviours.ZombieAIBehaviour;
 import com.mygdx.game.behaviours.collision.ZombieCollisionBehaviour;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
@@ -13,6 +18,7 @@ import lombok.Setter;
 public class Zombie extends Entity{
     @Getter int damage = 4;
     GameObject zombieObject;
+    @Getter @Setter float speed = 10f;
     @Getter @Setter float maxAttackCoolDown = 1f;
     @Getter @Setter float attackCoolDown = 0;
     public Zombie(TiledMapTile tile, World world, Vector2 position){
@@ -29,8 +35,8 @@ public class Zombie extends Entity{
         fixtureDef.density = 1f;
         fixtureDef.friction = 0.01f;
         fixtureDef.restitution = 0.01f;
-        fixtureDef.filter.categoryBits = GameItself.ZOMBIE_CF;
-        fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits & ~GameItself.LIGHT_CF);
+        fixtureDef.filter.categoryBits = Constants.ZOMBIE_CF;
+        fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits & ~Constants.LIGHT_CF);
 
         body = world.createBody(bodyDef);
         body.createFixture(fixtureDef);
@@ -48,14 +54,20 @@ public class Zombie extends Entity{
         zombieObject = new GameObject(getName(), GameItself.unbox);
 
         new Box2dBehaviour(body, zombieObject);
-        new SpriteBehaviour(zombieObject, tile.getTextureRegion(), GameConstants.ZOMBIE_RO);
+        new SpriteBehaviour(zombieObject, tile.getTextureRegion(), Globals.ZOMBIE_RO);
         new ZombieCollisionBehaviour(zombieObject);
+        new ZombieAIBehaviour(zombieObject);
         //new SoutBehaviour("zombieLogger", false, zombieObject);
     }
 
     @Override
     public String getName(){
         return "zombie";
+    }
+
+    @Override
+    public Object getData() {
+        return this;
     }
 
     @Override

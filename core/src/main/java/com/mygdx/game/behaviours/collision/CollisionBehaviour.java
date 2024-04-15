@@ -3,7 +3,7 @@ package com.mygdx.game.behaviours.collision;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.mygdx.game.UserName;
+import com.mygdx.game.BodyData;
 import dev.lyze.gdxUnBox2d.GameObject;
 import dev.lyze.gdxUnBox2d.behaviours.BehaviourAdapter;
 
@@ -48,6 +48,6 @@ public class CollisionBehaviour<T> extends BehaviourAdapter {
         thisFixtureUserData = thisFixture.getUserData();
         otherFixtureUserData = otherFixture.getUserData();
 
-        otherBodyUserName = otherUserData instanceof UserName ? ((UserName) otherUserData).getName() : "";
+        otherBodyUserName = otherUserData instanceof BodyData ? ((BodyData) otherUserData).getName() : "";
     }
 }
