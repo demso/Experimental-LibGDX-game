@@ -2,39 +2,36 @@ package com.mygdx.game.gamestate.UI.inventory;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.*;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Event;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.game.*;
-import com.mygdx.game.gamestate.UI.HUD;
-import com.mygdx.game.gamestate.objects.Item;
 import com.mygdx.game.gamestate.GameState;
+import com.mygdx.game.gamestate.objects.Item;
+import com.mygdx.game.gamestate.objects.bodies.player.Player;
+import com.mygdx.game.SecondGDXGame;
+import com.mygdx.game.gamestate.UI.HUD;
 
-public class InventoryHUD extends Table {
+public class InventoryHUD extends ScrollPane {
     HUD hud;
-    Array<Actor> invPopups = new Array<>();
-    public InventoryHUD(HUD hud, float x, float y){
-        super(SecondGDXGame.skin);
-        this.hud = hud;
-        //this.setFillParent(true);
-        this.setTouchable(Touchable.enabled);
-        this.setBackground("default-pane");
-        //this.setSize(400,300);
-
-        this.align(Align.top);
-        this.pad(5);
-        this.setPosition(x,y-getHeight());
-    }
+    Player player;
+    Array<Actor> popups = new Array<>();
+    Skin skin;
+    Table table;
 
     public void refill(){
-        this.clearChildren();
+        table.clearChildren();
         ItemEntry itemEntry;
         for (Item curItem : GameState.Instance.player.getInventoryItems()){
             itemEntry = new ItemEntry(this, curItem);
-            add(itemEntry).growX().align(Align.left);
+            table.add(itemEntry).growX().align(Align.left);
 
-            row().padTop(2);
+            table.row().padTop(2);
         }
     }
 
@@ -42,7 +39,7 @@ public class InventoryHUD extends Table {
         Vector3 mousePosition = hud.getCamera().unproject(new Vector3((float) Gdx.input.getX(), (float) Gdx.input.getY(), 0));
         ContextMenu contextMenu = new ContextMenu(hud,this, itemEntry, mousePosition.x, mousePosition.y);
 
-        invPopups.add(contextMenu);
+        popups.add(contextMenu);
         hud.esClosablePopups.add(contextMenu);
         hud.addActor(contextMenu);
     }
@@ -63,7 +60,7 @@ public class InventoryHUD extends Table {
     }
 
     public void closeItemContextMenu(ContextMenu contextMenu){
-        invPopups.removeValue(contextMenu, true);
+        popups.removeValue(contextMenu, true);
         hud.getActors().removeValue(contextMenu, true);
         if (contextMenu.hideListener != null)
             hud.removeCaptureListener(contextMenu.hideListener);
@@ -71,18 +68,48 @@ public class InventoryHUD extends Table {
     }
 
     public void onClose(){
-        for (Actor ac: invPopups){
+        for (Actor ac: popups){
             if (ac instanceof ContextMenu){
                 closeItemContextMenu( (ContextMenu) ac);
             }
         }
     }
 
-//    @Override
-//    public void setPosition(float x, float y) {
-//        for (Actor invPopup : invPopups){
-//            invPopup.setPosition(x-this.getX(), y-this.getY());
-//        }
-//        super.setPosition(x, y);
-//    }
+    @Override
+    public void setPosition(float x, float y, int align) {
+        float offsetX = x-this.getX(), offsetY = y-this.getY();
+        for (Actor invPopup : popups){
+            invPopup.setPosition(invPopup.getX() + offsetX, invPopup.getY() + offsetY);
+        }
+        super.setPosition(x, y, align);
+    }
+
+    public InventoryHUD(HUD hud, Player player) {
+        super(null, SecondGDXGame.skin);
+        skin = SecondGDXGame.skin;
+        this.player = player;
+        this.hud = hud;
+        ScrollPane.ScrollPaneStyle sps = this.getStyle();
+        sps.background = skin.getDrawable("default-pane");
+        setSize(400,300);
+        setName("InventoryScrollPane");
+        setFadeScrollBars(false);
+        addListener(new InputListener(){
+            @Override
+            public boolean handle(Event e){
+                super.handle(e);
+                return true;
+            }
+        });
+
+        table = new Table(SecondGDXGame.skin);
+
+        table.setTouchable(Touchable.enabled);
+        table.setBackground("default-pane");
+
+        table.align(Align.top);
+        table.pad(5);
+
+        setActor(table);
+    }
 }

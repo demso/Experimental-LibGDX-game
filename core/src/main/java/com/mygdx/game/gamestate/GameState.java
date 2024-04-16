@@ -49,7 +49,7 @@ public class GameState {
     public float zoom = 2 ;
     public final String mapToLoad = "newWorldMap/newmap.tmx";
     public static final int TILE_SIDE = 32;
-    public HUD hudStage;
+    public HUD hud;
     public Stage gameStage;
     public ObjectSet<Body> bodiesToDeletion = new ObjectSet<>();
     public float physicsStep = 1/60f;
@@ -63,7 +63,7 @@ public class GameState {
         player.addItemToInventory(new Item(TileResolver.getTile("watches"), this, "Watches"));
         player.addItemToInventory(new Item(TileResolver.getTile("shotgunammo"), this, "Shotgun ammo"));
         player.addItemToInventory(new Item(TileResolver.getTile("deagle_44"), this, "Deagle .44"));
-        MobsFactory.spawnZombie(5, 85);
+        //MobsFactory.spawnZombie(5, 85);
     }
 
     private void update(float deltaTime) {
@@ -105,13 +105,13 @@ public class GameState {
 
         unbox.postRender();
 
-        hudStage.act(deltaTime);
-        hudStage.draw();
+        hud.act(deltaTime);
+        hud.draw();
 
         if (debug) {
-            hudStage.getBatch().begin();
-            font.draw(hudStage.getBatch(), "FPS=" + Gdx.graphics.getFramesPerSecond(), 0, hudStage.getCamera().viewportHeight - 2);
-            hudStage.getBatch().end();
+            hud.getBatch().begin();
+            font.draw(hud.getBatch(), "FPS=" + Gdx.graphics.getFramesPerSecond(), 0, hud.getCamera().viewportHeight - 2);
+            hud.getBatch().end();
             renderDebug();
             debugRendererPh.render(world, camera.combined);
         }

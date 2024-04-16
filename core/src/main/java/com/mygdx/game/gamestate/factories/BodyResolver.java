@@ -93,7 +93,6 @@ public class BodyResolver {
         FixtureDef fullFixtureDef = new FixtureDef();
         fullBox.setAsBox(0.5f, 0.5f);
         fullFixtureDef.shape = fullBox;
-        fullFixtureDef.filter.groupIndex = 0;
 
         Body body = world.createBody(fullBodyDef);
         body.createFixture(fullFixtureDef);
@@ -145,8 +144,8 @@ public class BodyResolver {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
         fixtureDef.density = 1f;
-        fixtureDef.filter.categoryBits = Globals.BULLET_CF;
-        fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits & ~Globals.LIGHT_CF & ~Globals.PLAYER_CF & ~Globals.PLAYER_INTERACT_CF);
+        fixtureDef.filter.categoryBits = Globals.BULLET_CONTACT_FILTER;
+        fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits & ~Globals.LIGHT_CONTACT_FILTER & ~Globals.PLAYER_CONTACT_FILTER & ~Globals.PLAYER_INTERACT_CONTACT_FILTER);
         circle.dispose();
         body.createFixture(fixtureDef);
         body.setFixedRotation(true);
@@ -175,5 +174,13 @@ public class BodyResolver {
         if (eastWard)
             return Direction.EAST;
         return Direction.NORTH;
+    }
+
+    public static Filter createFilter(short mask, short category, short group){
+        Filter filter = new Filter();
+        filter.maskBits = mask;
+        filter.categoryBits = category;
+        filter.groupIndex = group;
+        return filter;
     }
 }

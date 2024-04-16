@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.mygdx.game.gamestate.GameState;
+import com.mygdx.game.gamestate.objects.Interactable;
 import com.mygdx.game.gamestate.objects.Item;
 import com.mygdx.game.gamestate.objects.bodies.player.PlayerHandler;
 import com.mygdx.game.gamestate.tiledmap.Door;
@@ -20,13 +22,13 @@ public class HUDInputListener extends InputListener {
     @Override
     public boolean keyUp (InputEvent event, int keycode) {
         if (keycode == Input.Keys.ESCAPE)
-            if (Instance.hudStage.esClosablePopups.notEmpty()){
-                Instance.hudStage.closeTopPopup();
+            if (Instance.hud.esClosablePopups.notEmpty()){
+                Instance.hud.closeTopPopup();
             }
             else Instance.game.setScreen(Instance.game.menuScreen);
         if (keycode == Input.Keys.B){
             Instance.debug = !Instance.debug;
-            Instance.hudStage.setDebugAll(Instance.debug);
+            Instance.hud.setDebugAll(Instance.debug);
             Instance.gameStage.setDebugAll(Instance.debug);
         }
         if (keycode == Input.Keys.EQUALS){
@@ -47,18 +49,12 @@ public class HUDInputListener extends InputListener {
         }
         if (keycode == Input.Keys.E){
             if (Instance.player.closestObject != null) {
-                var obj = Instance.player.closestObject.getUserData();
-                if (obj instanceof Door) {
-                    ((Door) obj).doAction();
-                }
-                if (obj instanceof Item){
-                    Instance.player.pickupItem((Item) obj);
-                    Instance.hudStage.updateInvHUDContent();
-                }
+                var obj = (Interactable) Instance.player.closestObject.getUserData();
+                obj.interact(Instance.player);
             }
         }
         if (keycode == Input.Keys.I){
-            Instance.hudStage.toggleInventoryHUD();
+            Instance.hud.toggleInventoryHUD();
         }
         if (keycode == Input.Keys.H){
             Instance.player.freeHands();

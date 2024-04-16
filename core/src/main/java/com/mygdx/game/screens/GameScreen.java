@@ -17,7 +17,7 @@ public class GameScreen implements Screen {
         this.game = game;
         gameState = new GameConstructor().createGameState(this);
         GameState.Instance = gameState;
-        this.hudStage = gameState.hudStage;
+        this.hudStage = gameState.hud;
     }
 
     @Override

@@ -34,8 +34,8 @@ public class Zombie extends Entity {
         fixtureDef.density = 1f;
         fixtureDef.friction = 0.01f;
         fixtureDef.restitution = 0.01f;
-        fixtureDef.filter.categoryBits = Globals.ZOMBIE_CF;
-        fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits & ~Globals.LIGHT_CF);
+        fixtureDef.filter.categoryBits = Globals.ZOMBIE_CONTACT_FILTER;
+        fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits & ~Globals.LIGHT_CONTACT_FILTER);
 
         setBody(world.createBody(bodyDef));
         getBody().createFixture(fixtureDef);

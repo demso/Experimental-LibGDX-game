@@ -19,13 +19,13 @@ public class ContextMenu extends Table {
         DESCRIPTION
     }
     HUD hud;
-    InventoryHUD invHUD;
+    InventoryHUD inventory;
     public InputListener hideListener;
     ItemEntry itemEntry;
     public ContextMenu(HUD h, InventoryHUD ih, ItemEntry iEntry, float x, float y){
         super(SecondGDXGame.skin);
         hud = h;
-        invHUD = ih;
+        inventory = ih;
         itemEntry = iEntry;
 
         this.setBackground("default-pane");
@@ -40,7 +40,7 @@ public class ContextMenu extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                invHUD.contextAction(ConAction.PUT, ContextMenu.this);
+                inventory.contextAction(ConAction.PUT, ContextMenu.this);
             }
         });
 
@@ -61,7 +61,7 @@ public class ContextMenu extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                invHUD.contextAction(ConAction.DESCRIPTION, ContextMenu.this);
+                inventory.contextAction(ConAction.DESCRIPTION, ContextMenu.this);
             }
         });
 
@@ -80,9 +80,9 @@ public class ContextMenu extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                invHUD.contextAction(ConAction.DESCRIPTION, ContextMenu.this);
+                inventory.contextAction(ConAction.DESCRIPTION, ContextMenu.this);
                 GameState.Instance.player.equipItem(itemEntry.item);
-                invHUD.closeItemContextMenu(ContextMenu.this);
+                inventory.closeItemContextMenu(ContextMenu.this);
             }
         });
 
@@ -110,7 +110,7 @@ public class ContextMenu extends Table {
                 super.touchDown(event, x, y, pointer, button);
                 Actor target = event.getTarget();
                 if (isAscendantOf(target)) return false;
-                invHUD.closeItemContextMenu(ContextMenu.this);
+                inventory.closeItemContextMenu(ContextMenu.this);
                 return false;
             }
         };

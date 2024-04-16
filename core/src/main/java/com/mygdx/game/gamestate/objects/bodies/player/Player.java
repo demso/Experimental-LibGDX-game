@@ -21,12 +21,6 @@ public class Player extends Entity {
 
     public GameObject playerObject;
 
-    public Player(){
-
-        setFriendliness(Friendliness.PLAYER);
-        setKind(Kind.PLAYER);
-    }
-
     @Nullable
     public Body getClosestObject(){
         return closestObject;

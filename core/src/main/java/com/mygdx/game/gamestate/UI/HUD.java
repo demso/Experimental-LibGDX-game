@@ -16,13 +16,13 @@ import com.badlogic.gdx.utils.ArrayMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.gamestate.UI.inventory.ContextMenu;
-import com.mygdx.game.gamestate.UI.inventory.InventoryScroll;
+import com.mygdx.game.gamestate.UI.inventory.InventoryHUD;
 import com.mygdx.game.gamestate.objects.bodies.userdata.SimpleUserData;
 import com.mygdx.game.gamestate.objects.Item;
 import com.mygdx.game.gamestate.GameState;
 
 public class HUD extends Stage {
-    InventoryScroll invScroll;
+    InventoryHUD inventoryHUD;
     boolean isInventoryShowed;
     public GameState gameState;
     ObjectMap<Item, ItemInfoPopUp> itemPopups =  new ObjectMap<>();
@@ -30,23 +30,6 @@ public class HUD extends Stage {
     public ArrayMap<String, String> debugEntries = new ArrayMap<>();
     Label label;
     Skin skin;
-
-    public HUD(GameState gi, ScreenViewport screenViewport, SpriteBatch batch) {
-        super(screenViewport, batch);
-        gameState = gi;
-        skin = gameState.skin;
-
-        invScroll = new InventoryScroll(this, gameState.player);
-        invScroll.setVisible(false);
-
-        label = new Label("", skin);
-        label.setFontScale(0.5f);
-        label.setWidth(350);
-        label.setAlignment(Align.topLeft);
-
-        addActor(label);
-        addActor(invScroll);
-    }
 
     public void showItemInfoWindow(Item item){
         getActors().removeValue(itemPopups.get(item), true);
@@ -62,32 +45,32 @@ public class HUD extends Stage {
     }
 
     public void showInventoryHUD(){
-        invScroll.refill();
-        invScroll.setPosition((Gdx.graphics.getWidth()-invScroll.getWidth())/2f,(Gdx.graphics.getHeight()-invScroll.getHeight())/2f, Align.bottomLeft);
-        invScroll.setVisible(true);
-        setScrollFocus(invScroll);
+        inventoryHUD.refill();
+        inventoryHUD.setPosition((Gdx.graphics.getWidth()- inventoryHUD.getWidth())/2f,(Gdx.graphics.getHeight()- inventoryHUD.getHeight())/2f, Align.bottomLeft);
+        inventoryHUD.setVisible(true);
+        setScrollFocus(inventoryHUD);
         isInventoryShowed = true;
-        esClosablePopups.add(invScroll);
+        esClosablePopups.add(inventoryHUD);
     }
 
     public void closeInventoryHUD(){
-        if(invScroll != null)
-            invScroll.setVisible(false);
-        invScroll.onClose();
+        if(inventoryHUD != null)
+            inventoryHUD.setVisible(false);
+        inventoryHUD.onClose();
         isInventoryShowed = false;
-        esClosablePopups.removeValue(invScroll, true);
+        esClosablePopups.removeValue(inventoryHUD, true);
     }
 
     public void closeTopPopup(){
         Actor ac = esClosablePopups.pop();
 
-        if (ac instanceof ScrollPane && ac.getName().equals(invScroll.getName())){
+        if (ac instanceof ScrollPane && ac.getName().equals(inventoryHUD.getName())){
             closeInventoryHUD();
             return;
         }
 
         if (ac instanceof ContextMenu){
-            invScroll.closeItemContextMenu((ContextMenu) ac);
+            inventoryHUD.closeItemContextMenu((ContextMenu) ac);
             return;
         }
 
@@ -103,14 +86,14 @@ public class HUD extends Stage {
     }
 
     public void updateInvHUDContent(){
-        if (invScroll != null)
-            invScroll.refill();
+        if (inventoryHUD != null)
+            inventoryHUD.refill();
     }
 
     public void updateOnResize(int width, int height){
         getViewport().update(width, height, true);
-        if (invScroll != null){
-            invScroll.setPosition((Gdx.graphics.getWidth()-invScroll.getWidth())/2f,(Gdx.graphics.getHeight()-invScroll.getHeight())/2f, Align.bottomLeft);
+        if (inventoryHUD != null){
+            inventoryHUD.setPosition((Gdx.graphics.getWidth()- inventoryHUD.getWidth())/2f,(Gdx.graphics.getHeight()- inventoryHUD.getHeight())/2f, Align.bottomLeft);
         }
     }
 
@@ -155,5 +138,22 @@ public class HUD extends Stage {
             drawTileDebugInfo();
         else
             label.setText("");
+    }
+
+    public HUD(GameState gi, ScreenViewport screenViewport, SpriteBatch batch) {
+        super(screenViewport, batch);
+        gameState = gi;
+        skin = gameState.skin;
+
+        inventoryHUD = new InventoryHUD(this, gameState.player);
+        inventoryHUD.setVisible(false);
+
+        label = new Label("", skin);
+        label.setFontScale(0.5f);
+        label.setWidth(350);
+        label.setAlignment(Align.topLeft);
+
+        addActor(label);
+        addActor(inventoryHUD);
     }
 }

@@ -13,11 +13,14 @@ import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.objects.behaviours.SpriteBehaviour;
 import com.mygdx.game.gamestate.factories.BodyResolver;
+import com.mygdx.game.gamestate.objects.bodies.player.Player;
 import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
-public class Item implements BodyData {
+import static com.mygdx.game.gamestate.GameState.Instance;
+
+public class Item implements BodyData, Interactable {
     public TiledMapTile tile;
     public Body physicalBody;
     public Table mouseHandler;
@@ -45,22 +48,22 @@ public class Item implements BodyData {
             @Override
             public void enter (InputEvent event, float x, float y, int pointer, @Null Actor fromActor) {
                 super.enter(event, x, y, pointer, fromActor);
-                gameState.hudStage.debugEntries.put(tileName + "_ClickListener", "Pointing at "+tileName+ " at "+getPosition());
-                gameState.hudStage.showItemInfoWindow(item);
+                gameState.hud.debugEntries.put(tileName + "_ClickListener", "Pointing at "+tileName+ " at "+getPosition());
+                gameState.hud.showItemInfoWindow(item);
             }
 
             @Override
             public void exit (InputEvent event, float x, float y, int pointer, @Null Actor toActor) {
                 super.exit(event, x, y, pointer, toActor);
-                gameState.hudStage.debugEntries.removeKey(tileName + "_ClickListener");
-                gameState.hudStage.hideItemInfoWindow(item);
+                gameState.hud.debugEntries.removeKey(tileName + "_ClickListener");
+                gameState.hud.hideItemInfoWindow(item);
             }
         });
 
         gameState.gameStage.addActor(mouseHandler);
 
-        GO = new GameObject("bullet", false, GameState.Instance.unbox);
-        new SpriteBehaviour(GO, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RO);
+        GO = new GameObject("bullet", false, Instance.unbox);
+        new SpriteBehaviour(GO, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
     }
 
     public Body allocate(Vector2 position){
@@ -102,5 +105,11 @@ public class Item implements BodyData {
     @Override
     public Object getData() {
         return this;
+    }
+
+    @Override
+    public void interact(Player player) {
+        Instance.player.pickupItem(this);
+        Instance.hud.updateInvHUDContent();
     }
 }

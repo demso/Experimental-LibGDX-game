@@ -39,7 +39,7 @@ public class ItemEntry extends Button {
         addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent e, float x, float y){
-                itemEntry.getClickListener().clicked(e, x, y);
+                super.clicked(e, x, y);
                 inventoryHUD.showItemContextMenu(itemEntry);
             }
         });

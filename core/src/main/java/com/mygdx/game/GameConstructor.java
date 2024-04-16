@@ -41,7 +41,7 @@ public class GameConstructor {
         gameState.world = new World(new Vector2(0, 0), true);
         gameState.unbox = new UnBox(gameState.world);
         gameState.unbox.getOptions().setTimeStep(gameState.physicsStep);
-        gameState.hudStage = new HUD(gameState, new ScreenViewport(), gameState.game.batch);
+        gameState.hud = new HUD(gameState, new ScreenViewport(), gameState.game.batch);
         gameState.camera = new OrthographicCamera();
         gameState.gameStage = new Stage(new ScreenViewport(gameState.camera));
 
@@ -74,7 +74,7 @@ public class GameConstructor {
     }
 
     private void initScene2D(){
-        gameState.hudStage.addListener(new HUDInputListener());
+        gameState.hud.addListener(new HUDInputListener());
     }
 
     private void initPhysics(){

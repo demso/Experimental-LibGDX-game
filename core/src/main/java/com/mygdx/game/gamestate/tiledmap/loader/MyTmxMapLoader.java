@@ -192,7 +192,8 @@ public class MyTmxMapLoader extends TmxMapLoader {
                                 }
                                 case "door" -> {
                                     body = BodyResolver.resolveBody(i + 0.5f, j + 0.5f, null, BodyResolver.Type.FULL_BODY, null);
-                                    body.setUserData(new Door(gameState, cell, body, map.getTileSets().getTile(13409), map.getTileSets().getTile(13358), i, j));
+                                    Door door = new Door(cell, body, map.getTileSets().getTile(13409), map.getTileSets().getTile(13358), i, j);
+                                    body.setUserData(door);
                                 }
                             }
                         }

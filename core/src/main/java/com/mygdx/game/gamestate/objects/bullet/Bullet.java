@@ -24,7 +24,7 @@ public class Bullet implements BodyData {
         bulletObject = new GameObject(getName(), GameState.Instance.unbox);
 
         new Box2dBehaviour(body, bulletObject);
-        new SpriteBehaviour(bulletObject, 0.5f, 0.5f, tile.getTextureRegion(), Globals.DEFAULT_RO);
+        new SpriteBehaviour(bulletObject, 0.5f, 0.5f, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
         new BulletCollisionBehaviour(bulletObject);
         //new SoutBehaviour("bulletLog", false, bulletObject);
 

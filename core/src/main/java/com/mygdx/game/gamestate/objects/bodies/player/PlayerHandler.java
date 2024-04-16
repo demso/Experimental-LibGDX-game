@@ -42,28 +42,6 @@ public class PlayerHandler extends BehaviourAdapter {
 
     public PlayerHandler(GameObject gameObject, Player player) {
         super(gameObject);
-        this.player = player;
-
-        Texture textureSheet = new Texture(Gdx.files.internal("ClassicRPG_Sheet.png"));
-        TextureRegion[][] textureRegions = TextureRegion.split(textureSheet, 16, 16);
-
-        TextureRegion[] walkFrames = new TextureRegion[4];
-        int index = 0;
-        for (int i = 0; i < 4; i++)
-            walkFrames[index++] = textureRegions[0][i];
-        walkDown = new Animation<TextureRegion>(frameDuration, walkFrames);
-
-        walkFrames = new TextureRegion[4];
-        index = 0;
-        for (int i = 0; i < 4; i++)
-            walkFrames[index++] = textureRegions[1][i];
-        walkSide = new Animation<TextureRegion>(frameDuration, walkFrames);
-
-        walkFrames = new TextureRegion[4];
-        index = 0;
-        for (int i = 0; i < 4; i++)
-            walkFrames[index++] = textureRegions[3][i];
-        walkUp = new Animation<TextureRegion>(frameDuration, walkFrames);
     }
 
     Vector2 movingVector = new Vector2();
@@ -158,6 +136,10 @@ public class PlayerHandler extends BehaviourAdapter {
             player.velocity.set(vel);
         } if (Math.abs(player.getBody().getLinearVelocity().len2()) < 0.5f) {
             state = State.Standing;
+        }
+        //update selection of object to interact with
+        if (player.closestObject != null){
+            player.playerObject.getBehaviour(PlayerCollisionBehaviour.class).updatePlayerClosestObject();
         }
     }
 }
