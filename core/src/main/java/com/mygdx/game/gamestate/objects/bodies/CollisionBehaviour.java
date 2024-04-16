@@ -1,4 +1,4 @@
-package com.mygdx.game.gamestate.objects;
+package com.mygdx.game.gamestate.objects.bodies;
 
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;

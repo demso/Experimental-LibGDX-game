@@ -22,8 +22,6 @@ public class InventoryHUD extends Table {
         this.setBackground("default-pane");
         //this.setSize(400,300);
 
-        //refill();
-
         this.align(Align.top);
         this.pad(5);
         this.setPosition(x,y-getHeight());

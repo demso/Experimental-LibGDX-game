@@ -1,7 +1,7 @@
 package com.mygdx.game.gamestate.objects.bullet;
 
 import com.badlogic.gdx.physics.box2d.Contact;
-import com.mygdx.game.gamestate.objects.CollisionBehaviour;
+import com.mygdx.game.gamestate.objects.bodies.CollisionBehaviour;
 import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.Zombie;
 import dev.lyze.gdxUnBox2d.Behaviour;
 import dev.lyze.gdxUnBox2d.GameObject;

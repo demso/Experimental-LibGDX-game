@@ -36,22 +36,8 @@ public class HUD extends Stage {
         gameState = gi;
         skin = gameState.skin;
 
-//        invHUD = new InventoryHUD(this, gameItself.player, 0,0);
         invScroll = new InventoryScroll(this, gameState.player);
-//        ScrollPane.ScrollPaneStyle sps = invScroll.getStyle();
-//        sps.background = skin.getDrawable("default-pane");
         invScroll.setVisible(false);
-//        invScroll.setSize(400,300);
-//        invScroll.setName("InventoryScrollPane");
-//        invScroll.setFadeScrollBars(false);
-        //invScroll.setBackground("default-pane");
-//        invScroll.addListener(new InputListener(){
-//            @Override
-//            public boolean handle(Event e){
-//                super.handle(e);
-//                return true;
-//            }
-//        });
 
         label = new Label("", skin);
         label.setFontScale(0.5f);
@@ -158,15 +144,16 @@ public class HUD extends Stage {
         label.setText(labelText);
     }
 
-    public void update(Boolean debug){
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+
         float height = Gdx.graphics.getHeight();
         float width = Gdx.graphics.getWidth();
         label.setPosition(100, height - 100);
-        if(debug)
+        if(GameState.Instance.debug)
             drawTileDebugInfo();
         else
             label.setText("");
     }
-
-
 }

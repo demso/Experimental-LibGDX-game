@@ -67,9 +67,6 @@ public class GameState {
     }
 
     private void update(float deltaTime) {
-        //UPDATE STAGE
-        hudStage.update(debug);
-
         //CAMERA UPDATE
         camera.position.set(player.getPosition(), 0);
         camera.update();

@@ -3,8 +3,7 @@ package com.mygdx.game.gamestate.objects.bodies.player;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.game.gamestate.objects.CollisionBehaviour;
-import com.mygdx.game.gamestate.objects.bodies.player.Player;
+import com.mygdx.game.gamestate.objects.bodies.CollisionBehaviour;
 import dev.lyze.gdxUnBox2d.Behaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
