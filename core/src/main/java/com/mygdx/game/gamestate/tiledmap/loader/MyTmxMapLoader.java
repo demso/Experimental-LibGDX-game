@@ -10,13 +10,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
-import com.mygdx.game.*;
-import com.mygdx.game.gamestate.factories.BodyResolver;
 import com.mygdx.game.gamestate.GameState;
-import com.mygdx.game.gamestate.factories.TileResolver;
-import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
-import com.mygdx.game.gamestate.objects.bodies.userdata.SimpleUserData;
-import com.mygdx.game.gamestate.tiledmap.Door;
+import com.mygdx.game.gamestate.tiledmap.TileInitializer;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
@@ -161,60 +156,17 @@ public class MyTmxMapLoader extends TmxMapLoader {
         MyTiledMap mymap = (MyTiledMap) map;
         MapLayers mlayers = mymap.getLayers();
         var obstaclesLayer = (TiledMapTileLayer) mlayers.get("obstacles");
+        TileInitializer initer = new TileInitializer(mymap);
 
         for(var i = 0; i < obstaclesLayer.getWidth(); i++)
             for(var j = 0; j < obstaclesLayer.getHeight(); j++){
                 var cell = obstaclesLayer.getCell(i, j);
-                if (cell != null && cell.getTile().getProperties().get("type") != null){
-                    var tileProperties = cell.getTile().getProperties();
-                    Body body = null;
-                    String bodyType = tileProperties.get("body type", null,  String.class);
-                    String name = tileProperties.get("name", null,  String.class);
-                    BodyResolver.Direction direction = BodyResolver.getDirection(cell);
-                    try{
-                        if (bodyType != null){
-                            body = BodyResolver.resolveBody(i+0.5f, j+0.5f, new SimpleUserData(cell, bodyType), BodyResolver.Type.valueOf(bodyType), direction);
-                        } else {
-                            switch (cell.getTile().getProperties().get("type").toString()) {
-                                case "wall" -> body = BodyResolver.fullBody(i + 0.5f, j + 0.5f, new SimpleUserData(cell, "betonWall"));
-                                case "fullBody" -> body = BodyResolver.fullBody(i + 0.5f, j + 0.5f, new SimpleUserData(cell, "mereFullBody"));
-                                case "metalCloset" -> body = BodyResolver.resolveBody(i + 0.5f, j + 0.3f, new SimpleUserData(cell, "metalCloset"), BodyResolver.Type.METAL_CLOSET_BODY, null);
-                                case "window" -> {
-                                    switch (direction) {
-                                        case NORTH ->
-                                            body = BodyResolver.resolveBody(i + 0.5f, j + 0.95f, new SimpleUserData(cell, "northWindow"), BodyResolver.Type.WINDOW, BodyResolver.Direction.NORTH);
-                                        case SOUTH ->
-                                            body = BodyResolver.resolveBody(i + 0.5f, j + 0.05f, new SimpleUserData(cell, "southWindow"), BodyResolver.Type.WINDOW, BodyResolver.Direction.SOUTH);
-                                        case WEST ->
-                                            body = BodyResolver.resolveBody(i + 0.05f, j + 0.5f, new SimpleUserData(cell, "westWindow"), BodyResolver.Type.WINDOW, BodyResolver.Direction.WEST);
-                                        case EAST ->
-                                            body = BodyResolver.resolveBody(i + 0.95f, j + 0.5f, new SimpleUserData(cell, "eastWindow"), BodyResolver.Type.WINDOW, BodyResolver.Direction.EAST);
-                                    }
-                                }
-                                case "door" -> {
-                                    body = BodyResolver.resolveBody(i + 0.5f, j + 0.5f, null, BodyResolver.Type.FULL_BODY, null);
-                                    Door door = new Door(cell, body, "oakdoor", i, j);
-                                    body.setUserData(door);
-                                }
-                            }
-                        }
-                    }catch (Exception e) {
-                        SecondGDXGame.helper.log("[MyTmxMapLoader] Problem with creating tile \n Type: "
-                            + cell.getTile().getProperties().get("type", "notype", String.class) + ", name "
-                            + cell.getTile().getProperties().get("name", "noname", String.class) + ",  body type "
-                            + bodyType + ", direction "
-                            + direction + " at x: "
-                            + i + ", y: "
-                            + j + " \n"
-                            + e.getLocalizedMessage());
-                    }
-                    if (body != null){
-                        GameObject object = new GameObject(GameState.Instance.unbox);
-                        object.setName(((BodyData)body.getUserData()).getName());
-                        new Box2dBehaviour(body, object);
-
-                        mymap.staticObjects.add(body);
-                    }
+                if (cell == null)
+                    continue;
+                var properties = cell.getTile().getProperties();
+                String name = properties.get("name", String.class);
+                if (name != null && !name.trim().isEmpty()){
+                    initer.initTile(cell, i, j);
                 }
             }
 

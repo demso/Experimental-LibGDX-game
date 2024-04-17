@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.Zombie;
+import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 
 public class MobsFactory {
     public enum Type {

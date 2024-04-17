@@ -4,15 +4,12 @@ import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Filter;
-import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.factories.BodyResolver;
-import com.mygdx.game.gamestate.factories.TileResolver;
 import com.mygdx.game.gamestate.objects.Interactable;
 import com.mygdx.game.gamestate.objects.bodies.player.Player;
 import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
-import com.mygdx.game.gamestate.objects.bodies.userdata.SimpleUserData;
 import lombok.Getter;
 
 public class Door implements Interactable, BodyData {
@@ -23,14 +20,15 @@ public class Door implements Interactable, BodyData {
     Filter openFilter;
     Body physicalBody;
     GameState gameState;
+    boolean isBoarded;
+    public boolean peep;
     @Getter float x;
     @Getter float y;
     @Getter boolean isOpen = false;
-    public Door( TiledMapTileLayer.Cell cell, Body body, String tileName, float x, float y) {
+    public Door( TiledMapTileLayer.Cell cell, Body body, float x, float y) {
         this.gameState = GameState.Instance;
         this.cell = cell;
-        this.openTile = TileResolver.getTile(tileName + "_opened");
-        this.closedTile = TileResolver.getTile(tileName + "_closed");
+        String tileName = cell.getTile().getProperties().get("name", String.class);
         physicalBody = body;
         this.x = x;
         this.y = y;
@@ -57,15 +55,27 @@ public class Door implements Interactable, BodyData {
             open();
     }
 
+    public void board(){
+        isBoarded = true;
+    }
+
+    public void unBoard(){
+        isBoarded = false;
+    }
+
     @Override
     public void interact(Player player) {
         toggle();
         player.getBody().getFixtureList().get(0).refilter();
     }
 
+    public TiledMapTile getTile(){
+        return cell.getTile();
+    }
+
     @Override
     public String getName() {
-        return "door at " + x + " " + y;
+        return getTile().getProperties().get("name", String.class);
     }
 
     @Override

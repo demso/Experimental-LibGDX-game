@@ -8,7 +8,7 @@ import com.mygdx.game.gamestate.GameState;
 
 public class MyTiledMap extends TiledMap {
     World world;
-    Array<Body> staticObjects = new Array<>();
+    public Array<Body> staticObjects = new Array<>();
 
     MyTiledMap(GameState gameState){
         super();

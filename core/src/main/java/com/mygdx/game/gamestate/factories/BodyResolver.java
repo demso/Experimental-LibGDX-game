@@ -11,8 +11,7 @@ public class BodyResolver {
     public enum Type {
         FULL_BODY,
         METAL_CLOSET_BODY,
-        WINDOW,
-        ITEM
+        WINDOW
     }
     public enum Direction{
         NORTH,
@@ -21,13 +20,12 @@ public class BodyResolver {
         EAST
     }
 
-    public static Body resolveBody(float x, float y, Object userData, Type type, Direction direction){
+    public static Body resolveTileBody(float x, float y, Object userData, Type type, Direction direction){
         Body body = null;
         switch (type){
-            case FULL_BODY -> body = fullBody(x, y, userData);
-            case WINDOW -> body = window(x, y, userData, direction);
-            case METAL_CLOSET_BODY -> body = metalClosetBody(x, y, userData);
-            case ITEM -> body = itemBody(x, y, userData);
+            case FULL_BODY -> body = fullBody(x + 0.5f, y + 0.5f, userData);
+            case WINDOW -> body = window(x, y, userData, direction, true);
+            case METAL_CLOSET_BODY -> body = metalClosetBody(x + 0.5f, y + 0.3f, userData);
         }
         return body;
     }
@@ -50,7 +48,7 @@ public class BodyResolver {
         return body;
     }
 
-    public static Body window(float x, float y, Object userData, Direction direction){
+    public static Body window(float x, float y, Object userData, Direction direction, boolean offset){
         BodyDef windowHorBodyDef = new BodyDef();
         PolygonShape windowHorBox = new PolygonShape();
         FixtureDef windowHorFixtureDef = new FixtureDef();
@@ -68,13 +66,35 @@ public class BodyResolver {
         Body body = null;
 
         switch (direction){
-            case NORTH, SOUTH -> {
-                windowHorBodyDef.position.set(x, y);
+            case NORTH-> {
+                if (offset)
+                    windowHorBodyDef.position.set(x + 0.5f, y + 0.95f);
+                else
+                    windowHorBodyDef.position.set(x, y);
                 body = world.createBody(windowHorBodyDef);
                 body.createFixture(windowHorFixtureDef);
                 body.setUserData(userData);
-            } case EAST, WEST -> {
-                windowVertBodyDef.position.set(x, y);
+            } case WEST -> {
+                if (offset)
+                    windowVertBodyDef.position.set(x + 0.05f, y + 0.5f);
+                else
+                    windowVertBodyDef.position.set(x, y);
+                body = world.createBody(windowVertBodyDef);
+                body.createFixture(windowVertFixtureDef);
+                body.setUserData(userData);
+            } case SOUTH -> {
+                if (offset)
+                    windowHorBodyDef.position.set(x + 0.5f, y + 0.05f);
+                else
+                    windowHorBodyDef.position.set(x, y);
+                body = world.createBody(windowHorBodyDef);
+                body.createFixture(windowHorFixtureDef);
+                body.setUserData(userData);
+            } case EAST -> {
+                if (offset)
+                    windowVertBodyDef.position.set(x + 0.95f, y + 0.5f);
+                else
+                    windowVertBodyDef.position.set(x, y);
                 body = world.createBody(windowVertBodyDef);
                 body.createFixture(windowVertFixtureDef);
                 body.setUserData(userData);

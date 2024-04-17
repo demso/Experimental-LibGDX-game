@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.gamestate.GameState;
-import com.mygdx.game.gamestate.factories.TileResolver;
+import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 import com.mygdx.game.gamestate.UI.ConsoleCommands;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
 import com.mygdx.game.screens.GameScreen;
