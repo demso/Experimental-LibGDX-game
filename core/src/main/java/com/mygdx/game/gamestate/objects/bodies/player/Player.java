@@ -1,25 +1,40 @@
 package com.mygdx.game.gamestate.objects.bodies.player;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.Item;
 import dev.lyze.gdxUnBox2d.GameObject;
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
 public class Player extends Entity {
+
+    public enum State {
+        Standing, Walking, Running, Sneaking
+    }
+    public enum Facing {
+        Right, Left, Up, Down
+    }
+
+    @Getter Player.State state =  Player.State.Walking;
+    @Getter Player.Facing facing = Player.Facing.Down;
+
     public float WIDTH = 0.8f;
     public float HEIGHT = 0.8f;
-    public float maxVelocity = 30f;
+    public float normalSpeed = 2.5f;
     public Body closestObject;
 
-    public Vector2 velocity = new Vector2();
     Array<Item> inventoryItems = new Array<>();
     public Item equipedItem;
 
     public GameObject playerObject;
+
+    float normalSpeedMultiplier = 1;
+    float currentSpeedMultiplier = normalSpeedMultiplier;
+    float runMultiplier = 1.5f;
+    float sneakMultiplier = 0.5f;
 
     @Nullable
     public Body getClosestObject(){

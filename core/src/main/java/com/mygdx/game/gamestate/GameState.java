@@ -52,7 +52,7 @@ public class GameState {
     public HUD hud;
     public Stage gameStage;
     public ObjectSet<Body> bodiesToDeletion = new ObjectSet<>();
-    public float physicsStep = 1/60f;
+    public float physicsStep = 1/144f;
     public GUIConsole console;
     public ShapeRenderer shapeRenderer;
     public UnBox unbox;

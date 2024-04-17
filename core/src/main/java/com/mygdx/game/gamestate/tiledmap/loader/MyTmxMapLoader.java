@@ -143,6 +143,8 @@ public class MyTmxMapLoader extends TmxMapLoader {
         }
         runOnEndOfLoadTiled = null;
 
+        TileResolver.tilesets = map.getTileSets();
+
         //load tile resolver
         map.getTileSets().forEach(tiledMapTiles -> tiledMapTiles.forEach(tiledMapTile -> {
             String tileName = tiledMapTile.getProperties().get("name", String.class);
@@ -151,8 +153,6 @@ public class MyTmxMapLoader extends TmxMapLoader {
         }));
 
         initPhysics();
-
-        TileResolver.tilesets = map.getTileSets();
 
         return (MyTiledMap) map;
     }
@@ -169,6 +169,7 @@ public class MyTmxMapLoader extends TmxMapLoader {
                     var tileProperties = cell.getTile().getProperties();
                     Body body = null;
                     String bodyType = tileProperties.get("body type", null,  String.class);
+                    String name = tileProperties.get("name", null,  String.class);
                     BodyResolver.Direction direction = BodyResolver.getDirection(cell);
                     try{
                         if (bodyType != null){
@@ -192,7 +193,7 @@ public class MyTmxMapLoader extends TmxMapLoader {
                                 }
                                 case "door" -> {
                                     body = BodyResolver.resolveBody(i + 0.5f, j + 0.5f, null, BodyResolver.Type.FULL_BODY, null);
-                                    Door door = new Door(cell, body, map.getTileSets().getTile(13409), map.getTileSets().getTile(13358), i, j);
+                                    Door door = new Door(cell, body, "oakdoor", i, j);
                                     body.setUserData(door);
                                 }
                             }

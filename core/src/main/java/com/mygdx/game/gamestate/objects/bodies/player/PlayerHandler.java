@@ -2,7 +2,6 @@ package com.mygdx.game.gamestate.objects.bodies.player;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -13,12 +12,7 @@ import dev.lyze.gdxUnBox2d.GameObject;
 import dev.lyze.gdxUnBox2d.behaviours.BehaviourAdapter;
 
 public class PlayerHandler extends BehaviourAdapter {
-    public enum State {
-        Standing, Walking
-    }
-    public enum Facing {
-        RIGHT, LEFT, UP, DOWN
-    }
+
 
     public boolean moveUp,
             moveDown,
@@ -31,9 +25,6 @@ public class PlayerHandler extends BehaviourAdapter {
     Animation<TextureRegion> walkUp;
     Animation<TextureRegion> walkDown;
 
-    public State state =  State.Walking;
-    public Facing facing = Facing.DOWN;
-
     TextureRegion currentFrame;
 
     float frameDuration = 0.1f;
@@ -45,38 +36,43 @@ public class PlayerHandler extends BehaviourAdapter {
     }
 
     Vector2 movingVector = new Vector2();
-    Vector2 vel = new Vector2();
+    Vector2 movingImpulse = new Vector2();
+
     Vector2 zeroVector = new Vector2(0, 0);
 
     @Override
     public void update(float delta) {
         if (delta > 0.1f) delta = 0.1f;
         stateTime += delta;
-        switch (state) {
+        switch (player.getState()) {
             case Standing:
                 currentFrame = walkDown.getKeyFrame(1);
                 break;
             case Walking:
-                switch (facing) {
-                    case RIGHT:
-                    case LEFT:
+            case Running:
+            case Sneaking:
+                switch (player.getFacing()) {
+                    case Right:
+                    case Left:
                         currentFrame = walkSide.getKeyFrame(stateTime, true);
                         break;
-                    case UP:
+                    case Up:
                         currentFrame = walkUp.getKeyFrame(stateTime, true);
                         break;
-                    case DOWN:
+                    case Down:
                         currentFrame = walkDown.getKeyFrame(stateTime, true);
                         break;
                 }
                 break;
         }
+
+
     }
 
     @Override
     public void render(Batch batch) {
        // batch.draw(walkDown.getKeyFrame(2), player.getPosition().x - player.WIDTH/2 + player.WIDTH, player.getPosition().y - player.WIDTH * 1/4, -player.WIDTH, player.HEIGHT);
-        if (facing == Facing.RIGHT)
+        if (player.facing == Player.Facing.Right)
             batch.draw(currentFrame, player.getPosition().x - player.WIDTH/2 + player.WIDTH, player.getPosition().y - player.WIDTH * 1/4, -player.WIDTH, player.HEIGHT);
         else
             batch.draw(currentFrame, player.getPosition().x - player.WIDTH/2, player.getPosition().y - player.WIDTH * 1/4, player.WIDTH, player.HEIGHT);
@@ -99,43 +95,53 @@ public class PlayerHandler extends BehaviourAdapter {
     @Override
     public void fixedUpdate() {
         if (player.isAlive() && (moveUp || moveDown || moveToTheRight || moveToTheLeft)){
-            vel.set(0,0);
+            movingImpulse.set(0,0);
             movingVector.set(0,0);
             if (!(moveToTheRight && moveToTheLeft)) {
                 if (moveToTheLeft) {
-                    movingVector.set(-player.maxVelocity, movingVector.y);
-                    state = State.Walking;
-                    facing = Facing.LEFT;
+                    movingVector.x = -1;
+                    player.state = Player.State.Walking;
+                    player.facing = Player.Facing.Left;
                 }
 
                 if (moveToTheRight) {
-                    movingVector.set(player.maxVelocity, movingVector.y);
-                    state = State.Walking;
-                    facing = Facing.RIGHT;
+                    movingVector.x = 1;
+                    player.state = Player.State.Walking;
+                    player.facing = Player.Facing.Right;
                 }
             }
             if (!(moveUp && moveDown)){
                 if (moveUp) {
-                    movingVector.set(movingVector.x, player.maxVelocity);
-                    state = State.Walking;
-                    facing = Facing.UP;
+                    movingVector.y = 1;
+                    player.state = Player.State.Walking;
+                    player.facing = Player.Facing.Up;
                 }
 
                 if (moveDown) {
-                    movingVector.set(movingVector.x, -player.maxVelocity);
-                    state = State.Walking;
-                    facing = Facing.DOWN;
+                    movingVector.y = -1;
+                    player.state = Player.State.Walking;
+                    player.facing = Player.Facing.Down;
                 }
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.C))
-                vel.set(movingVector.clamp(0, player.maxVelocity).scl(0.5f));
-            else if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT))
-                vel.set(movingVector.clamp(0, player.maxVelocity).scl(1.5f));
-            else vel.set(movingVector.clamp(0, player.maxVelocity));
-            player.getBody().applyLinearImpulse(vel, zeroVector, true);
-            player.velocity.set(vel);
+            movingVector.nor();
+
+            if (Gdx.input.isKeyPressed(Input.Keys.C)) {
+                player.state = Player.State.Sneaking;
+                player.currentSpeedMultiplier = player.sneakMultiplier;
+            }
+            else if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
+                player.state =  Player.State.Running;
+                player.currentSpeedMultiplier = player.runMultiplier;
+            } else {
+                player.currentSpeedMultiplier = player.normalSpeedMultiplier;
+            }
+
+            movingImpulse = movingVector.scl(player.currentSpeedMultiplier * player.normalSpeed * player.getBody().getMass() *  player.getBody().getLinearDamping() * GameState.Instance.physicsStep);
+
+            player.getBody().applyLinearImpulse(movingImpulse, zeroVector, true);
+
         } if (Math.abs(player.getBody().getLinearVelocity().len2()) < 0.5f) {
-            state = State.Standing;
+            player.state = Player.State.Standing;
         }
         //update selection of object to interact with
         if (player.closestObject != null){
