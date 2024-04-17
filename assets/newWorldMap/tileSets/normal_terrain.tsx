@@ -1,17 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tileset version="1.10" tiledversion="1.10.2" name="normal_terrain" tilewidth="32" tileheight="32" tilecount="4432" columns="16">
  <image source="../normal_terrain.png" width="512" height="8864"/>
- <tile id="109" type="door"/>
+ <tile id="109" type="door">
+  <properties>
+   <property name="body type" value="FULL_BODY"/>
+   <property name="name" value="oakdoor_closed"/>
+  </properties>
+ </tile>
  <tile id="110" type="door"/>
  <tile id="142" type="door">
   <properties>
-   <property name="name" value="closedDoor"/>
+   <property name="name" value=""/>
   </properties>
  </tile>
  <tile id="143" type="door"/>
  <tile id="144" type="door"/>
  <tile id="145" type="door"/>
- <tile id="159" type="door"/>
+ <tile id="159" type="door">
+  <properties>
+   <property name="name" value="oakdoor_opened"/>
+  </properties>
+ </tile>
  <tile id="160" type="door">
   <properties>
    <property name="name" value="openedDoor"/>

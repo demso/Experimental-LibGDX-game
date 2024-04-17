@@ -19,6 +19,7 @@ public class SecondGDXGame extends Game {
     public static HandyHelper helper;
     @Override
     public void create() {
+        helper = new HandyHelper();
         batch = new SpriteBatch();
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Xolonium-Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -38,7 +39,7 @@ public class SecondGDXGame extends Game {
 
         menuScreen = new MainMenuScreen(this);
         gameScreen = new GameScreen(this);
-        helper = new HandyHelper();
+
         this.setScreen(menuScreen);
     }
 }
