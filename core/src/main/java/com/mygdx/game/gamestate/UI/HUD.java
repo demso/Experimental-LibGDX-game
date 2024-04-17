@@ -45,6 +45,7 @@ public class HUD extends Stage {
     }
 
     public void showInventoryHUD(){
+        inventoryHUD.player = GameState.Instance.player;
         inventoryHUD.refill();
         inventoryHUD.setPosition((Gdx.graphics.getWidth()- inventoryHUD.getWidth())/2f,(Gdx.graphics.getHeight()- inventoryHUD.getHeight())/2f, Align.bottomLeft);
         inventoryHUD.setVisible(true);

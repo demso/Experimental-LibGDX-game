@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.Interactable;
 import com.mygdx.game.gamestate.objects.Item;
@@ -25,7 +26,8 @@ public class HUDInputListener extends InputListener {
             if (Instance.hud.esClosablePopups.notEmpty()){
                 Instance.hud.closeTopPopup();
             }
-            else Instance.game.setScreen(Instance.game.menuScreen);
+            else
+                Gdx.app.exit();
         if (keycode == Input.Keys.B){
             Instance.debug = !Instance.debug;
             Instance.hud.setDebugAll(Instance.debug);

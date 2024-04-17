@@ -3,13 +3,14 @@ package com.mygdx.game.gamestate.objects.bodies.player;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.SecondGDXGame;
+import com.mygdx.game.gamestate.UI.inventory.HasInventory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.Item;
 import dev.lyze.gdxUnBox2d.GameObject;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
-public class Player extends Entity {
+public class Player extends Entity implements HasInventory {
 
     public enum State {
         Standing, Walking, Running, Sneaking
@@ -27,6 +28,7 @@ public class Player extends Entity {
     public Body closestObject;
 
     Array<Item> inventoryItems = new Array<>();
+
     public Item equipedItem;
 
     public GameObject playerObject;
@@ -44,17 +46,22 @@ public class Player extends Entity {
         item.removeFromWorld();
         addItemToInventory(item);
     }
+    @Override
     public void addItemToInventory(Item item){
         inventoryItems.add(item);
     }
+    @Override
     public void removeItemFromInventory(Item item){
         if (equipedItem == item)
             equipedItem = null;
         inventoryItems.removeValue(item, true);
     }
+    @Override
     public Array<Item> getInventoryItems(){
         return inventoryItems;
     }
+
+
     public void equipItem(Item item){
         equipedItem = item;
     }

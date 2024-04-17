@@ -19,7 +19,7 @@ import com.mygdx.game.gamestate.UI.HUD;
 
 public class InventoryHUD extends ScrollPane {
     HUD hud;
-    Player player;
+    public Player player;
     Array<Actor> popups = new Array<>();
     Skin skin;
     Table table;
@@ -27,7 +27,7 @@ public class InventoryHUD extends ScrollPane {
     public void refill(){
         table.clearChildren();
         ItemEntry itemEntry;
-        for (Item curItem : GameState.Instance.player.getInventoryItems()){
+        for (Item curItem : player.getInventoryItems()){
             itemEntry = new ItemEntry(this, curItem);
             table.add(itemEntry).growX().align(Align.left);
 
@@ -45,9 +45,9 @@ public class InventoryHUD extends ScrollPane {
     }
 
     public void putItemFromInventory(ItemEntry itemEntry){
-        GameState.Instance.player.removeItemFromInventory(itemEntry.item);
+        player.removeItemFromInventory(itemEntry.item);
         refill();
-        itemEntry.item.allocate(GameState.Instance.player.getBody().getPosition());
+        itemEntry.item.allocate(player.getPosition());
     }
 
     public void contextAction(ContextMenu.ConAction action, ContextMenu contextMenu){
