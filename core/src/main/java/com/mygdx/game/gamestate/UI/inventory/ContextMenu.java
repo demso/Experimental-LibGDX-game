@@ -9,90 +9,37 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
-import com.mygdx.game.gamestate.GameState;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.UI.HUD;
 
+import java.util.Comparator;
+
 public class ContextMenu extends Table {
-    enum ConAction {
-        PUT,
-        DESCRIPTION
+    public enum ConAction {
+        Put, Store , Description, Equip, Take
     }
+    public ObjectMap<ConAction, Button> allActions = new ObjectMap<>();//порядок и conaction
+    public ObjectMap<ConAction, Button> actions = new ObjectMap<>();
     HUD hud;
     InventoryHUD inventory;
     public InputListener hideListener;
     ItemEntry itemEntry;
-    public ContextMenu(HUD h, InventoryHUD ih, ItemEntry iEntry, float x, float y){
+    Label.LabelStyle ls;
+    public ContextMenu(HUD hud, InventoryHUD ih, ConAction... actions){
         super(SecondGDXGame.skin);
-        hud = h;
+        this.hud = hud;
         inventory = ih;
-        itemEntry = iEntry;
 
         this.setBackground("default-pane");
         this.setSize(150,300);
         this.pad(5);
         this.align(Align.top);
 
-        Button button = new Button(getSkin());
-        button.setName("Inventory context menu \"Throw\" button");
-
-        button.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                inventory.contextAction(ConAction.PUT, ContextMenu.this);
-            }
-        });
-
-        Label label = new Label("Throw", getSkin());
-        Label.LabelStyle ls = new Label.LabelStyle(label.getStyle());
+        ls = new Label.LabelStyle(new Label("", getSkin()).getStyle());
         ls.font = SecondGDXGame.skin.getFont("default14font");
-        label.setStyle(ls);
-        button.add(label).expandX().align(Align.left);
 
-        this.add(button).growX().align(Align.left);
-
-        this.row().padTop(2);
-
-        button = new Button(getSkin());
-        button.setName("Inventory context menu \"Description\" button");
-
-        button.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                inventory.contextAction(ConAction.DESCRIPTION, ContextMenu.this);
-            }
-        });
-
-        label = new Label("Description", getSkin());
-        label.setStyle(ls);
-        button.add(label).expandX().align(Align.left);
-
-        this.add(button).growX().align(Align.left);
-
-        this.row().padTop(2);
-
-        button = new Button(getSkin());
-        button.setName("Inventory context menu \"Equip\" button");
-
-        button.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                inventory.contextAction(ConAction.DESCRIPTION, ContextMenu.this);
-                GameState.Instance.player.equipItem(itemEntry.item);
-                inventory.closeItemContextMenu(ContextMenu.this);
-            }
-        });
-
-        label = new Label("Equip", getSkin());
-        label.setStyle(ls);
-        button.add(label).expandX().align(Align.left);
-
-        this.add(button).growX().align(Align.left);
-
-        pack();
+        createEntries(actions);
 
         //to avoid sending event to gameStage
         addListener(new InputListener(){
@@ -115,7 +62,75 @@ public class ContextMenu extends Table {
             }
         };
 
-        this.setPosition(x, y, Align.topLeft);
         hud.addCaptureListener(hideListener);
+    }
+
+    public void setPosition(ItemEntry itemEntry, float x, float y) {
+        super.setPosition(x, y, Align.topLeft);
+        this.itemEntry = itemEntry;
+    }
+    int index = 1;
+    Button createEntry(ConAction action){
+        Button button = new Button(getSkin());
+        button.setName("Inventory context menu \"" + action.toString()+ "\" button");
+        button.addListener(createListener(action));
+
+        Label label = new Label(action.toString(), getSkin());
+
+        label.setStyle(ls);
+        button.add(label).expandX().align(Align.left);
+        button.setZIndex(index);
+
+        addButton(button);
+
+        actions.put(action, button);
+        allActions.put(action,button);
+
+        return button;
+    }
+
+    void createEntries(ConAction... actions){
+        for (ConAction action : actions){
+            createEntry(action);
+        }
+    }
+
+    ClickListener createListener(ConAction action){
+        return new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                inventory.contextAction(action, ContextMenu.this);
+            }
+        };
+    }
+
+    public void disableActions(ConAction... actions){
+        for (ConAction action : actions)
+            this.actions.remove(action);
+    }
+
+    public void enableActions(ConAction... actions){
+        for (ConAction action : actions){
+            if (allActions.get(action) == null)
+                continue;
+            this.actions.put(action, allActions.get(action));
+        }
+    }
+
+    private void addButton(Button button){
+        this.add(button).growX().align(Align.left);
+
+        this.row().padTop(2);
+
+        pack();
+    }
+
+    public void update(){
+        clearChildren();
+        var buttons = actions.values().toArray();
+        buttons.sort(Comparator.comparingInt(Actor::getZIndex));
+        for (Button button : buttons)
+            addButton(button);
     }
 }

@@ -17,6 +17,7 @@ public class Globals {
             ALL_CONTACT_FILTER =                -1,                     //11111111 11111111
             NONE_CONTACT_FILTER =               0X0000,
 
-            PLAYER_CONTACT_GROUP =             -42;
+            PLAYER_CONTACT_GROUP =              -42,
+            LIGHT_CONTACT_GROUP =               -10;
 
 }

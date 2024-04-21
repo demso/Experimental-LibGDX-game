@@ -25,7 +25,7 @@ public class PlayerConstructor {
         player.setFriendliness(Entity.Friendliness.PLAYER);
         player.setKind(Entity.Kind.PLAYER);
 
-        BodyDef bodyDef = MobsFactory.bodyDef(5, 90, BodyDef.BodyType.DynamicBody);
+        BodyDef bodyDef = MobsFactory.bodyDef(player.startX, player.startY, BodyDef.BodyType.DynamicBody);
         Body body = GameState.Instance.world.createBody(bodyDef);
         CircleShape circle = new CircleShape();
         circle.setRadius(0.2f);

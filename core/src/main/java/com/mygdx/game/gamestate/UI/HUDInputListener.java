@@ -4,12 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.mygdx.game.SecondGDXGame;
-import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.Interactable;
-import com.mygdx.game.gamestate.objects.Item;
 import com.mygdx.game.gamestate.objects.bodies.player.PlayerHandler;
-import com.mygdx.game.gamestate.tiledmap.Door;
 
 import static com.mygdx.game.gamestate.GameState.Instance;
 
@@ -23,10 +19,7 @@ public class HUDInputListener extends InputListener {
     @Override
     public boolean keyUp (InputEvent event, int keycode) {
         if (keycode == Input.Keys.ESCAPE)
-            if (Instance.hud.esClosablePopups.notEmpty()){
-                Instance.hud.closeTopPopup();
-            }
-            else
+            if (!Instance.hud.closeTopPopup())
                 Gdx.app.exit();
         if (keycode == Input.Keys.B){
             Instance.debug = !Instance.debug;
@@ -56,7 +49,7 @@ public class HUDInputListener extends InputListener {
             }
         }
         if (keycode == Input.Keys.I){
-            Instance.hud.toggleInventoryHUD();
+            Instance.hud.togglePlayerInventoryHUD();
         }
         if (keycode == Input.Keys.H){
             Instance.player.freeHands();

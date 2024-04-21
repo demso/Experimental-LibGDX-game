@@ -57,11 +57,11 @@ public class GameState {
     public UnBox unbox;
 
     public void tester(){
-        player.addItemToInventory(new Item(TileResolver.getTile("10mm_fmj"), this, "10mm FMJ bullets"));
-        player.addItemToInventory(new Item(TileResolver.getTile("beef"), this, "Beef"));
-        player.addItemToInventory(new Item(TileResolver.getTile("watches"), this, "Watches"));
-        player.addItemToInventory(new Item(TileResolver.getTile("shotgun_ammo"), this, "Shotgun ammo"));
-        player.addItemToInventory(new Item(TileResolver.getTile("deagle_44"), this, "Deagle .44"));
+        player.takeItem(new Item(TileResolver.getTile("10mm_fmj"), "10mm FMJ bullets"));
+        player.takeItem(new Item(TileResolver.getTile("beef"), "Beef"));
+        player.takeItem(new Item(TileResolver.getTile("watches"), "Watches"));
+        player.takeItem(new Item(TileResolver.getTile("shotgun_ammo"), "Shotgun ammo"));
+        player.takeItem(new Item(TileResolver.getTile("deagle_44"), "Deagle .44"));
         //MobsFactory.spawnZombie(5, 85);
     }
 

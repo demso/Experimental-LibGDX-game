@@ -1,7 +1,8 @@
-package com.mygdx.game.gamestate.tiledmap;
+package com.mygdx.game.gamestate.objects.tiles;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.mygdx.game.gamestate.GameState;
@@ -20,17 +21,13 @@ public class Window implements Interactable, BodyData {
     Filter openFilter;
     Body physicalBody;
     GameState gameState;
-    float x;
-    float y;
     boolean isOpen = false;
-    public Window(TiledMapTileLayer.Cell cell, Body body, float x, float y){
+    public Window(TiledMapTileLayer.Cell cell, Body body){
         this.gameState = GameState.Instance;
         this.cell = cell;
         physicalBody = body;
-        this.x = x;
-        this.y = y;
         closedFilter = new Filter();
-        closedFilter.groupIndex = -10;
+        closedFilter.groupIndex = Globals.LIGHT_CONTACT_GROUP;
         openFilter = BodyResolver.createFilter((short) (Globals.NONE_CONTACT_FILTER | Globals.PLAYER_INTERACT_CONTACT_FILTER), closedFilter.categoryBits, closedFilter.groupIndex);
     }
 
@@ -71,5 +68,9 @@ public class Window implements Interactable, BodyData {
     @Override
     public Object getData() {
         return this;
+    }
+
+    public Vector2 getPosititon(){
+        return physicalBody.getPosition();
     }
 }

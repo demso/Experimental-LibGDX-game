@@ -3,99 +3,185 @@ package com.mygdx.game.gamestate.UI;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.UI.inventory.ContextMenu;
-import com.mygdx.game.gamestate.UI.inventory.InventoryHUD;
+import com.mygdx.game.gamestate.UI.inventory.PlayerInventoryHUD;
+import com.mygdx.game.gamestate.UI.inventory.StorageInventoryHUD;
 import com.mygdx.game.gamestate.objects.bodies.userdata.SimpleUserData;
 import com.mygdx.game.gamestate.objects.Item;
 import com.mygdx.game.gamestate.GameState;
+import com.mygdx.game.gamestate.objects.tiles.Storage;
 
 public class HUD extends Stage {
-    InventoryHUD inventoryHUD;
-    boolean isInventoryShowed;
+    public PlayerInventoryHUD playerInventoryHud;
+    public StorageInventoryHUD storageInventoryHUD;
+    HorizontalGroup panels;
     public GameState gameState;
     ObjectMap<Item, ItemInfoPopUp> itemPopups =  new ObjectMap<>();
-    public Array<Actor> esClosablePopups = new Array<>();
+    private Array<Actor> esClosablePopups = new Array<>();
     public ArrayMap<String, String> debugEntries = new ArrayMap<>();
     Label label;
     Skin skin;
 
     public void showItemInfoWindow(Item item){
         getActors().removeValue(itemPopups.get(item), true);
-        Vector3 mousePosition = getCamera().unproject(new Vector3((float) Gdx.input.getX(), (float) Gdx.input.getY(), 0));
         Vector3 itemPos = getCamera().unproject(gameState.gameStage.getCamera().project(new Vector3(item.getPosition(), 0)));
         ItemInfoPopUp popup = new ItemInfoPopUp(item,itemPos.x,Gdx.graphics.getHeight()-itemPos.y);
-        addActor(popup);
         itemPopups.put(item, popup);
+        showPopup(popup);
     }
 
     public void hideItemInfoWindow(Item item){
-        getActors().removeValue(itemPopups.get(item), true);
+        closePopup(itemPopups.get(item));
     }
 
-    public void showInventoryHUD(){
-        inventoryHUD.player = GameState.Instance.player;
-        inventoryHUD.refill();
-        inventoryHUD.setPosition((Gdx.graphics.getWidth()- inventoryHUD.getWidth())/2f,(Gdx.graphics.getHeight()- inventoryHUD.getHeight())/2f, Align.bottomLeft);
-        inventoryHUD.setVisible(true);
-        setScrollFocus(inventoryHUD);
-        isInventoryShowed = true;
-        esClosablePopups.add(inventoryHUD);
+    public void showStorageInventoryHUD(Storage storage){
+        if (storageInventoryHUD.isVisible()) {
+            if (storageInventoryHUD.storage != storage){
+                storageInventoryHUD.storage = storage;
+                storageInventoryHUD.refill();
+            }
+            return;
+        }
+        panels.addActor(storageInventoryHUD);
+        storageInventoryHUD.onShow(storage);
+        showPlayerInventoryHud();
+        if (GameState.Instance.player.getClosestObject() == null || GameState.Instance.player.getClosestObject().getUserData() != storage)
+            playerInventoryHud.storageInventoryNear();
+        storageInventoryHUD.setVisible(true);
+        setScrollFocus(storageInventoryHUD);
+        addEscClosable(panels);
+        updatePanels();
+    }
+    //boolean if should player's inventory be closed
+    public void closeStorageInventoryHUD(boolean closePlayer){
+        if (!storageInventoryHUD.isVisible())
+            return;
+        panels.removeActor(storageInventoryHUD);
+        if (closePlayer)
+            closePlayerInventoryHud();
+        storageInventoryHUD.setVisible(false);
+        storageInventoryHUD.onClose();
+        esClosablePopups.removeValue(storageInventoryHUD, true);
+        if (GameState.Instance.player.getClosestObject() == null || GameState.Instance.player.getClosestObject().getUserData() != storageInventoryHUD.storage)
+            playerInventoryHud.storageInventoryFar();
+        updatePanels();
     }
 
-    public void closeInventoryHUD(){
-        if(inventoryHUD != null)
-            inventoryHUD.setVisible(false);
-        inventoryHUD.onClose();
-        isInventoryShowed = false;
-        esClosablePopups.removeValue(inventoryHUD, true);
+    public void toggleStorageInventoryHUD(Storage storage, boolean offPlayersInv){
+        if (storageInventoryHUD.isVisible())
+            closeStorageInventoryHUD(offPlayersInv);
+        else
+            showStorageInventoryHUD(storage);
     }
 
-    public void closeTopPopup(){
+    public void showPlayerInventoryHud(){
+        if (playerInventoryHud.isVisible())
+            return;
+        panels.addActorAt(0, playerInventoryHud);
+        playerInventoryHud.onShow(GameState.Instance.player);
+
+        playerInventoryHud.setVisible(true);
+        setScrollFocus(playerInventoryHud);
+        addEscClosable(panels);
+        updatePanels();
+    }
+
+
+    public void closePlayerInventoryHud(){
+        if (!playerInventoryHud.isVisible())
+            return;
+        panels.removeActor(playerInventoryHud);
+
+        playerInventoryHud.setVisible(false);
+        playerInventoryHud.onClose();
+        esClosablePopups.removeValue(playerInventoryHud, true);
+        updatePanels();
+    }
+
+    public void togglePlayerInventoryHUD(){
+        if (playerInventoryHud.isVisible())
+            closePlayerInventoryHud();
+        else
+            showPlayerInventoryHud();
+    }
+
+    public void updatePanels(){
+        Vector2 oldSPos = new Vector2(panels.getX() + storageInventoryHUD.getX(), panels.getY() + storageInventoryHUD.getY()),
+                oldPPos = new Vector2(panels.getX() + playerInventoryHud.getX(), panels.getY() + playerInventoryHud.getY());
+
+        panels.setPosition((Gdx.graphics.getWidth()- panels.getPrefWidth())/2f,(Gdx.graphics.getHeight() - panels.getMaxHeight())/2f, Align.bottomLeft);
+        panels.validate();
+
+        Vector2 newSPos = new Vector2(panels.getX() + storageInventoryHUD.getX(), panels.getY() + storageInventoryHUD.getY()),
+                newPPos = new Vector2(panels.getX() + storageInventoryHUD.getX(), panels.getY() + storageInventoryHUD.getY());
+        Vector2 offsetS = new Vector2(newSPos).sub(oldSPos),
+                offsetP = new Vector2(newPPos).sub(oldPPos);
+
+        if (storageInventoryHUD.isVisible()){
+            storageInventoryHUD.onPositionChanged(offsetS);
+            System.out.println(storageInventoryHUD.localToScreenCoordinates(new Vector2(Vector2.Zero)));
+        }
+        if (playerInventoryHud.isVisible()) playerInventoryHud.onPositionChanged(offsetP);
+
+    }
+
+    public void updateInvHUDContent(){
+        if (playerInventoryHud.isVisible())
+            playerInventoryHud.refill();
+        if (storageInventoryHUD.isVisible())
+            storageInventoryHUD.refill();
+    }
+
+    public void showPopup(Actor actor){
+        addEscClosable(actor);
+        //addActor(actor);
+    }
+
+    public void closePopup(Actor actor){
+        esClosablePopups.removeValue(actor, true);
+        //getActors().removeValue(actor, true);
+    }
+
+    public boolean closeTopPopup(){
+        if (esClosablePopups.isEmpty())
+            return false;
+
         Actor ac = esClosablePopups.pop();
 
-        if (ac instanceof ScrollPane && ac.getName().equals(inventoryHUD.getName())){
-            closeInventoryHUD();
-            return;
+        if (ac == panels){
+            closeStorageInventoryHUD(true);
+            closePlayerInventoryHud();
+            //panels.setVisible(false);
+            return true;
         }
 
         if (ac instanceof ContextMenu){
-            inventoryHUD.closeItemContextMenu((ContextMenu) ac);
-            return;
+            playerInventoryHud.closeItemContextMenu((ContextMenu) ac);
+            return true;
         }
 
         getActors().removeValue(ac, true);
 
-    }
-
-    public void toggleInventoryHUD(){
-        if (isInventoryShowed)
-            closeInventoryHUD();
-        else
-            showInventoryHUD();
-    }
-
-    public void updateInvHUDContent(){
-        if (inventoryHUD != null)
-            inventoryHUD.refill();
+        return true;
     }
 
     public void updateOnResize(int width, int height){
         getViewport().update(width, height, true);
-        if (inventoryHUD != null){
-            inventoryHUD.setPosition((Gdx.graphics.getWidth()- inventoryHUD.getWidth())/2f,(Gdx.graphics.getHeight()- inventoryHUD.getHeight())/2f, Align.bottomLeft);
-        }
+        updatePanels();
     }
 
     Body clObj;
@@ -128,6 +214,12 @@ public class HUD extends Stage {
         label.setText(labelText);
     }
 
+    public void addEscClosable(Actor actor){
+        if (esClosablePopups.contains(actor, true))
+            return;
+        esClosablePopups.add(actor);
+    }
+
     @Override
     public void act(float delta) {
         super.act(delta);
@@ -146,8 +238,14 @@ public class HUD extends Stage {
         gameState = gi;
         skin = gameState.skin;
 
-        inventoryHUD = new InventoryHUD(this, gameState.player);
-        inventoryHUD.setVisible(false);
+        panels = new HorizontalGroup();
+
+        playerInventoryHud = new PlayerInventoryHUD(this);
+
+        playerInventoryHud.setVisible(false);
+
+        storageInventoryHUD = new StorageInventoryHUD(this, ContextMenu.ConAction.Put, ContextMenu.ConAction.Description, ContextMenu.ConAction.Equip, ContextMenu.ConAction.Take);
+        storageInventoryHUD.setVisible(false);
 
         label = new Label("", skin);
         label.setFontScale(0.5f);
@@ -155,6 +253,9 @@ public class HUD extends Stage {
         label.setAlignment(Align.topLeft);
 
         addActor(label);
-        addActor(inventoryHUD);
+        panels.space(5);
+        addActor(panels);
+
+        //setDebugAll(true);
     }
 }

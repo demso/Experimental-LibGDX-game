@@ -1,4 +1,4 @@
-package com.mygdx.game.gamestate.tiledmap;
+package com.mygdx.game.gamestate.objects.tiles;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -31,8 +31,6 @@ public class TileInitializer {
             bodyType = tileProperties.get("body type", null, String.class);
             String name = tileProperties.get("name", null, String.class);
 
-            ArrayList<String> nameEntries = new ArrayList<>(Arrays.asList(name.split("_")));
-
             direction = BodyResolver.getDirection(cell);
 
             if (bodyType != null) {
@@ -40,12 +38,13 @@ public class TileInitializer {
             } else {
                 return;
             }
+            ArrayList<String> nameEntries = new ArrayList<>(Arrays.asList(name.split("_")));
 
             BodyData bodyData = null;
 
             if (nameEntries.get(0).equals("t")) switch (nameEntries.get(1)) {
                 case "door" -> {
-                    Door door = new Door(cell, body, x, y);
+                    Door door = new Door(cell, body);
                     if (nameEntries.contains("o")){
                         door.openTile = TileResolver.getTile(name);
                         int index = nameEntries.indexOf("o");
@@ -64,15 +63,14 @@ public class TileInitializer {
                     if (nameEntries.contains("peep")) door.peep = true;
                     bodyData = door;
                 } case "window" -> {
-                    Window window = new Window(cell, body, x, y);
+                    Window window = new Window(cell, body);
                     if (nameEntries.contains("o")) {
                         window.openTile = TileResolver.getTile(name);
                         int index = nameEntries.indexOf("o");
                         nameEntries.set(index, "c");
                         window.closedTile = TileResolver.getTile(String.join("_", nameEntries));
                         window.open();
-                    }
-                    else if (nameEntries.contains("c")) {
+                    } else if (nameEntries.contains("c")) {
                         window.closedTile = TileResolver.getTile(name);
                         int index = nameEntries.indexOf("c");
                         nameEntries.set(index, "o");
@@ -81,6 +79,9 @@ public class TileInitializer {
                         window.close();
                     }
                     bodyData = window;
+                } case "closet"-> {
+                    Closet closet = new Closet(cell, body);
+                    bodyData = closet;
                 } default -> {
                     bodyData = new SimpleUserData(cell, name);
                 }
@@ -96,7 +97,8 @@ public class TileInitializer {
 
         if (body != null) {
             GameObject object = new GameObject(GameState.Instance.unbox);
-            object.setName(((BodyData) body.getUserData()).getName()); new Box2dBehaviour(body, object);
+            object.setName(((BodyData) body.getUserData()).getName());
+            new Box2dBehaviour(body, object);
 
             mymap.staticObjects.add(body);
         }

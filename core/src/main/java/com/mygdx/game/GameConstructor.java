@@ -41,6 +41,7 @@ public class GameConstructor {
         gameState.world = new World(new Vector2(0, 0), true);
         gameState.unbox = new UnBox(gameState.world);
         gameState.unbox.getOptions().setTimeStep(gameState.physicsStep);
+        gameState.unbox.getOptions().setInterpolateMovement(true);
         gameState.hud = new HUD(gameState, new ScreenViewport(), gameState.game.batch);
         gameState.camera = new OrthographicCamera();
         gameState.gameStage = new Stage(new ScreenViewport(gameState.camera));
@@ -87,7 +88,7 @@ public class GameConstructor {
         gameState.rayHandler.setBlurNum(3);
 
         //game
-        Item it = new Item(TileResolver.getTile("10mm_fmj"), gameState, "10mm FMJ bullets");
+        Item it = new Item(TileResolver.getTile("10mm_fmj"), "10mm FMJ bullets");
         it.allocate(new Vector2(3.5f,96.5f));
     }
 }

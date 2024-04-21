@@ -3,14 +3,16 @@ package com.mygdx.game.gamestate.objects.bodies.player;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.SecondGDXGame;
-import com.mygdx.game.gamestate.UI.inventory.HasInventory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.Item;
+import com.mygdx.game.gamestate.objects.tiles.Storage;
 import dev.lyze.gdxUnBox2d.GameObject;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
-public class Player extends Entity implements HasInventory {
+import static com.mygdx.game.gamestate.GameState.Instance;
+
+public class Player extends Entity implements Storage {
 
     public enum State {
         Standing, Walking, Running, Sneaking
@@ -18,6 +20,9 @@ public class Player extends Entity implements HasInventory {
     public enum Facing {
         Right, Left, Up, Down
     }
+
+    float startX = 21;
+    float startY = 87;
 
     @Getter Player.State state =  Player.State.Walking;
     @Getter Player.Facing facing = Player.Facing.Down;
@@ -42,19 +47,19 @@ public class Player extends Entity implements HasInventory {
     public Body getClosestObject(){
         return closestObject;
     }
-    public void pickupItem(Item item){
+
+    @Override
+    public void takeItem(Item item){
         item.removeFromWorld();
-        addItemToInventory(item);
-    }
-    @Override
-    public void addItemToInventory(Item item){
         inventoryItems.add(item);
+        Instance.hud.updateInvHUDContent();
     }
     @Override
-    public void removeItemFromInventory(Item item){
+    public void dropItem(Item item){
         if (equipedItem == item)
             equipedItem = null;
         inventoryItems.removeValue(item, true);
+        Instance.hud.updateInvHUDContent();
     }
     @Override
     public Array<Item> getInventoryItems(){

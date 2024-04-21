@@ -140,12 +140,16 @@ public class PlayerHandler extends BehaviourAdapter {
 
             player.getBody().applyLinearImpulse(movingImpulse, zeroVector, true);
 
-        } if (Math.abs(player.getBody().getLinearVelocity().len2()) < 0.5f) {
+        }
+        if (Math.abs(player.getBody().getLinearVelocity().len2()) < 0.5f) {
             player.state = Player.State.Standing;
         }
         //update selection of object to interact with
         if (player.closestObject != null){
             player.playerObject.getBehaviour(PlayerCollisionBehaviour.class).updatePlayerClosestObject();
         }
+
+
+
     }
 }

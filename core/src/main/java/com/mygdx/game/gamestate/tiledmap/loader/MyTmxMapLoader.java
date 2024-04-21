@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
 import com.mygdx.game.gamestate.GameState;
-import com.mygdx.game.gamestate.tiledmap.TileInitializer;
+import com.mygdx.game.gamestate.objects.tiles.TileInitializer;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 

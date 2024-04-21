@@ -15,6 +15,7 @@ import com.mygdx.game.gamestate.objects.behaviours.SpriteBehaviour;
 import com.mygdx.game.gamestate.factories.BodyResolver;
 import com.mygdx.game.gamestate.objects.bodies.player.Player;
 import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
+import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
@@ -34,11 +35,11 @@ public class Item implements BodyData, Interactable {
     public float spiteHeight = 0.7f;
     GameObject GO;
 
-    public Item(TiledMapTile tile, GameState gi, String itemName){
+    public Item(TiledMapTile tile, String itemName){
         this.tile = tile;
         this.item = this;
         this.tileName = tile.getProperties().get("name", "no_name", String.class);
-        this.gameState = gi;
+        this.gameState = Instance;
         this.itemName = itemName;
 
         mouseHandler = new Table();
@@ -64,6 +65,10 @@ public class Item implements BodyData, Interactable {
 
         GO = new GameObject("bullet", false, Instance.unbox);
         new SpriteBehaviour(GO, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
+    }
+
+    public Item(String tileName, String itemName){
+        this(TileResolver.getTile(tileName), itemName);
     }
 
     public Body allocate(Vector2 position){
@@ -109,7 +114,6 @@ public class Item implements BodyData, Interactable {
 
     @Override
     public void interact(Player player) {
-        Instance.player.pickupItem(this);
-        Instance.hud.updateInvHUDContent();
+        Instance.player.takeItem(this);
     }
 }

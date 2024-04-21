@@ -3,8 +3,10 @@ package com.mygdx.game.gamestate.objects.bodies.player;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.Interactable;
 import com.mygdx.game.gamestate.objects.bodies.CollisionBehaviour;
+import com.mygdx.game.gamestate.objects.tiles.Storage;
 import dev.lyze.gdxUnBox2d.Behaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
@@ -45,23 +47,38 @@ public class PlayerCollisionBehaviour extends CollisionBehaviour<Player> {
         if (otherUserData instanceof Interactable && thisFixture.isSensor() && !otherFixture.isSensor()){
             closeBodies.removeValue(otherBody, true);
             updatePlayerClosestObject();
+            if (otherUserData instanceof Storage storage
+                    && GameState.Instance.hud.storageInventoryHUD.isVisible()
+                    && GameState.Instance.hud.storageInventoryHUD.storage == storage){
+                GameState.Instance.hud.closeStorageInventoryHUD(false);
+            }
         }
+
     }
 
     public void updatePlayerClosestObject(){
+        Body formelyClosest = data.closestObject;
         if (closeBodies.isEmpty()){
             data.closestObject = null;
-            return;
-        }
-        float minDist = Float.MAX_VALUE;
-        float dist;
-        for (Body closeBody : closeBodies) {
-            dist = body.getPosition().dst2(closeBody.getPosition());
-            if (dist < minDist){
-                data.closestObject = closeBody;
-                minDist = dist;
+        } else {
+            float minDist = Float.MAX_VALUE;
+            float dist;
+            for (Body closeBody : closeBodies) {
+                dist = body.getPosition().dst2(closeBody.getPosition());
+                if (dist < minDist){
+                    data.closestObject = closeBody;
+                    minDist = dist;
+                }
             }
         }
+
+        if (formelyClosest != null && formelyClosest.getUserData() != GameState.Instance.hud.storageInventoryHUD.storage && GameState.Instance.hud.playerInventoryHud.isVisible() && GameState.Instance.player.getClosestObject() != null && GameState.Instance.player.getClosestObject().getUserData() instanceof Storage storage)
+            GameState.Instance.hud.showStorageInventoryHUD(storage);
+
+        if (data.getClosestObject() != null && data.getClosestObject().getUserData() instanceof Storage && (formelyClosest == null || !(formelyClosest.getUserData() instanceof Storage)))
+            GameState.Instance.hud.playerInventoryHud.storageInventoryNear();
+        else if ((data.getClosestObject() == null || !(data.getClosestObject().getUserData() instanceof Storage)) && formelyClosest != null && formelyClosest.getUserData() instanceof Storage)
+            GameState.Instance.hud.playerInventoryHud.storageInventoryFar();
     }
 
     public Array<Body> getCloseBodies(){
