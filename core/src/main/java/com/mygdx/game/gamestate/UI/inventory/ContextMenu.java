@@ -26,10 +26,14 @@ public class ContextMenu extends Table {
     public InputListener hideListener;
     ItemEntry itemEntry;
     Label.LabelStyle ls;
+    String storageName;
     public ContextMenu(HUD hud, InventoryHUD ih, ConAction... actions){
         super(SecondGDXGame.skin);
         this.hud = hud;
         inventory = ih;
+        storageName = inventory.getClass().equals(StorageInventoryHUD.class) ? "some storage" :
+                inventory.getClass().equals(PlayerInventoryHUD.class) ? "player inventory" : "some other inventory";
+        setName("Item context menu for " + storageName );
 
         this.setBackground("default-pane");
         this.setSize(150,300);
@@ -69,7 +73,8 @@ public class ContextMenu extends Table {
         super.setPosition(x, y, Align.topLeft);
         this.itemEntry = itemEntry;
     }
-    int index = 1;
+
+    int index = 0;
     Button createEntry(ConAction action){
         Button button = new Button(getSkin());
         button.setName("Inventory context menu \"" + action.toString()+ "\" button");
@@ -85,6 +90,8 @@ public class ContextMenu extends Table {
 
         actions.put(action, button);
         allActions.put(action,button);
+
+        index++;
 
         return button;
     }
@@ -108,6 +115,7 @@ public class ContextMenu extends Table {
     public void disableActions(ConAction... actions){
         for (ConAction action : actions)
             this.actions.remove(action);
+        validate();
     }
 
     public void enableActions(ConAction... actions){
@@ -127,10 +135,20 @@ public class ContextMenu extends Table {
     }
 
     public void update(){
+        float oldWidth = getWidth();
+        float oldHeight = getHeight();
         clearChildren();
         var buttons = actions.values().toArray();
         buttons.sort(Comparator.comparingInt(Actor::getZIndex));
+        SecondGDXGame.helper.log(buttons.toString(", "), false);
         for (Button button : buttons)
             addButton(button);
+        validate();
+        super.setPosition(getX() - (getWidth() - oldWidth), getY() - (getHeight() - oldHeight), Align.bottomLeft);
+    }
+
+    @Override
+    public String toString() {
+        return "\n" + super.toString();
     }
 }

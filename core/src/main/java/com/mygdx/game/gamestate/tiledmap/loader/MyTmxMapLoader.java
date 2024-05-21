@@ -192,7 +192,7 @@ public class MyTmxMapLoader extends TmxMapLoader {
         borderShape.set(br, tr);
         borderBody.createFixture(borderFixture);
 
-        GameObject bordersObject = new GameObject("borderBody", GameState.Instance.unbox);
+        GameObject bordersObject = new GameObject("borderBody", GameState.instance.unbox);
 
         new Box2dBehaviour(borderBody, bordersObject);
 

@@ -12,6 +12,14 @@ border
   orig: 3, 3
   offset: 0, 0
   index: -1
+border-black
+  rotate: false
+  xy: 311, 196
+  size: 3, 3
+  split: 1, 1, 1, 1
+  orig: 3, 3
+  offset: 0, 0
+  index: -1
 border-circle
   rotate: false
   xy: 391, 241
@@ -686,6 +694,14 @@ white
 window
   rotate: false
   xy: 284, 221
+  size: 27, 34
+  split: 5, 4, 26, 3
+  orig: 27, 34
+  offset: 0, 0
+  index: -1
+window-black
+  rotate: false
+  xy: 309, 161
   size: 27, 34
   split: 5, 4, 26, 3
   orig: 27, 34

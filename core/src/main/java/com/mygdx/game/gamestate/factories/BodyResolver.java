@@ -7,7 +7,7 @@ import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
 
 public class BodyResolver {
-    static World world = GameState.Instance.world;
+    static World world = GameState.instance.world;
     public enum Type {
         FULL_BODY,
         METAL_CLOSET_BODY,

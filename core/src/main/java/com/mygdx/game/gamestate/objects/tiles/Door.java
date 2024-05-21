@@ -9,7 +9,7 @@ import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.factories.BodyResolver;
 import com.mygdx.game.gamestate.objects.Interactable;
-import com.mygdx.game.gamestate.objects.bodies.player.Player;
+import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
 import lombok.Getter;
 
@@ -25,7 +25,7 @@ public class Door implements Interactable, BodyData {
     public boolean peep;
     @Getter boolean isOpen = false;
     public Door( TiledMapTileLayer.Cell cell, Body body) {
-        this.gameState = GameState.Instance;
+        this.gameState = GameState.instance;
         this.cell = cell;
         physicalBody = body;
         closedFilter = new Filter();

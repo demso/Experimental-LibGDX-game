@@ -14,20 +14,19 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectSet;
+import com.mygdx.game.gamestate.UI.console.InGameConsole;
 import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.objects.bullet.Bullet;
 import com.mygdx.game.gamestate.objects.Item;
-import com.mygdx.game.gamestate.objects.bodies.player.Player;
-import com.strongjoshua.console.GUIConsole;
+import com.mygdx.game.gamestate.player.Player;
 import dev.lyze.gdxUnBox2d.UnBox;
 import net.dermetfan.gdx.physics.box2d.Box2DUtils;
 
 public class GameState {
-    public static GameState Instance;
+    public static GameState instance;
 
     public SecondGDXGame game;
     public GameScreen gameScreen;
@@ -50,9 +49,8 @@ public class GameState {
     public static final int TILE_SIDE = 32;
     public HUD hud;
     public Stage gameStage;
-    public ObjectSet<Body> bodiesToDeletion = new ObjectSet<>();
     public float physicsStep = 1/144f;
-    public GUIConsole console;
+    public InGameConsole console;
     public ShapeRenderer shapeRenderer;
     public UnBox unbox;
 

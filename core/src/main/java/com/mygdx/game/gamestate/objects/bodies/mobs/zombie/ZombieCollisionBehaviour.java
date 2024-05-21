@@ -2,7 +2,7 @@ package com.mygdx.game.gamestate.objects.bodies.mobs.zombie;
 
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.mygdx.game.gamestate.objects.bodies.CollisionBehaviour;
-import com.mygdx.game.gamestate.objects.bodies.player.Player;
+import com.mygdx.game.gamestate.player.Player;
 import dev.lyze.gdxUnBox2d.Behaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 

@@ -13,13 +13,13 @@ import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.objects.behaviours.SpriteBehaviour;
 import com.mygdx.game.gamestate.factories.BodyResolver;
-import com.mygdx.game.gamestate.objects.bodies.player.Player;
+import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
 import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
-import static com.mygdx.game.gamestate.GameState.Instance;
+import static com.mygdx.game.gamestate.GameState.instance;
 
 public class Item implements BodyData, Interactable {
     public TiledMapTile tile;
@@ -39,7 +39,7 @@ public class Item implements BodyData, Interactable {
         this.tile = tile;
         this.item = this;
         this.tileName = tile.getProperties().get("name", "no_name", String.class);
-        this.gameState = Instance;
+        this.gameState = instance;
         this.itemName = itemName;
 
         mouseHandler = new Table();
@@ -63,7 +63,7 @@ public class Item implements BodyData, Interactable {
 
         gameState.gameStage.addActor(mouseHandler);
 
-        GO = new GameObject("bullet", false, Instance.unbox);
+        GO = new GameObject("bullet", false, instance.unbox);
         new SpriteBehaviour(GO, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
     }
 
@@ -114,6 +114,6 @@ public class Item implements BodyData, Interactable {
 
     @Override
     public void interact(Player player) {
-        Instance.player.takeItem(this);
+        instance.player.takeItem(this);
     }
 }

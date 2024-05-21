@@ -96,7 +96,7 @@ public class TileInitializer {
         }
 
         if (body != null) {
-            GameObject object = new GameObject(GameState.Instance.unbox);
+            GameObject object = new GameObject(GameState.instance.unbox);
             object.setName(((BodyData) body.getUserData()).getName());
             new Box2dBehaviour(body, object);
 

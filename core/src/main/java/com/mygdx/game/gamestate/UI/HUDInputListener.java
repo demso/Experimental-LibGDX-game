@@ -5,9 +5,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.mygdx.game.gamestate.objects.Interactable;
-import com.mygdx.game.gamestate.objects.bodies.player.PlayerHandler;
+import com.mygdx.game.gamestate.player.PlayerHandler;
 
-import static com.mygdx.game.gamestate.GameState.Instance;
+import static com.mygdx.game.gamestate.GameState.instance;
 
 public class HUDInputListener extends InputListener {
     @Override
@@ -19,56 +19,56 @@ public class HUDInputListener extends InputListener {
     @Override
     public boolean keyUp (InputEvent event, int keycode) {
         if (keycode == Input.Keys.ESCAPE)
-            if (!Instance.hud.closeTopPopup())
+            if (!instance.hud.closeTopPopup())
                 Gdx.app.exit();
         if (keycode == Input.Keys.B){
-            Instance.debug = !Instance.debug;
-            Instance.hud.setDebugAll(Instance.debug);
-            Instance.gameStage.setDebugAll(Instance.debug);
+            instance.debug = !instance.debug;
+            instance.hud.setDebugAll(instance.debug);
+            instance.gameStage.setDebugAll(instance.debug);
         }
         if (keycode == Input.Keys.EQUALS){
-            Instance.zoom += 0.3f;
-            Instance.camera.setToOrtho(false, Gdx.graphics.getWidth() * (1f/ Instance.TILE_SIDE) * (1/Instance.zoom),
-                    Gdx.graphics.getHeight() * (1f / Instance.TILE_SIDE) * (1 / Instance.zoom));
+            instance.zoom += 0.3f;
+            instance.camera.setToOrtho(false, Gdx.graphics.getWidth() * (1f/ instance.TILE_SIDE) * (1/ instance.zoom),
+                    Gdx.graphics.getHeight() * (1f / instance.TILE_SIDE) * (1 / instance.zoom));
         }
         if (keycode == Input.Keys.MINUS){
-            Instance.zoom -= 0.3f;
-            Instance.camera.setToOrtho(false, Gdx.graphics.getWidth() * (1f/ Instance.TILE_SIDE) * (1/Instance.zoom),
-                    Gdx.graphics.getHeight() * (1f/ Instance.TILE_SIDE) * (1/Instance.zoom));
+            instance.zoom -= 0.3f;
+            instance.camera.setToOrtho(false, Gdx.graphics.getWidth() * (1f/ instance.TILE_SIDE) * (1/ instance.zoom),
+                    Gdx.graphics.getHeight() * (1f/ instance.TILE_SIDE) * (1/ instance.zoom));
         }
         if (keycode == Input.Keys.R){
             if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-                Instance.player.revive();
+                instance.player.revive();
                 return false;
             }
         }
         if (keycode == Input.Keys.E){
-            if (Instance.player.closestObject != null) {
-                var obj = (Interactable) Instance.player.closestObject.getUserData();
-                obj.interact(Instance.player);
+            if (instance.player.closestObject != null) {
+                var obj = (Interactable) instance.player.closestObject.getUserData();
+                obj.interact(instance.player);
             }
         }
         if (keycode == Input.Keys.I){
-            Instance.hud.togglePlayerInventoryHUD();
+            instance.hud.togglePlayerInventoryHUD();
         }
         if (keycode == Input.Keys.H){
-            Instance.player.freeHands();
+            instance.player.freeHands();
         }
         if (keycode == Input.Keys.T){
-            if (Instance.player.equipedItem != null && Instance.player.equipedItem.itemName.equals("Deagle .44"))
-                Instance.fireBullet(Instance.player);
+            if (instance.player.equipedItem != null && instance.player.equipedItem.itemName.equals("Deagle .44"))
+                instance.fireBullet(instance.player);
         }
         if (keycode == Input.Keys.W || keycode == Input.Keys.UP){
-            Instance.player.playerObject.getBehaviour(PlayerHandler.class).moveUp = false;
+            instance.player.playerObject.getBehaviour(PlayerHandler.class).moveUp = false;
         }
         if (keycode == Input.Keys.S || keycode == Input.Keys.DOWN){
-            Instance.player.playerObject.getBehaviour(PlayerHandler.class).moveDown = false;
+            instance.player.playerObject.getBehaviour(PlayerHandler.class).moveDown = false;
         }
         if (keycode == Input.Keys.A || keycode == Input.Keys.LEFT){
-            Instance.player.playerObject.getBehaviour(PlayerHandler.class).moveToTheLeft = false;
+            instance.player.playerObject.getBehaviour(PlayerHandler.class).moveToTheLeft = false;
         }
         if (keycode == Input.Keys.D || keycode == Input.Keys.RIGHT){
-            Instance.player.playerObject.getBehaviour(PlayerHandler.class).moveToTheRight = false;
+            instance.player.playerObject.getBehaviour(PlayerHandler.class).moveToTheRight = false;
         }
         return false;
     }
@@ -76,16 +76,16 @@ public class HUDInputListener extends InputListener {
     @Override
     public boolean keyDown(InputEvent event, int keycode) {
         if (keycode == Input.Keys.W || keycode == Input.Keys.UP){
-            Instance.player.playerObject.getBehaviour(PlayerHandler.class).moveUp = true;
+            instance.player.playerObject.getBehaviour(PlayerHandler.class).moveUp = true;
         }
         if (keycode == Input.Keys.S || keycode == Input.Keys.DOWN){
-            Instance.player.playerObject.getBehaviour(PlayerHandler.class).moveDown = true;
+            instance.player.playerObject.getBehaviour(PlayerHandler.class).moveDown = true;
         }
         if (keycode == Input.Keys.A || keycode == Input.Keys.LEFT){
-            Instance.player.playerObject.getBehaviour(PlayerHandler.class).moveToTheLeft = true;
+            instance.player.playerObject.getBehaviour(PlayerHandler.class).moveToTheLeft = true;
         }
         if (keycode == Input.Keys.D || keycode == Input.Keys.RIGHT){
-            Instance.player.playerObject.getBehaviour(PlayerHandler.class).moveToTheRight = true;
+            instance.player.playerObject.getBehaviour(PlayerHandler.class).moveToTheRight = true;
         }
         return false;
     }

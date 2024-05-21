@@ -24,12 +24,12 @@ public class MobsFactory {
 
     }
 
-    static World world = GameState.Instance.world;
+    static World world = GameState.instance.world;
     private static Vector2 tempPosition = new Vector2();
 
     public static Zombie spawnZombie(float x, float y){
         tempPosition.set(x,y);
-        Zombie zombie = new Zombie(TileResolver.getTile("zombie1"), world, tempPosition);
+        Zombie zombie = new Zombie(TileResolver.getTile("zombie"), world, tempPosition);
         return zombie;
     }
 

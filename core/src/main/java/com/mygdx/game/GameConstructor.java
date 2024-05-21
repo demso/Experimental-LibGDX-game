@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import box2dLight.RayHandler;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -13,22 +14,22 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.gamestate.GameState;
+import com.mygdx.game.gamestate.UI.console.InGameConsole;
 import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
-import com.mygdx.game.gamestate.UI.ConsoleCommands;
+import com.mygdx.game.gamestate.UI.console.ConsoleCommands;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.objects.Item;
-import com.mygdx.game.gamestate.objects.bodies.player.PlayerConstructor;
+import com.mygdx.game.gamestate.player.PlayerConstructor;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTmxMapLoader;
-import com.strongjoshua.console.GUIConsole;
 import dev.lyze.gdxUnBox2d.UnBox;
 
 public class GameConstructor {
     GameState gameState;
     public GameState createGameState(GameScreen gameScreen){
         gameState = new GameState();
-        GameState.Instance = gameState;
+        GameState.instance = gameState;
 
         gameState.game = gameScreen.game;
         gameState.gameScreen = gameScreen;
@@ -62,8 +63,9 @@ public class GameConstructor {
 
         gameState.player = new PlayerConstructor().createPlayer(gameState);
 
-        gameState.console = new GUIConsole(true);
-        gameState.console.setNoHoverAlpha(0.5f);
+        gameState.console = new InGameConsole(SecondGDXGame.instance.skin1x,true);
+        gameState.console.setDisplayKeyID(Input.Keys.GRAVE);
+        //gameState.console.setNoHoverAlpha(0.5f);
         gameState.console.setCommandExecutor(new ConsoleCommands(gameState));
 
         gameState.tester();
@@ -85,7 +87,7 @@ public class GameConstructor {
         RayHandler.useDiffuseLight(true );
         gameState.rayHandler.setAmbientLight(0f, 0f, 0f, 1f);
         gameState.rayHandler.setBlur(true);
-        gameState.rayHandler.setBlurNum(3);
+        gameState.rayHandler.setBlurNum(2);
 
         //game
         Item it = new Item(TileResolver.getTile("10mm_fmj"), "10mm FMJ bullets");

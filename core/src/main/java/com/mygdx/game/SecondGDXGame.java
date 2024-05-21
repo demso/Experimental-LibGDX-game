@@ -10,15 +10,18 @@ import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.screens.MainMenuScreen;
 
 public class SecondGDXGame extends Game {
+    public static SecondGDXGame instance;
     public SpriteBatch batch;
     public static MainMenuScreen menuScreen;
     public static GameScreen gameScreen;
     public static Skin skin;
+    public Skin skin1x;
     public static BitmapFont font;
     public static BitmapFont fontRoboto14;
     public static HandyHelper helper;
     @Override
     public void create() {
+        instance = this;
         helper = new HandyHelper();
         batch = new SpriteBatch();
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Xolonium-Regular.ttf"));
@@ -35,6 +38,8 @@ public class SecondGDXGame extends Game {
         generator.dispose(); // don't forget to dispose to avoid memory leaks!
         skin = new Skin(Gdx.files.internal("vis/skin/x2/uiskin.json"));
         skin.add("default14font", fontRoboto14);
+        skin1x = new Skin(Gdx.files.internal("vis/skin/x1/uiskin.json"));
+        skin1x.add("default14font", fontRoboto14);
         Button.ButtonStyle bs = skin.get(Button.ButtonStyle.class);
 
         menuScreen = new MainMenuScreen(this);

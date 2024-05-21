@@ -16,7 +16,7 @@ public class GameScreen implements Screen {
     public GameScreen(@NotNull SecondGDXGame game){
         this.game = game;
         gameState = new GameConstructor().createGameState(this);
-        GameState.Instance = gameState;
+        GameState.instance = gameState;
         this.hudStage = gameState.hud;
     }
 
@@ -30,7 +30,7 @@ public class GameScreen implements Screen {
     @Override
     public void resize(int width, int height) {
        hudStage.updateOnResize(width, height);
-       gameState.console.refresh(true);
+       gameState.console.refresh(false);
        gameState.gameStage.getViewport().update(width , height, false);
        gameState.camera.setToOrtho(false, width * (1f/ GameState.TILE_SIDE) * (1/ gameState.zoom), height * (1f/ GameState.TILE_SIDE) * (1/ gameState.zoom));
     }

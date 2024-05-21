@@ -9,10 +9,10 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.Interactable;
 import com.mygdx.game.gamestate.objects.Item;
-import com.mygdx.game.gamestate.objects.bodies.player.Player;
+import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
 
-import static com.mygdx.game.gamestate.GameState.Instance;
+import static com.mygdx.game.gamestate.GameState.instance;
 
 public class Closet implements BodyData, Interactable, Storage {
     TiledMapTileLayer.Cell cell;
@@ -28,7 +28,7 @@ public class Closet implements BodyData, Interactable, Storage {
     @Override
     public void interact(Player player) {
         boolean offPlayersInv = !Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT);
-        GameState.Instance.hud.toggleStorageInventoryHUD(this, offPlayersInv);
+        GameState.instance.hud.toggleStorageInventoryHUD(this, offPlayersInv);
     }
 
     @Override
@@ -50,12 +50,12 @@ public class Closet implements BodyData, Interactable, Storage {
     public void takeItem(Item item){
         item.removeFromWorld();
         inventoryItems.add(item);
-        Instance.hud.updateInvHUDContent();
+        instance.hud.updateInvHUDContent();
     }
     @Override
     public void dropItem(Item item){
         inventoryItems.removeValue(item, true);
-        Instance.hud.updateInvHUDContent();
+        instance.hud.updateInvHUDContent();
     }
 
     public Vector2 getPosition() {

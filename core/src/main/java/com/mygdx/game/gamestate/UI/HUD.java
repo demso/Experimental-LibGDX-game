@@ -26,6 +26,7 @@ import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
 
 public class HUD extends Stage {
+    boolean debug = false;
     public PlayerInventoryHUD playerInventoryHud;
     public StorageInventoryHUD storageInventoryHUD;
     HorizontalGroup panels;
@@ -59,7 +60,7 @@ public class HUD extends Stage {
         panels.addActor(storageInventoryHUD);
         storageInventoryHUD.onShow(storage);
         showPlayerInventoryHud();
-        if (GameState.Instance.player.getClosestObject() == null || GameState.Instance.player.getClosestObject().getUserData() != storage)
+        if (GameState.instance.player.getClosestObject() == null || GameState.instance.player.getClosestObject().getUserData() != storage)
             playerInventoryHud.storageInventoryNear();
         storageInventoryHUD.setVisible(true);
         setScrollFocus(storageInventoryHUD);
@@ -76,7 +77,7 @@ public class HUD extends Stage {
         storageInventoryHUD.setVisible(false);
         storageInventoryHUD.onClose();
         esClosablePopups.removeValue(storageInventoryHUD, true);
-        if (GameState.Instance.player.getClosestObject() == null || GameState.Instance.player.getClosestObject().getUserData() != storageInventoryHUD.storage)
+        if (GameState.instance.player.getClosestObject() == null || GameState.instance.player.getClosestObject().getUserData() != storageInventoryHUD.storage)
             playerInventoryHud.storageInventoryFar();
         updatePanels();
     }
@@ -92,7 +93,7 @@ public class HUD extends Stage {
         if (playerInventoryHud.isVisible())
             return;
         panels.addActorAt(0, playerInventoryHud);
-        playerInventoryHud.onShow(GameState.Instance.player);
+        playerInventoryHud.onShow(GameState.instance.player);
 
         playerInventoryHud.setVisible(true);
         setScrollFocus(playerInventoryHud);
@@ -119,23 +120,33 @@ public class HUD extends Stage {
             showPlayerInventoryHud();
     }
 
+    Vector2 oldSPos = new Vector2(),
+            oldPPos = new Vector2(),
+            offsetS = new Vector2(),
+            offsetP = new Vector2(),
+            temZeroVector = new Vector2(0, 0);
+
     public void updatePanels(){
-        Vector2 oldSPos = new Vector2(panels.getX() + storageInventoryHUD.getX(), panels.getY() + storageInventoryHUD.getY()),
-                oldPPos = new Vector2(panels.getX() + playerInventoryHud.getX(), panels.getY() + playerInventoryHud.getY());
+        if (storageInventoryHUD.isVisible()){
+            temZeroVector.set(0,0);
+            oldSPos.set(storageInventoryHUD.localToStageCoordinates(temZeroVector));
+        }
+        if (playerInventoryHud.isVisible()){
+            temZeroVector.set(0,0);
+            oldPPos.set(playerInventoryHud.localToStageCoordinates(temZeroVector));
+        }
 
         panels.setPosition((Gdx.graphics.getWidth()- panels.getPrefWidth())/2f,(Gdx.graphics.getHeight() - panels.getMaxHeight())/2f, Align.bottomLeft);
         panels.validate();
 
-        Vector2 newSPos = new Vector2(panels.getX() + storageInventoryHUD.getX(), panels.getY() + storageInventoryHUD.getY()),
-                newPPos = new Vector2(panels.getX() + storageInventoryHUD.getX(), panels.getY() + storageInventoryHUD.getY());
-        Vector2 offsetS = new Vector2(newSPos).sub(oldSPos),
-                offsetP = new Vector2(newPPos).sub(oldPPos);
-
         if (storageInventoryHUD.isVisible()){
-            storageInventoryHUD.onPositionChanged(offsetS);
-            System.out.println(storageInventoryHUD.localToScreenCoordinates(new Vector2(Vector2.Zero)));
+            temZeroVector.set(0,0);
+            storageInventoryHUD.onPositionChanged(storageInventoryHUD.localToStageCoordinates(temZeroVector).sub(oldSPos));
         }
-        if (playerInventoryHud.isVisible()) playerInventoryHud.onPositionChanged(offsetP);
+        if (playerInventoryHud.isVisible()){
+            temZeroVector.set(0,0);
+            playerInventoryHud.onPositionChanged(playerInventoryHud.localToStageCoordinates(temZeroVector).sub(oldPPos));
+        }
 
     }
 
@@ -157,6 +168,9 @@ public class HUD extends Stage {
     }
 
     public boolean closeTopPopup(){
+        if (esClosablePopups.contains(panels, true) && panels.getChildren().size == 0)
+            esClosablePopups.removeValue(panels, true);
+        
         if (esClosablePopups.isEmpty())
             return false;
 
@@ -227,10 +241,13 @@ public class HUD extends Stage {
         float height = Gdx.graphics.getHeight();
         float width = Gdx.graphics.getWidth();
         label.setPosition(100, height - 100);
-        if(GameState.Instance.debug)
+        if(GameState.instance.debug)
             drawTileDebugInfo();
         else
             label.setText("");
+
+        if (debug)
+            SecondGDXGame.helper.log("[HUD:250] " + esClosablePopups.toString());
     }
 
     public HUD(GameState gi, ScreenViewport screenViewport, SpriteBatch batch) {

@@ -50,7 +50,7 @@ public class Zombie extends Entity {
         getBody().setUserData(this);
         circle.dispose();
 
-        zombieObject = new GameObject(getName(), GameState.Instance.unbox);
+        zombieObject = new GameObject(getName(), GameState.instance.unbox);
 
         new Box2dBehaviour(getBody(), zombieObject);
         new SpriteBehaviour(zombieObject, tile.getTextureRegion(), Globals.ZOMBIE_RO);

@@ -21,7 +21,7 @@ public class Bullet implements BodyData {
         float bulletSpeed = 200f;
         body = BodyResolver.bulletBody(position.x, position.y, this);
 
-        bulletObject = new GameObject(getName(), GameState.Instance.unbox);
+        bulletObject = new GameObject(getName(), GameState.instance.unbox);
 
         new Box2dBehaviour(body, bulletObject);
         new SpriteBehaviour(bulletObject, 0.5f, 0.5f, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);

@@ -39,10 +39,10 @@ public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
 
     public void showItemContextMenu(ItemEntry itemEntry){
         Vector3 mousePosition = hud.getCamera().unproject(new Vector3((float) Gdx.input.getX(), (float) Gdx.input.getY(), 0));
+        contextMenu.update();
         contextMenu.setPosition(itemEntry, mousePosition.x, mousePosition.y);
         contextMenu.setVisible(true);
         contextMenu.setZIndex(hud.getActors().size+1);
-        contextMenu.update();
 
         popups.add(contextMenu);
         hud.showPopup(contextMenu);
@@ -54,31 +54,30 @@ public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
         hud.closePopup(contextMenu);
     }
 
-    public void contextAction(ContextMenu.ConAction action, ContextMenu contextMenu){
+    public boolean contextAction(ContextMenu.ConAction action, ContextMenu contextMenu){
+        boolean handled = true;
         switch (action){
             case Put -> {
                 putItemFromInventory(contextMenu.itemEntry);
-                closeItemContextMenu(contextMenu);
             }
             case Equip -> {
-                GameState.Instance.player.equipItem(contextMenu.itemEntry.item);
-                closeItemContextMenu(contextMenu);
+                contextAction(ContextMenu.ConAction.Take, contextMenu);
+                GameState.instance.player.equipItem(contextMenu.itemEntry.item);
             }
             case Description -> {}
             case Take -> {
-                GameState.Instance.player.takeItem(contextMenu.itemEntry.item);
+                GameState.instance.player.takeItem(contextMenu.itemEntry.item);
                 storage.dropItem(contextMenu.itemEntry.item);
-                closeItemContextMenu(contextMenu);
             }
-            case Store -> {
-
-            }
+            default -> handled = false;
         }
+        closeItemContextMenu(contextMenu);
+        return handled;
     }
 
     public void putItemFromInventory(ItemEntry itemEntry){
         storage.dropItem(itemEntry.item);
-        itemEntry.item.allocate(GameState.Instance.player.getPosition());
+        itemEntry.item.allocate(GameState.instance.player.getPosition());
     }
 
     public void onClose(){
@@ -114,7 +113,7 @@ public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
         ScrollPane.ScrollPaneStyle sps = this.getStyle();
         sps.background = skin.getDrawable("default-pane");
         setSize(400,300);
-        setName("PlayerInventoryScrollPane");
+        setName("StorageInventoryScrollPane");
         setFadeScrollBars(false);
         addListener(new InputListener(){
             @Override

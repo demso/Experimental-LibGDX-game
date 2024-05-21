@@ -14,7 +14,7 @@ dependencies {
   api "com.github.tommyettinger:libgdx-utils-box2d:$utilsBox2dVersion"
   api "com.github.tommyettinger:libgdx-utils:$utilsVersion"
   api "com.kotcrab.vis:vis-ui:$visUiVersion"
-  implementation "com.strongjoshua:libgdx-inGameConsole:1.0.0"
+  //implementation "com.strongjoshua:libgdx-inGameConsole:1.0.0"
   implementation 'org.jetbrains:annotations:24.0.0'
   implementation "space.earlygrey:shapedrawer:$shapedrawerVersion"
   //implementation "net.onedaybeard.artemis:artemis-odb:$artemisOdbVersion"

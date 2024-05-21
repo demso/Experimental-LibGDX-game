@@ -8,9 +8,8 @@ import com.badlogic.gdx.physics.box2d.Filter;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.factories.BodyResolver;
-import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 import com.mygdx.game.gamestate.objects.Interactable;
-import com.mygdx.game.gamestate.objects.bodies.player.Player;
+import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
 
 public class Window implements Interactable, BodyData {
@@ -23,7 +22,7 @@ public class Window implements Interactable, BodyData {
     GameState gameState;
     boolean isOpen = false;
     public Window(TiledMapTileLayer.Cell cell, Body body){
-        this.gameState = GameState.Instance;
+        this.gameState = GameState.instance;
         this.cell = cell;
         physicalBody = body;
         closedFilter = new Filter();
