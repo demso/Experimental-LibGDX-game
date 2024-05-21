@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<template>
- <object name="treeshadow1" type="treeshadow">
-  <polygon points="0,0 2,1 6,1.27273 7.90909,2 9.90909,1.27273 13.8182,1.18182 13.7273,0.181818 15.3636,-0.909091 12.3636,-4.90909 2.54545,-4.72727"/>
- </object>
-</template>
