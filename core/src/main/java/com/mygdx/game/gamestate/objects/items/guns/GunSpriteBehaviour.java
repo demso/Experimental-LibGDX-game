@@ -80,17 +80,12 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
 
     //float elapsedTime;
 
-    float oldRotation = 0f;
     @Override
     public void update(float delta) {
         Vector3 mousePos = GameState.instance.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
         float rotation = Double.valueOf(Math.toDegrees(Math.atan2(mousePos.y - player.getPosition().y, mousePos.x - player.getPosition().x))).floatValue()-34;
 
         rotateAxis.set(0f, 0f, 1);
-
-
-
-        //transform.idt();
 
        if (interToRecPos != null && progressToRec < 1f){
            progressToRec += delta/lifeTime;
@@ -100,28 +95,19 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
            alpha = interToRecPos.apply(progressToRec);
            transform.getTranslation(tempVec);
            transform.translate(-recoil * alpha - tempVec.x, -recoil * alpha - tempVec.y);
-           //sprite.setPosition(-recoil * alpha + player.getPosition().x, -recoil * alpha + player.getPosition().y);
-           //transform.setToTranslation(-recoil * alpha, -recoil * alpha);
        }
-//       else
-//        if (interToOrig != null && progressToOrig < 1f){
-//            progressToOrig += delta/lifeTime;
-//            progressToOrig = Math.min(1f, progressToOrig);
-//            alpha = interToOrig.apply(progressToOrig);
-//            transform.getTranslation(tempVec);
-//            transform.translate(recoil * alpha - tempVec.x, recoil * alpha - tempVec.y);
-//            //transform.translate(recoil * alpha, recoil * alpha);
-//        }
+       else
+        if (interToOrig != null && progressToOrig < 1f){
+            progressToOrig += delta/lifeTime;
+            progressToOrig = Math.min(1f, progressToOrig);
+            alpha = interToOrig.apply(progressToOrig);
+            transform.getTranslation(tempVec);
+            transform.translate(recoil * alpha - tempVec.x, recoil * alpha - tempVec.y);
+        }
 
-//        if (oldRotation != rotation)
-//            transform.rotate(oldRotation - rotation);
         rotationTransform.setToRotation(rotation);
-        //transform.rotate(rotation);
 
         transformSprite(transform);
-
-        oldRotation = rotation;
-        //transform.setToScaling(sprite.getScaleX(), sprite.getScaleY());
     }
 
     public void transformSprite(Matrix3 mat){
