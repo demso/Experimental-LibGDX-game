@@ -20,7 +20,7 @@ import com.mygdx.game.gamestate.UI.console.ConsoleCommands;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.gamestate.UI.HUD;
-import com.mygdx.game.gamestate.objects.Item;
+import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.player.PlayerConstructor;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTmxMapLoader;
 import dev.lyze.gdxUnBox2d.UnBox;
@@ -51,6 +51,7 @@ public class GameConstructor {
 
         gameState.map = new MyTmxMapLoader(gameState).load(gameState.mapToLoad);
 
+        gameState.shapeRenderer.setProjectionMatrix(gameState.camera.combined);
         gameState.renderer = new OrthogonalTiledMapRenderer(gameState.map, 1f / GameState.TILE_SIDE);
         gameState.batch = gameState.renderer.getBatch();
         gameState.debugRendererPh = new Box2DDebugRenderer();

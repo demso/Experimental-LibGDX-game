@@ -8,7 +8,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.Interactable;
-import com.mygdx.game.gamestate.objects.Item;
+import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
 

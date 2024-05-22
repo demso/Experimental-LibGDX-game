@@ -35,12 +35,14 @@ public class Door implements Interactable, BodyData {
     public void open(){
         isOpen = true;
         physicalBody.getFixtureList().get(0).getFilterData().set(openFilter);
+        physicalBody.getFixtureList().get(0).refilter();
         cell.setTile(openTile);
     }
 
     public void close(){
         isOpen = false;
         physicalBody.getFixtureList().get(0).getFilterData().set(closedFilter);
+        physicalBody.getFixtureList().get(0).refilter();
         cell.setTile(closedTile);
     }
 

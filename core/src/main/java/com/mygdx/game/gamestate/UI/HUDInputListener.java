@@ -56,7 +56,8 @@ public class HUDInputListener extends InputListener {
         }
         if (keycode == Input.Keys.T){
             if (instance.player.equipedItem != null && instance.player.equipedItem.itemName.equals("Deagle .44"))
-                instance.fireBullet(instance.player);
+                instance.player.fire();
+                //instance.fireBullet(instance.player);
         }
         if (keycode == Input.Keys.W || keycode == Input.Keys.UP){
             instance.player.playerObject.getBehaviour(PlayerHandler.class).moveUp = false;

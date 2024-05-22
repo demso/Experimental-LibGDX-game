@@ -21,7 +21,7 @@ import com.mygdx.game.gamestate.UI.inventory.ContextMenu;
 import com.mygdx.game.gamestate.UI.inventory.PlayerInventoryHUD;
 import com.mygdx.game.gamestate.UI.inventory.StorageInventoryHUD;
 import com.mygdx.game.gamestate.objects.bodies.userdata.SimpleUserData;
-import com.mygdx.game.gamestate.objects.Item;
+import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
 

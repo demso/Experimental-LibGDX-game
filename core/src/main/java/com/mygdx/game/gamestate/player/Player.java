@@ -4,7 +4,8 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
-import com.mygdx.game.gamestate.objects.Item;
+import com.mygdx.game.gamestate.objects.items.Item;
+import com.mygdx.game.gamestate.objects.items.guns.Gun;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
 import dev.lyze.gdxUnBox2d.GameObject;
 import lombok.Getter;
@@ -69,6 +70,9 @@ public class Player extends Entity implements Storage {
 
     public void equipItem(Item item){
         equipedItem = item;
+        if (item instanceof Gun gun){
+            gun.equip(this);
+        }
     }
     public Item freeHands(){
         Item item = equipedItem;
@@ -96,5 +100,10 @@ public class Player extends Entity implements Storage {
         setHp(getMaxHp());
         isAlive = true;
         SecondGDXGame.helper.log("Player revived");
+    }
+
+    public void fire(){
+        if (equipedItem != null && equipedItem instanceof Gun gun)
+            gun.fireBullet(this);
     }
 }

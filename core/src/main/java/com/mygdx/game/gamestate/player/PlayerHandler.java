@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.gamestate.GameState;
+import com.mygdx.game.gamestate.objects.items.guns.Gun;
 import dev.lyze.gdxUnBox2d.GameObject;
 import dev.lyze.gdxUnBox2d.behaviours.BehaviourAdapter;
 
@@ -77,18 +78,22 @@ public class PlayerHandler extends BehaviourAdapter {
         else
             batch.draw(currentFrame, player.getPosition().x - player.WIDTH/2, player.getPosition().y - player.WIDTH * 1/4, player.WIDTH, player.HEIGHT);
         if (player.equipedItem != null){
-            TextureRegion tileTextureRegion = player.equipedItem.item.tile.getTextureRegion();
-            float width = 0.5f;
-            float height = 0.5f;
-            float offsetX = 0;
-            float offsetY = 0f;
-            Vector3 mousePos = GameState.instance.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-            float rotation = Double.valueOf(Math.toDegrees(Math.atan2(mousePos.y - player.getPosition().y, mousePos.x - player.getPosition().x))).floatValue()-34;
-            batch.draw(tileTextureRegion, player.getPosition().x - (tileTextureRegion.getRegionWidth()*width /2f + offsetX)/(float) GameState.TILE_SIDE, player.getPosition().y -
-                    (tileTextureRegion.getRegionHeight()*height/2f + offsetY)/(float) GameState.TILE_SIDE,
-                    tileTextureRegion.getRegionWidth()*width/2f/(float) GameState.TILE_SIDE,
-                    tileTextureRegion.getRegionHeight()*height/2f/ (float) GameState.TILE_SIDE,
-                    width, height, 1,1,rotation);
+            if (player.equipedItem instanceof Gun gun) {
+                gun.getSpriteBehaviour().render(batch);
+            } else {
+                TextureRegion tileTextureRegion = player.equipedItem.item.tile.getTextureRegion();
+                float width = 0.5f;
+                float height = 0.5f;
+                float offsetX = 0;
+                float offsetY = 0f;
+                Vector3 mousePos = GameState.instance.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+                float rotation = Double.valueOf(Math.toDegrees(Math.atan2(mousePos.y - player.getPosition().y, mousePos.x - player.getPosition().x))).floatValue() - 34;
+                batch.draw(tileTextureRegion, player.getPosition().x - (tileTextureRegion.getRegionWidth() * width / 2f + offsetX) / (float) GameState.TILE_SIDE,
+                        player.getPosition().y - (tileTextureRegion.getRegionHeight() * height / 2f + offsetY) / (float) GameState.TILE_SIDE,
+                        tileTextureRegion.getRegionWidth() * width / 2f / (float) GameState.TILE_SIDE,
+                        tileTextureRegion.getRegionHeight() * height / 2f / (float) GameState.TILE_SIDE, width, height,
+                        1, 1, rotation);
+            }
         }
     }
 

@@ -1,7 +1,7 @@
 package com.mygdx.game.gamestate.objects.tiles;
 
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.game.gamestate.objects.Item;
+import com.mygdx.game.gamestate.objects.items.Item;
 
 public interface Storage {
     public Array<Item> getInventoryItems();

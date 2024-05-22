@@ -3,6 +3,7 @@ package com.mygdx.game.gamestate.objects.behaviours;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.SecondGDXGame;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
@@ -12,10 +13,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class SpriteBehaviour extends BehaviourAdapter {
-    private float offsetX;
-    private float offsetY;
-    @Getter @Setter private Sprite sprite;
-    private final Vector2 position = new Vector2();
+    protected float offsetX;
+    protected float offsetY;
+    @Getter @Setter protected Sprite sprite;
+    protected final Vector2 position = new Vector2();
 
     public SpriteBehaviour(GameObject gameObject, TextureRegion textureRegion, float renderOrder) {
         super(gameObject);
@@ -42,6 +43,10 @@ public class SpriteBehaviour extends BehaviourAdapter {
         setOffset(-sprite.getWidth()/2f, -sprite.getHeight()/2f);
     }
 
+    public SpriteBehaviour(GameObject gameObject){
+        super(gameObject);
+    }
+
     public SpriteBehaviour setOffset(float x, float y){
         offsetX = x;
         offsetY = y;
@@ -51,14 +56,16 @@ public class SpriteBehaviour extends BehaviourAdapter {
     @Override
     public void fixedUpdate() {
         Box2dBehaviour box2dBehaviour = getGameObject().getBehaviour(Box2dBehaviour.class);
-        if (box2dBehaviour != null)
+        if (box2dBehaviour != null) {
+            if (box2dBehaviour.getBody().getPosition().equals(position)) return;
+
             position.set(box2dBehaviour.getBody().getPosition());
-        else {
+
+            position.add(offsetX, offsetY);
+            this.sprite.setPosition(position.x, position.y);
+        } else {
             SecondGDXGame.helper.log("[SpriteBehaviour] No Box2dBehaviour.class");
         };
-
-        position.add(offsetX, offsetY);
-        this.sprite.setPosition(position.x, position.y);
     }
 
     @Override

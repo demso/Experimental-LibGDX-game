@@ -15,12 +15,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.gamestate.UI.console.InGameConsole;
+import com.mygdx.game.gamestate.objects.items.guns.Gun;
 import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.objects.bullet.Bullet;
-import com.mygdx.game.gamestate.objects.Item;
+import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.player.Player;
 import dev.lyze.gdxUnBox2d.UnBox;
 import net.dermetfan.gdx.physics.box2d.Box2DUtils;
@@ -46,7 +47,7 @@ public class GameState {
     public Box2DDebugRenderer debugRendererPh;
     public float zoom = 2 ;
     public final String mapToLoad = "tiled/worldmap.tmx";
-    public static final int TILE_SIDE = 32;
+    public static final float TILE_SIDE = 32f;
     public HUD hud;
     public Stage gameStage;
     public float physicsStep = 1/144f;
@@ -59,7 +60,7 @@ public class GameState {
         player.takeItem(new Item(TileResolver.getTile("beef"), "Beef"));
         player.takeItem(new Item(TileResolver.getTile("watches"), "Watches"));
         player.takeItem(new Item(TileResolver.getTile("shotgun_ammo"), "Shotgun ammo"));
-        player.takeItem(new Item(TileResolver.getTile("deagle_44"), "Deagle .44"));
+        player.takeItem(new Gun(TileResolver.getTile("deagle_44"), "Deagle .44"));
         //MobsFactory.spawnZombie(5, 85);
     }
 
