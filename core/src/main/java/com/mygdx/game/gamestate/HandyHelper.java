@@ -3,6 +3,7 @@ package com.mygdx.game.gamestate;
 import com.mygdx.game.gamestate.UI.console.sjconsole.LogLevel;
 
 public class HandyHelper {
+    public  static HandyHelper instance;
     boolean noSpam = true;
     public void log(String toLog){
         if (noSpam)

@@ -24,6 +24,7 @@ public class SecondGDXGame extends Game {
         instance = this;
         helper = new HandyHelper();
         batch = new SpriteBatch();
+        HandyHelper.instance = helper;
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Xolonium-Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 20;

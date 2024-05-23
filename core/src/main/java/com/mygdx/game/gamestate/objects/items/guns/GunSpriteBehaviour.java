@@ -5,10 +5,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
-import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
+import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.objects.behaviours.SpriteBehaviour;
 import com.mygdx.game.gamestate.player.Player;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
@@ -18,9 +17,9 @@ import space.earlygrey.shapedrawer.ShapeDrawer;
 import static com.badlogic.gdx.graphics.g2d.Batch.*;
 
 public class GunSpriteBehaviour extends SpriteBehaviour {
-
+    public static boolean debug = false;
     Player player;
-    Matrix3 transform;
+    Matrix3 translateScaleTransform;
     Matrix3 rotationTransform;
     float recoil = 10f/32f;
     public boolean equipped = false;
@@ -52,62 +51,69 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
     }
 
     private void init(){
-        transform = new Matrix3();
+        translateScaleTransform = new Matrix3();
         rotationTransform = new Matrix3();
         player = GameState.instance.player;
         shapeDrawer = new ShapeDrawer(GameState.instance.batch, new TextureRegion(GameState.instance.userSelection, 1,1, 1,1));
         shapeDrawer.setDefaultLineWidth(0.5f/GameState.TILE_SIDE);
+        recoilInterpolation = Interpolation.pow3InInverse;
+        returnInterpolation = Interpolation.pow3;
+        rotateAxis.set(0f, 0f, 1);
 
-
-        transform.scale(0.5f, 0.5f);
+        translateScaleTransform.scale(0.5f, 0.5f);
     }
 
-    Interpolation interToRecPos, interToOrig;
+    Interpolation recoilInterpolation, returnInterpolation;
 
-    float progressToRec = 1, progressToOrig = 1, alpha;
+    float recoilProgress = 1, returnProgress = 1, commonProgress, alpha;
 
     Vector2 recPos = new Vector2();
 
-    float lifeTime = 1;
+    float recoilTime = 0.5f;
+    float returnTime = 1f;
 
     public void fire(){
-        interToRecPos = Interpolation.linear;
-        interToOrig = Interpolation.linear;
+
         //Vector3 mousePos = GameState.instance.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-        if (progressToRec == 1f)
-            progressToRec = 0f;
+        if (recoilProgress == 1f)
+            recoilProgress = 0f;
     }
 
     //float elapsedTime;
+
+    float lastValue;
+    Vector2 distanceFromOrigin = new Vector2();
 
     @Override
     public void update(float delta) {
         Vector3 mousePos = GameState.instance.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
         float rotation = Double.valueOf(Math.toDegrees(Math.atan2(mousePos.y - player.getPosition().y, mousePos.x - player.getPosition().x))).floatValue()-34;
 
-        rotateAxis.set(0f, 0f, 1);
-
-       if (interToRecPos != null && progressToRec < 1f){
-           progressToRec += delta/lifeTime;
-           progressToRec = Math.min(1f, progressToRec);
-           if(progressToRec == 1f)
-               progressToOrig = 0f;
-           alpha = interToRecPos.apply(progressToRec);
-           transform.getTranslation(tempVec);
-           transform.translate(-recoil * alpha - tempVec.x, -recoil * alpha - tempVec.y);
-       }
-       else
-        if (interToOrig != null && progressToOrig < 1f){
-            progressToOrig += delta/lifeTime;
-            progressToOrig = Math.min(1f, progressToOrig);
-            alpha = interToOrig.apply(progressToOrig);
-            transform.getTranslation(tempVec);
-            transform.translate(recoil * alpha - tempVec.x, recoil * alpha - tempVec.y);
+       if (recoilInterpolation != null && recoilProgress < 1f){
+            recoilProgress += delta/ recoilTime;
+            recoilProgress = Math.min(1f, recoilProgress);
+            if(recoilProgress == 1f)
+                returnProgress = 0f;
+            alpha = recoilInterpolation.apply(recoilProgress);
+            translateScaleTransform.getTranslation(tempVec);
+            commonProgress = Math.abs(tempVec.len() / recoil);
+            translateScaleTransform.translate(-recoil * (alpha - lastValue) , -recoil * (alpha - lastValue));
+       } else if (returnInterpolation != null && returnProgress < 1f){
+            returnProgress += delta / returnTime;
+            returnProgress = Math.min(1f, returnProgress);
+            alpha = 1 - returnInterpolation.apply(returnProgress);
+            translateScaleTransform.getTranslation(tempVec);
+            commonProgress = Math.abs(tempVec.len() / recoil);
+            translateScaleTransform.translate(-recoil * (alpha - lastValue), -recoil * (alpha - lastValue));
         }
+
+        lastValue = alpha;
 
         rotationTransform.setToRotation(rotation);
 
-        transformSprite(transform);
+        transformSprite(translateScaleTransform);
+
+        HandyHelper.instance.log("[GunSpriteBehaviour:113] recoilProgress: " + recoilProgress + " returnProgress: " + returnProgress);
     }
 
     public void transformSprite(Matrix3 mat){
@@ -171,8 +177,10 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
     @Override
     public void render(Batch batch) {
         super.render(batch);
-        shapeDrawer.setColor(Color.CYAN);
-        float[] vertices = sprite.getVertices();
-        shapeDrawer.polygon(new float[]{vertices[X1], vertices[Y1], vertices[X2], vertices[Y2], vertices[X3], vertices[Y3], vertices[X4], vertices[Y4]});
+        if (debug) {
+            shapeDrawer.setColor(Color.CYAN);
+            float[] vertices = sprite.getVertices();
+            shapeDrawer.polygon(new float[]{vertices[X1], vertices[Y1], vertices[X2], vertices[Y2], vertices[X3], vertices[Y3], vertices[X4], vertices[Y4]});
+        }
     }
 }

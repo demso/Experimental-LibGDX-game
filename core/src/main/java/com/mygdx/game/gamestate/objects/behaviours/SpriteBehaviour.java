@@ -64,7 +64,7 @@ public class SpriteBehaviour extends BehaviourAdapter {
             position.add(offsetX, offsetY);
             this.sprite.setPosition(position.x, position.y);
         } else {
-            SecondGDXGame.helper.log("[SpriteBehaviour] No Box2dBehaviour.class");
+           // SecondGDXGame.helper.log("[SpriteBehaviour] No Box2dBehaviour.class");
         };
     }
 
