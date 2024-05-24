@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.gamestate.GameState;
-import com.mygdx.game.gamestate.objects.items.Item;
+import com.mygdx.game.gamestate.objects.items.SimpleItem;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
@@ -29,7 +29,7 @@ public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
     public void refill(){
         table.clearChildren();
         ItemEntry itemEntry;
-        for (Item curItem : storage.getInventoryItems()){
+        for (SimpleItem curItem : storage.getInventoryItems()){
             itemEntry = new ItemEntry(this, curItem);
             table.add(itemEntry).growX().align(Align.left);
 

@@ -1,10 +1,10 @@
 package com.mygdx.game.gamestate.objects.tiles;
 
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.game.gamestate.objects.items.Item;
+import com.mygdx.game.gamestate.objects.items.SimpleItem;
 
 public interface Storage {
-    public Array<Item> getInventoryItems();
-    public void dropItem(Item item);
-    public void takeItem(Item item);
+    public Array<SimpleItem> getInventoryItems();
+    public void dropItem(SimpleItem item);
+    public void takeItem(SimpleItem item);
 }

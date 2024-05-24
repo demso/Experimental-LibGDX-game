@@ -4,7 +4,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
-import com.mygdx.game.gamestate.objects.items.Item;
+import com.mygdx.game.gamestate.objects.items.SimpleItem;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
 import dev.lyze.gdxUnBox2d.GameObject;
@@ -33,9 +33,9 @@ public class Player extends Entity implements Storage {
     public float normalSpeed = 3f;
     public Body closestObject;
 
-    Array<Item> inventoryItems = new Array<>();
+    Array<SimpleItem> inventoryItems = new Array<>();
 
-    public Item equipedItem;
+    public SimpleItem equipedItem;
 
     public GameObject playerObject;
 
@@ -50,32 +50,32 @@ public class Player extends Entity implements Storage {
     }
 
     @Override
-    public void takeItem(Item item){
+    public void takeItem(SimpleItem item){
         item.removeFromWorld();
         inventoryItems.add(item);
         instance.hud.updateInvHUDContent();
     }
     @Override
-    public void dropItem(Item item){
+    public void dropItem(SimpleItem item){
         if (equipedItem == item)
             equipedItem = null;
         inventoryItems.removeValue(item, true);
         instance.hud.updateInvHUDContent();
     }
     @Override
-    public Array<Item> getInventoryItems(){
+    public Array<SimpleItem> getInventoryItems(){
         return inventoryItems;
     }
 
 
-    public void equipItem(Item item){
+    public void equipItem(SimpleItem item){
         equipedItem = item;
         if (item instanceof Gun gun){
             gun.equip(this);
         }
     }
-    public Item freeHands(){
-        Item item = equipedItem;
+    public SimpleItem freeHands(){
+        SimpleItem item = equipedItem;
         equipedItem = null;
         return item;
     }

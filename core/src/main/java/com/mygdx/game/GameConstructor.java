@@ -20,7 +20,7 @@ import com.mygdx.game.gamestate.UI.console.ConsoleCommands;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.gamestate.UI.HUD;
-import com.mygdx.game.gamestate.objects.items.Item;
+import com.mygdx.game.gamestate.objects.items.SimpleItem;
 import com.mygdx.game.gamestate.player.PlayerConstructor;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTmxMapLoader;
 import dev.lyze.gdxUnBox2d.UnBox;
@@ -91,7 +91,7 @@ public class GameConstructor {
         gameState.rayHandler.setBlurNum(2);
 
         //game
-        Item it = new Item(TileResolver.getTile("10mm_fmj"), "10mm FMJ bullets");
+        SimpleItem it = new SimpleItem(TileResolver.getTile("10mm_fmj"), "10mm FMJ bullets");
         it.allocate(new Vector2(3.5f,96.5f));
     }
 }

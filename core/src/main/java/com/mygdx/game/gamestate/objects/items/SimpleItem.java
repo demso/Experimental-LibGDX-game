@@ -1,0 +1,119 @@
+package com.mygdx.game.gamestate.objects.items;
+
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Null;
+import com.mygdx.game.gamestate.GameState;
+import com.mygdx.game.gamestate.Globals;
+import com.mygdx.game.gamestate.objects.Interactable;
+import com.mygdx.game.gamestate.objects.behaviours.SpriteBehaviour;
+import com.mygdx.game.gamestate.factories.BodyResolver;
+import com.mygdx.game.gamestate.player.Player;
+import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
+import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
+import dev.lyze.gdxUnBox2d.Box2dBehaviour;
+import dev.lyze.gdxUnBox2d.GameObject;
+import lombok.Getter;
+
+import static com.mygdx.game.gamestate.GameState.instance;
+
+public class SimpleItem implements BodyData, Interactable {
+    public TiledMapTile tile;
+    @Getter
+    public Body physicalBody;
+    public Table mouseHandler;
+    public SimpleItem item;
+
+    public GameState gameState;
+    public String tileName = "{No tile name}";
+    public String itemName = "{No name item}";
+    public String description = "First you must develop a Skin that implements all the widgets you plan to use in your layout. You can't use a widget if it doesn't have a valid style. Do this how you would usually develop a Skin in Scene Composer.";
+    public float spriteWidth = 0.7f;
+    public float spiteHeight = 0.7f;
+    protected GameObject GO;
+    protected @Getter SpriteBehaviour spriteBehaviour;
+
+    public SimpleItem(TiledMapTile tile, String itemName){
+        this.tile = tile;
+        this.item = this;
+        this.tileName = tile.getProperties().get("name", "no_name", String.class);
+        this.gameState = instance;
+        this.itemName = itemName;
+
+        mouseHandler = new Table();
+        mouseHandler.setSize(spriteWidth-0.1f,spiteHeight-0.1f);
+        mouseHandler.setTouchable(Touchable.enabled);
+        mouseHandler.addListener(new ClickListener(){
+            @Override
+            public void enter (InputEvent event, float x, float y, int pointer, @Null Actor fromActor) {
+                super.enter(event, x, y, pointer, fromActor);
+                gameState.hud.debugEntries.put(tileName + "_ClickListener", "Pointing at "+tileName+ " at "+getPosition());
+                gameState.hud.showItemInfoWindow(item);
+            }
+
+            @Override
+            public void exit (InputEvent event, float x, float y, int pointer, @Null Actor toActor) {
+                super.exit(event, x, y, pointer, toActor);
+                gameState.hud.debugEntries.removeKey(tileName + "_ClickListener");
+                gameState.hud.hideItemInfoWindow(item);
+            }
+        });
+
+        gameState.gameStage.addActor(mouseHandler);
+
+        GO = new GameObject(itemName, false, instance.unbox);
+        spriteBehaviour = new SpriteBehaviour(GO, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
+    }
+
+    public SimpleItem(String tileName, String itemName){
+        this(TileResolver.getTile(tileName), itemName);
+    }
+
+    public Body allocate(Vector2 position){
+        physicalBody = BodyResolver.itemBody(position.x, position.y, this);
+        new Box2dBehaviour(physicalBody, GO);
+        GO.setEnabled(true);
+        mouseHandler.setPosition(getPosition().x- mouseHandler.getWidth()/2f, getPosition().y- mouseHandler.getHeight()/2f);
+        return physicalBody;
+    }
+
+    public void removeFromWorld(){
+        if (mouseHandler != null){
+            gameState.gameStage.getActors().removeValue(mouseHandler, true);
+        }
+        if (physicalBody != null){
+            clearPhysicalBody();
+        }
+    }
+
+    public Vector2 getPosition(){
+        return physicalBody.getPosition();
+    }
+
+    public void clearPhysicalBody(){
+        GO.setEnabled(false);
+        physicalBody = null;
+        GO.destroy(GO.getBox2dBehaviour());
+    }
+
+    @Override
+    public String getName() {
+        return "item " + itemName;
+    }
+
+    @Override
+    public Object getData() {
+        return this;
+    }
+
+    @Override
+    public void interact(Player player) {
+        instance.player.takeItem(this);
+    }
+}

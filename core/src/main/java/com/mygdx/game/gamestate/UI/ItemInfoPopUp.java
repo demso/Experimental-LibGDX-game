@@ -4,14 +4,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.mygdx.game.*;
-import com.mygdx.game.gamestate.objects.items.Item;
+import com.mygdx.game.gamestate.objects.items.SimpleItem;
 
 public class ItemInfoPopUp extends Table {
     Image itemImage;
     Label itemName;
     VerticalGroup itemPropsVGroup;
     Label itemDesc;
-    public ItemInfoPopUp(Item item, float x, float y){
+    public ItemInfoPopUp(SimpleItem item, float x, float y){
         super(SecondGDXGame.skin);
         this.setBackground("default-pane");
 

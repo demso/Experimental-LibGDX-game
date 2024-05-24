@@ -21,7 +21,7 @@ import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.objects.bullet.Bullet;
-import com.mygdx.game.gamestate.objects.items.Item;
+import com.mygdx.game.gamestate.objects.items.SimpleItem;
 import com.mygdx.game.gamestate.player.Player;
 import dev.lyze.gdxUnBox2d.UnBox;
 import net.dermetfan.gdx.physics.box2d.Box2DUtils;
@@ -56,10 +56,10 @@ public class GameState {
     public UnBox unbox;
 
     public void tester(){
-        player.takeItem(new Item(TileResolver.getTile("10mm_fmj"), "10mm FMJ bullets"));
-        player.takeItem(new Item(TileResolver.getTile("beef"), "Beef"));
-        player.takeItem(new Item(TileResolver.getTile("watches"), "Watches"));
-        player.takeItem(new Item(TileResolver.getTile("shotgun_ammo"), "Shotgun ammo"));
+        player.takeItem(new SimpleItem(TileResolver.getTile("10mm_fmj"), "10mm FMJ bullets"));
+        player.takeItem(new SimpleItem(TileResolver.getTile("beef"), "Beef"));
+        player.takeItem(new SimpleItem(TileResolver.getTile("watches"), "Watches"));
+        player.takeItem(new SimpleItem(TileResolver.getTile("shotgun_ammo"), "Shotgun ammo"));
         player.takeItem(new Gun(TileResolver.getTile("deagle_44"), "Deagle .44"));
         player.equipItem(new Gun(TileResolver.getTile("deagle_44"), "Deagle .44"));
         //MobsFactory.spawnZombie(5, 85);

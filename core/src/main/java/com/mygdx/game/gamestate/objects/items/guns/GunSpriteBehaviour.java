@@ -113,13 +113,11 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
         if ((rotation < -90 && rotation >= -180) || rotation <= 180 && rotation > 90) {
             flip = true;
             sprite.setFlip(false, true);
-            //xCoef = -1;
             offsetRotationTransform.setToRotation(-rotationOffset);
         }
         else{
             flip = false;
             sprite.setFlip(false, false);
-            //xCoef = 1;
             offsetRotationTransform.setToRotation(rotationOffset);
         }
         if (shakeProgress < 0.6f){
@@ -147,8 +145,6 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
             else
                 translateTransform.translate(-(Math.max(0, recoil - distanceFromOrigin.x)) * (alpha - lastValue), 0);
 
-            //shakeRotationTransform.setToRotation(alphaShake * shake);
-
             if(recoilProgress == 1f) {
                 returnProgress = 0f;
                 translateTransform.getTranslation(tempVec);
@@ -168,12 +164,6 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
         }
 
         lastValue = alpha;
-
-//        if (rotation < -90 && rotation >= -180) {
-//            rotation -= 180;
-//        } else if ( rotation <= 180 && rotation > 90){
-//            rotation -= 180;
-//        }
 
         rotationTransform.setToRotation(rotation);
 
@@ -197,67 +187,26 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
         vectorXY3.mul(scaleTransform).mul(offsetRotationTransform).mul(shakeRotationTransform).mul(mat).mul(rotationTransform);
         vectorXY4.mul(scaleTransform).mul(offsetRotationTransform).mul(shakeRotationTransform).mul(mat).mul(rotationTransform);
 
-//        if (flip) {
-//            vertices[U1] = vertices[U3];
-//            vertices[U2] = vertices[U4];
-//            vertices[U3] = vertices[U1];
-//            vertices[U4] = vertices[U2];
-//        }
+        float x1 = vectorXY1.x * xCoef + worldOriginX;
+        float y1 = vectorXY1.y * yCoef + worldOriginY;
+        float x2 = vectorXY2.x * xCoef + worldOriginX;
+        float y2 = vectorXY2.y * yCoef + worldOriginY;
+        float x3 = vectorXY3.x * xCoef + worldOriginX;
+        float y3 = vectorXY3.y * yCoef + worldOriginY;
+        float x4 = vectorXY4.x * xCoef + worldOriginX;
+        float y4 = vectorXY4.y * yCoef + worldOriginY;
 
-        float x1 = 0;
-        float y1 = 0;
-        float x2 = 0;
-        float y2 = 1;
-        float x3 = 1;
-        float y3 = 1;
-        float x4 = 1;
-        float y4 = 0;
+        vertices[X1] = x1;
+        vertices[Y1] = y1;
 
-//        if (sprite.isFlipY()){
-//            x1 = vectorXY4.x + worldOriginX;
-//            y1 = vectorXY4.y + worldOriginY;
-//            x2 = vectorXY3.x + worldOriginX;
-//            y2 = vectorXY3.y + worldOriginY;
-//            x3 = vectorXY2.x + worldOriginX;
-//            y3 = vectorXY2.y + worldOriginY;
-//            x4 = vectorXY1.x + worldOriginX;
-//            y4 = vectorXY1.y + worldOriginY;
-//        } else {
-            x1 = vectorXY1.x * xCoef + worldOriginX;
-            y1 = vectorXY1.y * yCoef + worldOriginY;
-            x2 = vectorXY2.x * xCoef + worldOriginX;
-            y2 = vectorXY2.y * yCoef + worldOriginY;
-            x3 = vectorXY3.x * xCoef + worldOriginX;
-            y3 = vectorXY3.y * yCoef + worldOriginY;
-            x4 = vectorXY4.x * xCoef + worldOriginX;
-            y4 = vectorXY4.y * yCoef + worldOriginY;
-        //}
+        vertices[X2] = x2;
+        vertices[Y2] = y2;
 
-//        if (flip){
-//            vertices[X1] = x2;
-//            vertices[Y1] = y2;
-//
-//            vertices[X2] = x1;
-//            vertices[Y2] = y1;
-//
-//            vertices[X3] = x4;
-//            vertices[Y3] = y4;
-//
-//            vertices[X4] = x3;
-//            vertices[Y4] = y3;
-//        } else {
-            vertices[X1] = x1;
-            vertices[Y1] = y1;
+        vertices[X3] = x3;
+        vertices[Y3] = y3;
 
-            vertices[X2] = x2;
-            vertices[Y2] = y2;
-
-            vertices[X3] = x3;
-            vertices[Y3] = y3;
-
-            vertices[X4] = x4;
-            vertices[Y4] = y4;
-        //}
+        vertices[X4] = x4;
+        vertices[Y4] = y4;
     }
 
     public void equip(Player player){
