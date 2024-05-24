@@ -61,6 +61,7 @@ public class GameState {
         player.takeItem(new Item(TileResolver.getTile("watches"), "Watches"));
         player.takeItem(new Item(TileResolver.getTile("shotgun_ammo"), "Shotgun ammo"));
         player.takeItem(new Gun(TileResolver.getTile("deagle_44"), "Deagle .44"));
+        player.equipItem(new Gun(TileResolver.getTile("deagle_44"), "Deagle .44"));
         //MobsFactory.spawnZombie(5, 85);
     }
 

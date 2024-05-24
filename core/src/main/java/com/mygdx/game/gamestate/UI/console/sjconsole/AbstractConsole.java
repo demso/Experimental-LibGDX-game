@@ -212,9 +212,12 @@ public abstract class AbstractConsole implements Console, Disposable {
 			if (m.isPublic() && ConsoleUtils.canDisplayCommand(this, m)) {
 				String s = "";
 				s += m.getName();
-				s += " : ";
 
 				Class<?>[] params = m.getParameterTypes();
+
+				if (params.length > 0)
+					s += " : ";
+
 				for (int i = 0; i < params.length; i++) {
 					s += params[i].getSimpleName();
 					if (i < params.length - 1) {

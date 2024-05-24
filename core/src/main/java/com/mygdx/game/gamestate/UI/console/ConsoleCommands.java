@@ -5,6 +5,7 @@ import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.UI.console.sjconsole.CommandExecutor;
 import com.mygdx.game.gamestate.UI.console.sjconsole.annotation.ConsoleDoc;
+import com.mygdx.game.gamestate.objects.items.guns.GunSpriteBehaviour;
 
 import java.util.function.Consumer;
 
@@ -20,7 +21,7 @@ public class ConsoleCommands extends CommandExecutor {
         MobsFactory.spawnEntity(MobsFactory.Type.valueOf(type.toUpperCase()), x, y);
     }
 
-    @ConsoleDoc(description = "Get types of mob.")
+    @ConsoleDoc(description = "Prints all types of mobs.")
     public final void mobs() {
         StringBuilder logs = new StringBuilder();
 
@@ -32,5 +33,19 @@ public class ConsoleCommands extends CommandExecutor {
         });
 
         console.log(logs.toString());
+    }
+
+    @ConsoleDoc(description = "Enables debug of certain part of the game.", paramDescriptions = {"what to debug", "true or false"})
+    public final void debug(String type, boolean bool) {
+        switch (type) {
+            case "gunSprite" -> {
+                GunSpriteBehaviour.debug = bool;
+            }
+        }
+    }
+
+    @ConsoleDoc(description = "Clears console.")
+    public final void clear() {
+        console.clear();
     }
 }
