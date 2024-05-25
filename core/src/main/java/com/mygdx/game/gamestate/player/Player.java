@@ -4,7 +4,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
-import com.mygdx.game.gamestate.objects.items.SimpleItem;
+import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
 import dev.lyze.gdxUnBox2d.GameObject;
@@ -33,9 +33,9 @@ public class Player extends Entity implements Storage {
     public float normalSpeed = 3f;
     public Body closestObject;
 
-    Array<SimpleItem> inventoryItems = new Array<>();
+    Array<Item> inventoryItems = new Array<>();
 
-    public SimpleItem equipedItem;
+    public Item equipedItem;
 
     public GameObject playerObject;
 
@@ -50,32 +50,45 @@ public class Player extends Entity implements Storage {
     }
 
     @Override
-    public void takeItem(SimpleItem item){
+    public void takeItem(Item item){
         item.removeFromWorld();
         inventoryItems.add(item);
         instance.hud.updateInvHUDContent();
     }
     @Override
-    public void dropItem(SimpleItem item){
+    public void dropItem(Item item){
+        item.unequip();
         if (equipedItem == item)
             equipedItem = null;
         inventoryItems.removeValue(item, true);
         instance.hud.updateInvHUDContent();
     }
     @Override
-    public Array<SimpleItem> getInventoryItems(){
+    public Array<Item> getInventoryItems(){
         return inventoryItems;
     }
 
+    public boolean inventoryContains(Item item){
+        return getInventoryItems().contains(item, true);
+    }
 
-    public void equipItem(SimpleItem item){
+    public void equipItem(Item item){
+        if (!inventoryContains(item))
+            takeItem(item);
+        if (equipedItem != null)
+            equipedItem.unequip();
         equipedItem = item;
         if (item instanceof Gun gun){
             gun.equip(this);
         }
     }
-    public SimpleItem freeHands(){
-        SimpleItem item = equipedItem;
+
+    public void uneqipItem(){
+        equipedItem.unequip();
+        equipedItem = null;
+    }
+    public Item freeHands(){
+        Item item = equipedItem;
         equipedItem = null;
         return item;
     }

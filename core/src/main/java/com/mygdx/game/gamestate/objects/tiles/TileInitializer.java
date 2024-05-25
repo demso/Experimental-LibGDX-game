@@ -90,6 +90,7 @@ public class TileInitializer {
             nameEntries.clear();
 
             body.setUserData(bodyData);
+            cell.setData(bodyData);
 
         } catch (Exception e) {
             SecondGDXGame.helper.log("[Error] [TileInitializer] Problem with creating tile \n Type: " + cell.getTile().getProperties().get("type", null, String.class) + ", name " + cell.getTile().getProperties().get("name", null, String.class) + ",  body type " + bodyType + ", direction " + direction + " at x: " + x + ", y: " + y + " \n " + e.getLocalizedMessage());

@@ -79,7 +79,7 @@ public class PlayerHandler extends BehaviourAdapter {
             batch.draw(currentFrame, player.getPosition().x - player.WIDTH/2, player.getPosition().y - player.WIDTH * 1/4, player.WIDTH, player.HEIGHT);
         if (player.equipedItem != null){
             if (player.equipedItem instanceof Gun gun) {
-                gun.getSpriteBehaviour().render(batch);
+               // gun.getSpriteBehaviour().render(batch);
             } else {
                 TextureRegion tileTextureRegion = player.equipedItem.tile.getTextureRegion();
                 float width = 0.5f;

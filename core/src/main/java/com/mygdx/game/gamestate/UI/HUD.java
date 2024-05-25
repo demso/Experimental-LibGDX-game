@@ -21,7 +21,7 @@ import com.mygdx.game.gamestate.UI.inventory.ContextMenu;
 import com.mygdx.game.gamestate.UI.inventory.PlayerInventoryHUD;
 import com.mygdx.game.gamestate.UI.inventory.StorageInventoryHUD;
 import com.mygdx.game.gamestate.objects.bodies.userdata.SimpleUserData;
-import com.mygdx.game.gamestate.objects.items.SimpleItem;
+import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
 
@@ -31,13 +31,13 @@ public class HUD extends Stage {
     public StorageInventoryHUD storageInventoryHUD;
     HorizontalGroup panels;
     public GameState gameState;
-    ObjectMap<SimpleItem, ItemInfoPopUp> itemPopups =  new ObjectMap<>();
+    ObjectMap<Item, ItemInfoPopUp> itemPopups =  new ObjectMap<>();
     private Array<Actor> esClosablePopups = new Array<>();
     public ArrayMap<String, String> debugEntries = new ArrayMap<>();
     Label label;
     Skin skin;
 
-    public void showItemInfoWindow(SimpleItem item){
+    public void showItemInfoWindow(Item item){
         getActors().removeValue(itemPopups.get(item), true);
         Vector3 itemPos = getCamera().unproject(gameState.gameStage.getCamera().project(new Vector3(item.getPosition(), 0)));
         ItemInfoPopUp popup = new ItemInfoPopUp(item,itemPos.x,Gdx.graphics.getHeight()-itemPos.y);
@@ -45,7 +45,7 @@ public class HUD extends Stage {
         showPopup(popup);
     }
 
-    public void hideItemInfoWindow(SimpleItem item){
+    public void hideItemInfoWindow(Item item){
         closePopup(itemPopups.get(item));
     }
 

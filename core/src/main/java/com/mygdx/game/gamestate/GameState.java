@@ -14,14 +14,16 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.gamestate.UI.HUDInputListener;
 import com.mygdx.game.gamestate.UI.console.InGameConsole;
+import com.mygdx.game.gamestate.factories.ItemsFactory;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
 import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.objects.bullet.Bullet;
-import com.mygdx.game.gamestate.objects.items.SimpleItem;
+import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.player.Player;
 import dev.lyze.gdxUnBox2d.UnBox;
 import net.dermetfan.gdx.physics.box2d.Box2DUtils;
@@ -54,18 +56,20 @@ public class GameState {
     public InGameConsole console;
     public ShapeRenderer shapeRenderer;
     public UnBox unbox;
+    public HUDInputListener HUDIL;
 
     public void tester(){
-        player.takeItem(new SimpleItem(TileResolver.getTile("10mm_fmj"), "10mm FMJ bullets"));
-        player.takeItem(new SimpleItem(TileResolver.getTile("beef"), "Beef"));
-        player.takeItem(new SimpleItem(TileResolver.getTile("watches"), "Watches"));
-        player.takeItem(new SimpleItem(TileResolver.getTile("shotgun_ammo"), "Shotgun ammo"));
-        player.takeItem(new Gun(TileResolver.getTile("deagle_44"), "Deagle .44"));
-        player.equipItem(new Gun(TileResolver.getTile("deagle_44"), "Deagle .44"));
-        //MobsFactory.spawnZombie(5, 85);
+        player.takeItem(ItemsFactory.getItem("10mm_fmj"));
+        player.takeItem(ItemsFactory.getItem("beef"));
+        player.takeItem(ItemsFactory.getItem("watches"));
+        player.takeItem(ItemsFactory.getItem("shotgun_ammo"));
+        player.takeItem(ItemsFactory.getItem("deagle_44"));
+        player.equipItem(ItemsFactory.getItem("deagle_44"));
     }
 
     private void update(float deltaTime) {
+        //Input Listener Update
+        HUDIL.update();
         //CAMERA UPDATE
         camera.position.set(player.getPosition(), 0);
         camera.update();

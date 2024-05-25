@@ -8,16 +8,16 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
-import com.mygdx.game.gamestate.objects.items.SimpleItem;
+import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.SecondGDXGame;
 
 public class ItemEntry extends Button {
 
     ItemEntry itemEntry;
     InventoryHUD inventoryHUD;
-    SimpleItem item;
+    Item item;
 
-    ItemEntry(InventoryHUD iHUD, SimpleItem item){
+    ItemEntry(InventoryHUD iHUD, Item item){
         super(SecondGDXGame.skin);
         itemEntry = this;
         inventoryHUD = iHUD;

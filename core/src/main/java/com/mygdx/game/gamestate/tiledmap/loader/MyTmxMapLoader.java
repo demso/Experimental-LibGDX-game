@@ -11,6 +11,8 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
 import com.mygdx.game.gamestate.GameState;
+import com.mygdx.game.gamestate.factories.ItemsFactory;
+import com.mygdx.game.gamestate.objects.tiles.Storage;
 import com.mygdx.game.gamestate.objects.tiles.TileInitializer;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
@@ -169,6 +171,20 @@ public class MyTmxMapLoader extends TmxMapLoader {
                     initer.initTile(cell, i, j);
                 }
             }
+
+        var objects = mlayers.get("chest_content").getObjects();
+
+        for (MapObject object : objects) {
+            TiledMapTileLayer.Cell curCell = obstaclesLayer.getCell((int) Math.ceil(object.getProperties().get("x", float.class)/GameState.TILE_SIDE),
+                    (int) Math.ceil(object.getProperties().get("y", float.class)/GameState.TILE_SIDE));
+            if (curCell.getData() != null && curCell.getData() instanceof Storage storage){
+                String[] items = object.getProperties().get("items", String.class).split(",");
+                for (String item : items){
+                    storage.takeItem(ItemsFactory.getItem(item.trim().toLowerCase()));
+                }
+
+            }
+        }
 
         //world borders
         BodyDef borderBodyDef = new BodyDef();

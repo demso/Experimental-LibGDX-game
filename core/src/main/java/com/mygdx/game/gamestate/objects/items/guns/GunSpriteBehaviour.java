@@ -18,7 +18,7 @@ import static com.badlogic.gdx.graphics.g2d.Batch.*;
 
 public class GunSpriteBehaviour extends SpriteBehaviour {
     public static boolean debug = false;
-    Player player;
+    Gun gun;
     Matrix3 translateTransform;
     Matrix3 rotationTransform;
     Matrix3 shakeRotationTransform;
@@ -26,20 +26,26 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
     Matrix3 offsetRotationTransform;
     float recoil = 2f/32f,
         shake = 50f;
-    public boolean equipped = false;
     Player playerEquipped;
     //rotate axis in local coordinates
     Vector3 rotateAxis = new Vector3();
     Vector2 tempVec = new Vector2();
     ShapeDrawer shapeDrawer;
 
-    public GunSpriteBehaviour(GameObject gameObject, TextureRegion textureRegion, float renderOrder) {
+    public GunSpriteBehaviour(GameObject gameObject, Gun gun, TextureRegion textureRegion, float renderOrder) {
         super(gameObject, textureRegion, renderOrder);
+        this.gun = gun;
+        this.gun = gun;
+        setRenderOrder(renderOrder);
+        sprite = new Sprite(textureRegion);
+        sprite.setSize(1, 1);
+        sprite.setOriginCenter();
         init();
     }
 
-    public GunSpriteBehaviour(GameObject gameObject, float width, float height, TextureRegion textureRegion, float renderOrder) {
+    public GunSpriteBehaviour(GameObject gameObject, Gun gun, float width, float height, TextureRegion textureRegion, float renderOrder) {
         super(gameObject);
+        this.gun = gun;
         setRenderOrder(renderOrder);
         sprite = new Sprite(textureRegion);
         sprite.setSize(width, height);
@@ -47,10 +53,11 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
         init();
     }
 
-    public GunSpriteBehaviour(GameObject gameObject, Sprite sprite, float renderOrder) {
-        super(gameObject, sprite, renderOrder);
-        init();
-    }
+//    public GunSpriteBehaviour(GameObject gameObject, Gun gun, Sprite sprite, float renderOrder) {
+//        super(gameObject, sprite, renderOrder);
+//
+//        init();
+//    }
 
     private void init(){
         translateTransform = new Matrix3();
@@ -58,15 +65,15 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
         scaleTransform = new Matrix3();
         shakeRotationTransform = new Matrix3();
         offsetRotationTransform = new Matrix3();
-        player = GameState.instance.player;
         shapeDrawer = new ShapeDrawer(GameState.instance.batch, new TextureRegion(GameState.instance.userSelection, 1,1, 1,1));
         shapeDrawer.setDefaultLineWidth(0.5f/GameState.TILE_SIDE);
         recoilInterpolation = Interpolation.pow3InInverse;
         returnInterpolation = Interpolation.pow3;
         shakeInterpolation = Interpolation.elasticOut;
         rotateAxis.set(0f, 0f, 1);
+        setOffset(-sprite.getWidth()/2f, -sprite.getHeight()/2f);
 
-        scaleTransform.scale(0.4f, 0.4f);
+        //scaleTransform.scale(0.4f, 0.4f);
     }
 
     Interpolation recoilInterpolation, returnInterpolation, shakeInterpolation;
@@ -96,8 +103,6 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
         translateTransform.getTranslation(translationOnFire);
     }
 
-    //float shakeElapsedTime;
-
     float lastValue;
     Vector2 distanceFromOrigin = new Vector2();
     float xCoef = 1;
@@ -106,70 +111,70 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
 
     @Override
     public void update(float delta) {
-        Vector3 mousePos = GameState.instance.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-        float rotation = Double.valueOf(Math.toDegrees(Math.atan2(mousePos.y - player.getPosition().y, mousePos.x - player.getPosition().x))).floatValue();
-        HandyHelper.instance.log(Float.toString(Math.round(rotation)));
+        if (gun.isEquipped()) {
+            Player player = gun.getOwner();
+            Vector3 mousePos = GameState.instance.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+            float rotation = Double.valueOf(Math.toDegrees(Math.atan2(mousePos.y - player.getPosition().y, mousePos.x - player.getPosition().x))).floatValue();
+            //HandyHelper.instance.log(Float.toString(Math.round(rotation)));
 
-        if ((rotation < -90 && rotation >= -180) || rotation <= 180 && rotation > 90) {
-            flip = true;
-            sprite.setFlip(false, true);
-            offsetRotationTransform.setToRotation(-rotationOffset);
-        }
-        else{
-            flip = false;
-            sprite.setFlip(false, false);
-            offsetRotationTransform.setToRotation(rotationOffset);
-        }
-        if (shakeProgress < 0.6f){
-            shakeProgress += delta/shakeTime;
-            shakeProgress = Math.min(0.6f, shakeProgress);
-
-            alphaShake = (shakeInterpolation.apply(shakeProgress) - 1) * 0.5f;
-
-            if (flip)
-                shakeRotationTransform.setToRotation(alphaShake * -shake);
-            else
-                shakeRotationTransform.setToRotation(alphaShake * shake);
-        }
-
-        if (recoilInterpolation != null && recoilProgress < 1f) {
-            recoilProgress += delta/recoilTime;
-            recoilProgress = Math.min(1f, recoilProgress);
-
-            alpha = recoilInterpolation.apply(recoilProgress);
-
-            translateTransform.getTranslation(tempVec);
-
-            if (sprite.isFlipY())
-                translateTransform.translate(-(Math.max(0, recoil - distanceFromOrigin.x)) * (alpha - lastValue), 0);
-            else
-                translateTransform.translate(-(Math.max(0, recoil - distanceFromOrigin.x)) * (alpha - lastValue), 0);
-
-            if(recoilProgress == 1f) {
-                returnProgress = 0f;
-                translateTransform.getTranslation(tempVec);
-                distanceFromOrigin.set(-tempVec.x, -tempVec.y);
+            if ((rotation < -90 && rotation >= -180) || rotation <= 180 && rotation > 90) {
+                flip = true;
+                sprite.setFlip(false, true);
+                offsetRotationTransform.setToRotation(-rotationOffset);
+            } else {
+                flip = false;
+                sprite.setFlip(false, false);
+                offsetRotationTransform.setToRotation(rotationOffset);
             }
+            if (shakeProgress < 0.6f) {
+                shakeProgress += delta / shakeTime;
+                shakeProgress = Math.min(0.6f, shakeProgress);
+
+                alphaShake = (shakeInterpolation.apply(shakeProgress) - 1) * 0.5f;
+
+                if (flip) shakeRotationTransform.setToRotation(alphaShake * -shake);
+                else shakeRotationTransform.setToRotation(alphaShake * shake);
+            }
+
+            if (recoilInterpolation != null && recoilProgress < 1f) {
+                recoilProgress += delta / recoilTime;
+                recoilProgress = Math.min(1f, recoilProgress);
+
+                alpha = recoilInterpolation.apply(recoilProgress);
+
+                translateTransform.getTranslation(tempVec);
+
+                if (sprite.isFlipY())
+                    translateTransform.translate(-(Math.max(0, recoil - distanceFromOrigin.x)) * (alpha - lastValue), 0);
+                else
+                    translateTransform.translate(-(Math.max(0, recoil - distanceFromOrigin.x)) * (alpha - lastValue), 0);
+
+                if (recoilProgress == 1f) {
+                    returnProgress = 0f;
+                    translateTransform.getTranslation(tempVec);
+                    distanceFromOrigin.set(-tempVec.x, -tempVec.y);
+                }
+            } else if (returnInterpolation != null && returnProgress < 1f) {
+                returnProgress += delta / returnTime;
+                returnProgress = Math.min(1f, returnProgress);
+                alpha = 1 - returnInterpolation.apply(returnProgress);
+                translateTransform.getTranslation(tempVec);
+                if (sprite.isFlipY())
+                    translateTransform.translate(-(distanceFromOrigin.x) * (alpha - lastValue), -(distanceFromOrigin.y) * (alpha - lastValue));
+                else
+                    translateTransform.translate(-(distanceFromOrigin.x) * (alpha - lastValue), -(distanceFromOrigin.y) * (alpha - lastValue));
+            }
+
+            lastValue = alpha;
+
+            rotationTransform.setToRotation(rotation);
+
+            //HandyHelper.instance.log("[GunSprite:169] rot: " + Math.round(rotation));
+
+            transformSprite(translateTransform);
+        } else {
+            sprite.setOriginCenter();
         }
-       else
-        if (returnInterpolation != null && returnProgress < 1f){
-            returnProgress += delta / returnTime;
-            returnProgress = Math.min(1f, returnProgress);
-            alpha = 1 - returnInterpolation.apply(returnProgress);
-            translateTransform.getTranslation(tempVec);
-            if (sprite.isFlipY())
-                translateTransform.translate(-(distanceFromOrigin.x) * (alpha - lastValue), -(distanceFromOrigin.y) * (alpha - lastValue));
-            else
-                translateTransform.translate(-(distanceFromOrigin.x) * (alpha - lastValue), -(distanceFromOrigin.y) * (alpha - lastValue));
-        }
-
-        lastValue = alpha;
-
-        rotationTransform.setToRotation(rotation);
-
-        //HandyHelper.instance.log("[GunSprite:169] rot: " + Math.round(rotation));
-
-        transformSprite(translateTransform);
     }
 
     public void transformSprite(Matrix3 mat){
@@ -209,24 +214,19 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
         vertices[Y4] = y4;
     }
 
-    public void equip(Player player){
-        equipped = true;
-        playerEquipped = player;
-    }
-
     @Override
     public void fixedUpdate() {
         Box2dBehaviour box2dBehaviour = getGameObject().getBehaviour(Box2dBehaviour.class);
-        if (box2dBehaviour != null) {
+        if (box2dBehaviour != null && !gun.isEquipped()) {
             if (box2dBehaviour.getBody().getPosition().equals(position)) return;
-
+            sprite.setFlip(false, false);
             position.set(box2dBehaviour.getBody().getPosition());
 
             position.add(offsetX, offsetY);
             this.sprite.setPosition(position.x, position.y);
         }
-        if (equipped){
-            sprite.setPosition(player.getPosition().x + (sprite.getWidth() / 2f), player.getPosition().y + sprite.getHeight() / 2f);
+        if (gun.isEquipped()){
+            sprite.setPosition(gun.getOwner().getPosition().x + (sprite.getWidth() / 2f), gun.getOwner().getPosition().y + sprite.getHeight() / 2f);
         }
     }
 

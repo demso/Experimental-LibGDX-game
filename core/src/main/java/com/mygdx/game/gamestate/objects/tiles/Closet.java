@@ -8,7 +8,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.Interactable;
-import com.mygdx.game.gamestate.objects.items.SimpleItem;
+import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
 
@@ -16,13 +16,12 @@ import static com.mygdx.game.gamestate.GameState.instance;
 
 public class Closet implements BodyData, Interactable, Storage {
     TiledMapTileLayer.Cell cell;
-    Array<SimpleItem> inventoryItems = new Array<>();
+    Array<Item> inventoryItems = new Array<>();
     Body body;
 
     public Closet(TiledMapTileLayer.Cell cell, Body body){
         this.cell = cell;
         this.body = body;
-        inventoryItems.add(new SimpleItem("deagle_44", "Deagle .44"));
     }
 
     @Override
@@ -42,18 +41,18 @@ public class Closet implements BodyData, Interactable, Storage {
     }
 
     @Override
-    public Array<SimpleItem> getInventoryItems() {
+    public Array<Item> getInventoryItems() {
         return inventoryItems;
     }
 
     @Override
-    public void takeItem(SimpleItem item){
+    public void takeItem(Item item){
         item.removeFromWorld();
         inventoryItems.add(item);
         instance.hud.updateInvHUDContent();
     }
     @Override
-    public void dropItem(SimpleItem item){
+    public void dropItem(Item item){
         inventoryItems.removeValue(item, true);
         instance.hud.updateInvHUDContent();
     }

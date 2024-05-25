@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.mygdx.game.gamestate.GameState;
+import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.objects.Interactable;
 import com.mygdx.game.gamestate.player.PlayerHandler;
 
@@ -41,6 +43,7 @@ public class HUDInputListener extends InputListener {
                     Gdx.graphics.getHeight() * (1f/ instance.TILE_SIDE) * (1/ instance.zoom));
         }
         if (keycode == Input.Keys.R){
+            RLongPressed = false;
             if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
                 instance.player.revive();
                 return false;
@@ -77,7 +80,8 @@ public class HUDInputListener extends InputListener {
         }
         return false;
     }
-
+    long RPressedTime = 0;
+    boolean RLongPressed;
     @Override
     public boolean keyDown(InputEvent event, int keycode) {
         if (keycode == Input.Keys.W || keycode == Input.Keys.UP){
@@ -92,8 +96,25 @@ public class HUDInputListener extends InputListener {
         if (keycode == Input.Keys.D || keycode == Input.Keys.RIGHT){
             instance.player.playerObject.getBehaviour(PlayerHandler.class).moveToTheRight = true;
         }
+
+        if (keycode == Input.Keys.R){
+            if (Gdx.input.isKeyPressed(Input.Keys.R)) {
+                RPressedTime = System.nanoTime();
+                RLongPressed = false;
+            }
+            //HandyHelper.instance.log(System.currentTimeMillis() + " ", false);
+        }
         return false;
     }
 
+    public void update(){
+        if (Gdx.input.isKeyPressed(Input.Keys.R) && (System.nanoTime() - RPressedTime > 400000000L) && !RLongPressed) {
+            HandyHelper.instance.log("R long pressed", false);
+            if (instance.player.equipedItem != null)
+                instance.player.uneqipItem();
+            RLongPressed = true;
+        }
+        //HandyHelper.instance.log(System.nanoTime() + " " + RPressedTime + " " + (System.nanoTime() - RPressedTime), false);
+    }
 
 }
