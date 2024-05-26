@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.*;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.objects.behaviours.SpriteBehaviour;
+import com.mygdx.game.gamestate.objects.items.PistolAnimation;
 import com.mygdx.game.gamestate.player.Player;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
@@ -31,6 +32,7 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
     Vector3 rotateAxis = new Vector3();
     Vector2 tempVec = new Vector2();
     ShapeDrawer shapeDrawer;
+    PistolAnimation pistolAnimation;
 
     public GunSpriteBehaviour(GameObject gameObject, Gun gun, TextureRegion textureRegion, float renderOrder) {
         super(gameObject, textureRegion, renderOrder);
@@ -72,6 +74,7 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
         shakeInterpolation = Interpolation.elasticOut;
         rotateAxis.set(0f, 0f, 1);
         setOffset(-sprite.getWidth()/2f, -sprite.getHeight()/2f);
+        pistolAnimation = new PistolAnimation();
 
         //scaleTransform.scale(0.4f, 0.4f);
     }

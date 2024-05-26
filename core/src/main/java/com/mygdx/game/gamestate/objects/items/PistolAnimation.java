@@ -30,7 +30,7 @@ public class PistolAnimation {
     Vector3 rotateAxis = new Vector3();
     Vector2 tempVec = new Vector2();
 
-    PistolAnimation(){
+    public PistolAnimation(){
         translateTransform = new Matrix3();
         rotationTransform = new Matrix3();
         scaleTransform = new Matrix3();
