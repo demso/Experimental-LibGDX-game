@@ -119,11 +119,11 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
 
             if ((rotation < -90 && rotation >= -180) || rotation <= 180 && rotation > 90) {
                 flip = true;
-                sprite.setFlip(false, true);
+                //sprite.setFlip(false, true);
                 offsetRotationTransform.setToRotation(-rotationOffset);
             } else {
                 flip = false;
-                sprite.setFlip(false, false);
+                //sprite.setFlip(false, false);
                 offsetRotationTransform.setToRotation(rotationOffset);
             }
             if (shakeProgress < 0.6f) {
@@ -144,7 +144,7 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
 
                 translateTransform.getTranslation(tempVec);
 
-                if (sprite.isFlipY())
+                if (flip)
                     translateTransform.translate(-(Math.max(0, recoil - distanceFromOrigin.x)) * (alpha - lastValue), 0);
                 else
                     translateTransform.translate(-(Math.max(0, recoil - distanceFromOrigin.x)) * (alpha - lastValue), 0);
@@ -159,7 +159,7 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
                 returnProgress = Math.min(1f, returnProgress);
                 alpha = 1 - returnInterpolation.apply(returnProgress);
                 translateTransform.getTranslation(tempVec);
-                if (sprite.isFlipY())
+                if (flip)
                     translateTransform.translate(-(distanceFromOrigin.x) * (alpha - lastValue), -(distanceFromOrigin.y) * (alpha - lastValue));
                 else
                     translateTransform.translate(-(distanceFromOrigin.x) * (alpha - lastValue), -(distanceFromOrigin.y) * (alpha - lastValue));
@@ -201,17 +201,31 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
         float x4 = vectorXY4.x * xCoef + worldOriginX;
         float y4 = vectorXY4.y * yCoef + worldOriginY;
 
-        vertices[X1] = x1;
-        vertices[Y1] = y1;
+        if (flip) {
+            vertices[X1] = x2;
+            vertices[Y1] = y2;
 
-        vertices[X2] = x2;
-        vertices[Y2] = y2;
+            vertices[X2] = x1;
+            vertices[Y2] = y1;
 
-        vertices[X3] = x3;
-        vertices[Y3] = y3;
+            vertices[X3] = x4;
+            vertices[Y3] = y4;
 
-        vertices[X4] = x4;
-        vertices[Y4] = y4;
+            vertices[X4] = x3;
+            vertices[Y4] = y3;
+        } else {
+            vertices[X1] = x1;
+            vertices[Y1] = y1;
+
+            vertices[X2] = x2;
+            vertices[Y2] = y2;
+
+            vertices[X3] = x3;
+            vertices[Y3] = y3;
+
+            vertices[X4] = x4;
+            vertices[Y4] = y4;
+        }
     }
 
     @Override

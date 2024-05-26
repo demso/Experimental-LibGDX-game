@@ -51,7 +51,6 @@ public class Item implements BodyData, Interactable {
         this(TileResolver.getTile(tileName), itemName);
     }
 
-
     public Body allocate(Vector2 position){
         prepareForRendering();
 
