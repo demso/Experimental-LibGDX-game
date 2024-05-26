@@ -125,7 +125,7 @@ public class PistolAnimation {
 
         lastValue = alpha;
 
-
+        rotationTransform.setToRotation(rotation);
 
         //HandyHelper.instance.log("[GunSprite:169] rot: " + Math.round(rotation));
 
