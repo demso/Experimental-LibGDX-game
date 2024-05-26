@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.badlogic.gdx.maps.tiled;
+package com.mygdx.game.gamestate.tiledmap.tiled;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.maps.Map;

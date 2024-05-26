@@ -2,7 +2,6 @@ package com.mygdx.game.gamestate.objects.tiles;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
@@ -11,11 +10,12 @@ import com.mygdx.game.gamestate.objects.Interactable;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
+import com.mygdx.game.gamestate.tiledmap.tiled.*;
 
 import static com.mygdx.game.gamestate.GameState.instance;
 
 public class Closet implements BodyData, Interactable, Storage {
-    TiledMapTileLayer.Cell cell;
+    com.mygdx.game.gamestate.tiledmap.tiled.TiledMapTileLayer.Cell cell;
     Array<Item> inventoryItems = new Array<>();
     Body body;
 

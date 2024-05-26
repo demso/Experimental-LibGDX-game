@@ -3,7 +3,7 @@ package com.mygdx.game.gamestate.tiledmap.loader;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.*;
-import com.badlogic.gdx.maps.tiled.*;
+import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
@@ -175,9 +175,11 @@ public class MyTmxMapLoader extends TmxMapLoader {
         var objects = mlayers.get("chest_content").getObjects();
 
         for (MapObject object : objects) {
-            TiledMapTileLayer.Cell curCell = obstaclesLayer.getCell((int) Math.ceil(object.getProperties().get("x", float.class)/GameState.TILE_SIDE),
-                    (int) Math.ceil(object.getProperties().get("y", float.class)/GameState.TILE_SIDE));
-            if (curCell.getData() != null && curCell.getData() instanceof Storage storage){
+            TiledMapTileLayer.Cell curCell = obstaclesLayer.getCell(
+                    (int) Math.ceil(object.getProperties().get("x", float.class)/GameState.TILE_SIDE) - 1,
+                    (int) Math.ceil(object.getProperties().get("y", float.class)/GameState.TILE_SIDE) - 1);
+            String s = object.getProperties().get("items", String.class);
+            if (curCell.getData() != null && curCell.getData() instanceof Storage storage && s != null && !s.trim().isEmpty()){
                 String[] items = object.getProperties().get("items", String.class).split(",");
                 for (String item : items){
                     storage.takeItem(ItemsFactory.getItem(item.trim().toLowerCase()));

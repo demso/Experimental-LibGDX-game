@@ -57,7 +57,7 @@ public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
     public boolean contextAction(ContextMenu.ConAction action, ContextMenu contextMenu){
         boolean handled = true;
         switch (action){
-            case Put -> {
+            case Drop -> {
                 putItemFromInventory(contextMenu.itemEntry);
             }
             case Equip -> {

@@ -12,15 +12,13 @@ import com.mygdx.game.gamestate.player.PlayerHandler;
 import static com.mygdx.game.gamestate.GameState.instance;
 
 public class HUDInputListener extends InputListener {
-    @Override
-    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-        if (button == Input.Buttons.LEFT)
-            if (instance.player.equipedItem != null && instance.player.equipedItem.itemName.equals("Deagle .44"))
-                instance.player.fire();
-        return false;
-    }
-
-
+//    @Override
+//    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+//        if (button == Input.Buttons.LEFT)
+//            if (instance.player.equipedItem != null && instance.player.equipedItem.itemName.equals("Deagle .44"))
+//                instance.player.fire();
+//        return false;
+//    }
 
     @Override
     public boolean keyUp (InputEvent event, int keycode) {

@@ -14,14 +14,14 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.badlogic.gdx.maps.tiled.objects;
+package com.mygdx.game.gamestate.tiledmap.tiled.objects;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.TextureMapObject;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
-import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
-import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
+import com.mygdx.game.gamestate.tiledmap.tiled.*;
+import com.mygdx.game.gamestate.tiledmap.tiled.tiles.AnimatedTiledMapTile;
+import com.mygdx.game.gamestate.tiledmap.tiled.tiles.StaticTiledMapTile;
 
 /** A {@link MapObject} with a {@link TiledMapTile}. Can be both {@link StaticTiledMapTile} or {@link AnimatedTiledMapTile}. For
  * compatibility reasons, this extends {@link TextureMapObject}. Use {@link TiledMapTile#getTextureRegion()} instead of

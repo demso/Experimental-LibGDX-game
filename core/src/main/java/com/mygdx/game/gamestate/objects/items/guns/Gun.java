@@ -1,7 +1,7 @@
 package com.mygdx.game.gamestate.objects.items.guns;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -19,6 +19,7 @@ import com.mygdx.game.gamestate.objects.bullet.Bullet;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
+import dev.lyze.gdxUnBox2d.BehaviourState;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
@@ -56,6 +57,7 @@ public class Gun extends Item {
         new Box2dBehaviour(physicalBody, GO);
         GO.setEnabled(true);
         mouseHandler.setPosition(getPosition().x - mouseHandler.getWidth()/2f, getPosition().y - mouseHandler.getHeight()/2f);
+        
         return physicalBody;
     }
 
@@ -66,17 +68,21 @@ public class Gun extends Item {
 
         if (isEquipped()) {
             Array<SpriteBehaviour> spriteBehaves = GO.getBehaviours(SpriteBehaviour.class);
-            if (spriteBehaves.size > 0)
+            if (spriteBehaves.size > 0) {
                 spriteBehaves.forEach((behave) -> {GO.destroy(behave);});
+                spriteBehaviour = null;
+            }
 
-            if (gunSpriteBehaviour == null)
+            if (gunSpriteBehaviour == null || gunSpriteBehaviour.getState().equals(BehaviourState.DESTROYED))
                 gunSpriteBehaviour = new GunSpriteBehaviour(GO, this, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
         } else {
             Array<GunSpriteBehaviour> gunSpriteBehaves = GO.getBehaviours(GunSpriteBehaviour.class);
-            if (gunSpriteBehaves.size > 0)
+            if (gunSpriteBehaves.size > 0) {
                 gunSpriteBehaves.forEach((behave) -> {GO.destroy(behave);});
+                gunSpriteBehaviour = null;
+            }
 
-            if (spriteBehaviour == null)
+            if (spriteBehaviour == null || spriteBehaviour.getState().equals(BehaviourState.DESTROYED))
                 spriteBehaviour = new SpriteBehaviour(GO, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
 
             if (mouseHandler == null) {
@@ -104,8 +110,6 @@ public class Gun extends Item {
         }
     }
 
-
-
     @Override
     public void equip(Player player){
         super.equip(player);
@@ -119,4 +123,6 @@ public class Gun extends Item {
         if (GO != null)
             GO.setEnabled(false);
     }
+
+
 }

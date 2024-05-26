@@ -6,7 +6,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.mygdx.game.gamestate.GameStageInputListener;
+import com.mygdx.game.gamestate.tiledmap.tiled.*;
+import com.mygdx.game.gamestate.tiledmap.tiled.renderers.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
@@ -46,13 +48,14 @@ public class GameConstructor {
         gameState.hud = new HUD(gameState, new ScreenViewport(), gameState.game.batch);
         gameState.camera = new OrthographicCamera();
         gameState.gameStage = new Stage(new ScreenViewport(gameState.camera));
+        gameState.gameStage.addListener(new GameStageInputListener());
 
         gameState.camera.setToOrtho(false, 30, 20);
 
         gameState.map = new MyTmxMapLoader(gameState).load(gameState.mapToLoad);
 
         gameState.shapeRenderer.setProjectionMatrix(gameState.camera.combined);
-        gameState.renderer = new OrthogonalTiledMapRenderer(gameState.map, 1f / GameState.TILE_SIDE);
+        gameState.renderer = new OrthogonalTiledMapRenderer(gameState.map, 1f / (float) GameState.TILE_SIDE);
         gameState.batch = gameState.renderer.getBatch();
         gameState.debugRendererPh = new Box2DDebugRenderer();
 

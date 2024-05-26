@@ -1,7 +1,6 @@
 package com.mygdx.game.gamestate.tiledmap.loader;
 
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
-import com.badlogic.gdx.maps.tiled.TiledMapTileSets;
+import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import com.mygdx.game.SecondGDXGame;
 

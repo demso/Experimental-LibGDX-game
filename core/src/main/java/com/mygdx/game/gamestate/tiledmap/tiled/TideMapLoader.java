@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.badlogic.gdx.maps.tiled;
+package com.mygdx.game.gamestate.tiledmap.tiled;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
@@ -29,9 +29,9 @@ import com.badlogic.gdx.maps.ImageResolver;
 import com.badlogic.gdx.maps.ImageResolver.AssetManagerImageResolver;
 import com.badlogic.gdx.maps.ImageResolver.DirectImageResolver;
 import com.badlogic.gdx.maps.MapProperties;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
-import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
-import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
+import com.mygdx.game.gamestate.tiledmap.tiled.TiledMapTileLayer.Cell;
+import com.mygdx.game.gamestate.tiledmap.tiled.tiles.AnimatedTiledMapTile;
+import com.mygdx.game.gamestate.tiledmap.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -257,7 +257,7 @@ public class TideMapLoader extends SynchronousAssetLoader<TiledMap, TideMapLoade
 						}
 						Cell cell = new Cell();
 						cell.setTile(new AnimatedTiledMapTile(interval / 1000f, frameTiles));
-						layer.setCell(x++, y, cell); // TODO: Reuse existing animated tiles
+						layer.setCell(x++, y, cell);
 					}
 				}
 			}

@@ -1,6 +1,6 @@
 package com.mygdx.game.gamestate.factories;
 
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.game.gamestate.GameState;

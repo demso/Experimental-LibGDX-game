@@ -1,6 +1,6 @@
 package com.mygdx.game.gamestate.objects.items;
 
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -50,6 +50,7 @@ public class Item implements BodyData, Interactable {
     public Item(String tileName, String itemName){
         this(TileResolver.getTile(tileName), itemName);
     }
+
 
     public Body allocate(Vector2 position){
         prepareForRendering();
@@ -113,7 +114,7 @@ public class Item implements BodyData, Interactable {
 
     @Override
     public String getName() {
-        return "item " + itemName;
+        return itemName == null ? "" : itemName;
     }
 
     @Override

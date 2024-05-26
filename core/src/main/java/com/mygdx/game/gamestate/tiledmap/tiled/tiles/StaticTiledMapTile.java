@@ -14,12 +14,12 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.badlogic.gdx.maps.tiled.tiles;
+package com.mygdx.game.gamestate.tiledmap.tiled.tiles;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.MapProperties;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.mygdx.game.gamestate.tiledmap.tiled.*;
 
 /** @brief Represents a non changing {@link TiledMapTile} (can be cached) */
 public class StaticTiledMapTile implements TiledMapTile {

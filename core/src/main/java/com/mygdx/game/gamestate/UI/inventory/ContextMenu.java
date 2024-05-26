@@ -17,7 +17,7 @@ import java.util.Comparator;
 
 public class ContextMenu extends Table {
     public enum ConAction {
-        Put, Store , Description, Equip, Take
+        Drop, Store , Description, Equip, Take
     }
     public ObjectMap<ConAction, Button> allActions = new ObjectMap<>();//порядок и conaction
     public ObjectMap<ConAction, Button> actions = new ObjectMap<>();

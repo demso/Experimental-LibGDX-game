@@ -1,5 +1,5 @@
 
-package com.badlogic.gdx.maps.tiled;
+package com.mygdx.game.gamestate.tiledmap.tiled;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
@@ -15,10 +15,11 @@ import com.badlogic.gdx.maps.objects.EllipseMapObject;
 import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.objects.PolylineMapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
-import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
-import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
-import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
+import com.mygdx.game.gamestate.tiledmap.tiled.*;
+import com.mygdx.game.gamestate.tiledmap.tiled.TiledMapTileLayer.Cell;
+import com.mygdx.game.gamestate.tiledmap.tiled.objects.TiledMapTileMapObject;
+import com.mygdx.game.gamestate.tiledmap.tiled.tiles.AnimatedTiledMapTile;
+import com.mygdx.game.gamestate.tiledmap.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Polyline;
 import com.badlogic.gdx.utils.*;

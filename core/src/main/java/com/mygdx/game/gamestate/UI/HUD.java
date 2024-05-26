@@ -2,7 +2,8 @@ package com.mygdx.game.gamestate.UI;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.MapLayer;
+import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -212,8 +213,10 @@ public class HUD extends Stage {
         int tileX = (int)Math.floor(tilePosition.x);
         int tileY = (int)Math.floor(tilePosition.y);
         for (var x = 0; x < gameState.map.getLayers().size(); x++){
-            TiledMapTileLayer currentLayer = (TiledMapTileLayer) gameState.map.getLayers().get(x);
-            TiledMapTileLayer.Cell mcell = currentLayer.getCell(tileX, tileY);
+            MapLayer currentLayer = gameState.map.getLayers().get(x);
+            if (! (currentLayer instanceof TiledMapTile))
+                continue;
+            TiledMapTileLayer.Cell mcell = ((TiledMapTileLayer)currentLayer).getCell(tileX, tileY);
 
             if(mcell != null){
                 labelText.append("Rotation : ").append(mcell.getRotation()).append("\nFlip Horizontally : ").append(mcell.getFlipHorizontally()).append("\nFlip Vertically : ").append(mcell.getFlipVertically()).append("\nLayer : ").append(currentLayer.getName()).append("\nX : ").append(tileX).append("\n").append("Y : ").append(tileY).append("\n").append("ID : ").append(mcell.getTile().getId()).append("\n");
@@ -261,7 +264,7 @@ public class HUD extends Stage {
 
         playerInventoryHud.setVisible(false);
 
-        storageInventoryHUD = new StorageInventoryHUD(this, ContextMenu.ConAction.Put, ContextMenu.ConAction.Description, ContextMenu.ConAction.Equip, ContextMenu.ConAction.Take);
+        storageInventoryHUD = new StorageInventoryHUD(this, ContextMenu.ConAction.Drop, ContextMenu.ConAction.Description, ContextMenu.ConAction.Equip, ContextMenu.ConAction.Take);
         storageInventoryHUD.setVisible(false);
 
         label = new Label("", skin);

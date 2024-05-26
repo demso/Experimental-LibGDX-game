@@ -14,12 +14,12 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.badlogic.gdx.maps.tiled.tiles;
+package com.mygdx.game.gamestate.tiledmap.tiled.tiles;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.MapProperties;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntArray;
@@ -78,7 +78,7 @@ public class AnimatedTiledMapTile implements TiledMapTile {
 	}
 
 	public TiledMapTile getCurrentFrame () {
-		return frameTiles[getCurrentFrameIndex()];
+		return (TiledMapTile) frameTiles[getCurrentFrameIndex()];
 	}
 
 	@Override

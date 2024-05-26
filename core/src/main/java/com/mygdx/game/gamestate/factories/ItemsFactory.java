@@ -13,13 +13,17 @@ public class ItemsFactory {
             init();
         switch (itemId) {
             case "deagle_44" -> {
-                Gun gun = new Gun(TileResolver.getTile(itemId), itemNames.get(itemId));
+                Gun gun = new Gun(TileResolver.getTile(itemId), getNameForID(itemId));
                 return gun;
             }
             default -> {
-                return new Item(TileResolver.getTile(itemId), itemNames.get(itemId));
+                return new Item(TileResolver.getTile(itemId), getNameForID(itemId));
             }
         }
+    }
+
+    private static String getNameForID(String id){
+        return itemNames.get(id, id);
     }
 
     private static void init(){

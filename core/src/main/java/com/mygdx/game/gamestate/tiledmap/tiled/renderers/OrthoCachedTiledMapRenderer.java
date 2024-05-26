@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.badlogic.gdx.maps.tiled.renderers;
+package com.mygdx.game.gamestate.tiledmap.tiled.renderers;
 
 import static com.badlogic.gdx.graphics.g2d.Batch.*;
 
@@ -28,12 +28,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.MapObject;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapImageLayer;
-import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
+import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Disposable;
@@ -305,7 +300,7 @@ public class OrthoCachedTiledMapRenderer implements TiledMapRenderer, Disposable
 				}
 				if (rotations != 0) {
 					switch (rotations) {
-					case Cell.ROTATE_90: {
+					case TiledMapTileLayer.Cell.ROTATE_90: {
 						float tempV = vertices[V1];
 						vertices[V1] = vertices[V2];
 						vertices[V2] = vertices[V3];
@@ -319,7 +314,7 @@ public class OrthoCachedTiledMapRenderer implements TiledMapRenderer, Disposable
 						vertices[U4] = tempU;
 						break;
 					}
-					case Cell.ROTATE_180: {
+					case TiledMapTileLayer.Cell.ROTATE_180: {
 						float tempU = vertices[U1];
 						vertices[U1] = vertices[U3];
 						vertices[U3] = tempU;
@@ -334,7 +329,7 @@ public class OrthoCachedTiledMapRenderer implements TiledMapRenderer, Disposable
 						vertices[V4] = tempV;
 						break;
 					}
-					case Cell.ROTATE_270: {
+					case TiledMapTileLayer.Cell.ROTATE_270: {
 						float tempV = vertices[V1];
 						vertices[V1] = vertices[V4];
 						vertices[V4] = vertices[V3];

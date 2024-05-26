@@ -14,17 +14,15 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.badlogic.gdx.maps.tiled.renderers;
+package com.mygdx.game.gamestate.tiledmap.tiled.renderers;
 
 import static com.badlogic.gdx.graphics.g2d.Batch.*;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
+import com.mygdx.game.gamestate.tiledmap.tiled.*;
+import com.mygdx.game.gamestate.tiledmap.tiled.tiles.AnimatedTiledMapTile;
 
 public class HexagonalTiledMapRenderer extends BatchTiledMapRenderer {
 
