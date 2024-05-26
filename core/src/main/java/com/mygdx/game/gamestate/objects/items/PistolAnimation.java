@@ -132,6 +132,11 @@ public class PistolAnimation {
         //transformSprite(translateTransform);
     }
 
+    public void updateAndTransform(float delta, float rotation, Sprite sprite){
+        update(delta, rotation);
+        transformSprite(sprite);
+    }
+
     public void transformSprite(Sprite sprite){
         float[] vertices = sprite.getVertices();
 
