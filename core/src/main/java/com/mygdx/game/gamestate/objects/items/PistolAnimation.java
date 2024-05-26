@@ -1,20 +1,12 @@
 package com.mygdx.game.gamestate.objects.items;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.gamestate.GameState;
-import com.mygdx.game.gamestate.objects.items.guns.Gun;
-import com.mygdx.game.gamestate.player.Player;
-import dev.lyze.gdxUnBox2d.Box2dBehaviour;
-import dev.lyze.gdxUnBox2d.GameObject;
-import space.earlygrey.shapedrawer.ShapeDrawer;
 
 import static com.badlogic.gdx.graphics.g2d.Batch.*;
 import static com.badlogic.gdx.graphics.g2d.Batch.Y4;
@@ -42,18 +34,16 @@ public class PistolAnimation {
         rotateAxis.set(0f, 0f, 1);
     }
 
-//    private void init(){
-//        translateTransform = new Matrix3();
-//        rotationTransform = new Matrix3();
-//        scaleTransform = new Matrix3();
-//        shakeRotationTransform = new Matrix3();
-//        offsetRotationTransform = new Matrix3();
-//        recoilInterpolation = Interpolation.pow3InInverse;
-//        returnInterpolation = Interpolation.pow3;
-//        shakeInterpolation = Interpolation.elasticOut;
-//        rotateAxis.set(0f, 0f, 1);
-//        //scaleTransform.scale(0.4f, 0.4f);
-//    }
+    public void fire(){
+        shakeProgress = 0f;
+
+        if (recoilProgress == 1f){
+            recoilProgress = 0f;
+            lastValue = 0;
+            translateTransform.getTranslation(tempVec);
+            distanceFromOrigin.set(-tempVec.x, -tempVec.y);
+        }
+    }
 
     Interpolation recoilInterpolation, returnInterpolation, shakeInterpolation;
 
@@ -72,10 +62,7 @@ public class PistolAnimation {
     boolean flip = false;
 
     public void update(float delta, float rotation) {
-        //Player player = gun.getOwner();
         Vector3 mousePos = GameState.instance.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-        //float rotation = Double.valueOf(Math.toDegrees(Math.atan2(mousePos.y - player.getPosition().y, mousePos.x - player.getPosition().x))).floatValue();
-        //HandyHelper.instance.log(Float.toString(Math.round(rotation)));
 
         if ((rotation < -90 && rotation >= -180) || rotation <= 180 && rotation > 90) {
             flip = true;
@@ -126,10 +113,6 @@ public class PistolAnimation {
         lastValue = alpha;
 
         rotationTransform.setToRotation(rotation);
-
-        //HandyHelper.instance.log("[GunSprite:169] rot: " + Math.round(rotation));
-
-        //transformSprite(translateTransform);
     }
 
     public void updateAndTransform(float delta, float rotation, Sprite sprite){

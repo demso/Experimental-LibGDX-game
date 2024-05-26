@@ -43,7 +43,7 @@ public class Gun extends Item {
     }
 
     public void fireBullet(Player player){
-        (gunSpriteBehaviour).fire();
+        (gunSpriteBehaviour).onFire();
         Vector3 mousePos = gameState.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
         Vector2 vv = new Vector2(mousePos.x-player.getPosition().x, mousePos.y-player.getPosition().y);
         new Bullet(TileResolver.getTile("bullet"), player.getPosition(), vv);
