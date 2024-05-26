@@ -42,20 +42,17 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
         init();
     }
 
-//    public GunSpriteBehaviour(GameObject gameObject, Gun gun, Sprite sprite, float renderOrder) {
-//        super(gameObject, sprite, renderOrder);
-//
-//        init();
-//    }
+    public GunSpriteBehaviour(GameObject gameObject, Gun gun, Sprite sprite, float renderOrder) {
+        super(gameObject, sprite, renderOrder);
+        setRenderOrder(renderOrder);
+        this.sprite = sprite;
+        init();
+    }
 
     private void init(){
         setOffset(-sprite.getWidth()/2f, -sprite.getHeight()/2f);
         pistolAnimation = new PistolAnimation();
-
-        //scaleTransform.scale(0.4f, 0.4f);
     }
-
-    Interpolation recoilInterpolation, returnInterpolation, shakeInterpolation;
 
     public void onFire(){
         pistolAnimation.fire();
@@ -70,23 +67,16 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
 
             pistolAnimation.updateAndTransform(delta, rotation, sprite);
         } else {
-            sprite.setOriginCenter();
+            super.update(delta);
         }
     }
 
     @Override
     public void fixedUpdate() {
-        Box2dBehaviour box2dBehaviour = getGameObject().getBehaviour(Box2dBehaviour.class);
-        if (box2dBehaviour != null && !gun.isEquipped()) {
-            if (box2dBehaviour.getBody().getPosition().equals(position)) return;
-            sprite.setFlip(false, false);
-            position.set(box2dBehaviour.getBody().getPosition());
-
-            position.add(offsetX, offsetY);
-            this.sprite.setPosition(position.x, position.y);
-        }
-        if (gun.isEquipped()){
+        if (gun.isEquipped()) {
             sprite.setPosition(gun.getOwner().getPosition().x + (sprite.getWidth() / 2f), gun.getOwner().getPosition().y + sprite.getHeight() / 2f);
+        } else {
+            super.fixedUpdate();
         }
     }
 

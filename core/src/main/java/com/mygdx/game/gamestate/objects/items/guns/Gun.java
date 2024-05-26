@@ -31,8 +31,6 @@ public class Gun extends Item {
         super(tile, itemName);
         spriteWidth = 0.4f;
         spiteHeight = 0.4f;
-//        spriteBehaviour = new GunSpriteBehaviour(GO, 1f, 1f, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
-//        mouseHandler.setTouchable(Touchable.disabled);
     }
 
     public Gun(String tileName, String itemName) {
@@ -66,24 +64,11 @@ public class Gun extends Item {
         if (GO == null)
             GO = new GameObject(itemName, false, instance.unbox);
 
-        if (isEquipped()) {
-            Array<SpriteBehaviour> spriteBehaves = GO.getBehaviours(SpriteBehaviour.class);
-            if (spriteBehaves.size > 0) {
-                spriteBehaves.forEach((behave) -> {GO.destroy(behave);});
-                spriteBehaviour = null;
-            }
-
-            if (gunSpriteBehaviour == null || gunSpriteBehaviour.getState().equals(BehaviourState.DESTROYED))
+        if (gunSpriteBehaviour == null || gunSpriteBehaviour.getState().equals(BehaviourState.DESTROYED))
                 gunSpriteBehaviour = new GunSpriteBehaviour(GO, this, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
-        } else {
-            Array<GunSpriteBehaviour> gunSpriteBehaves = GO.getBehaviours(GunSpriteBehaviour.class);
-            if (gunSpriteBehaves.size > 0) {
-                gunSpriteBehaves.forEach((behave) -> {GO.destroy(behave);});
-                gunSpriteBehaviour = null;
-            }
 
-            if (spriteBehaviour == null || spriteBehaviour.getState().equals(BehaviourState.DESTROYED))
-                spriteBehaviour = new SpriteBehaviour(GO, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
+        if (isEquipped()) {
+        } else {
 
             if (mouseHandler == null) {
                 mouseHandler = new Table();
