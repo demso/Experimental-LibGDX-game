@@ -6,10 +6,12 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Server;
+import com.mygdx.game.client.GameClient;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.*;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -17,14 +19,11 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
 import com.mygdx.game.gamestate.UI.console.InGameConsole;
 import com.mygdx.game.gamestate.factories.ItemsFactory;
-import com.mygdx.game.gamestate.objects.items.guns.Gun;
-import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.UI.HUD;
-import com.mygdx.game.gamestate.objects.bullet.Bullet;
-import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.player.Player;
+import com.mygdx.game.server.GameServer;
 import dev.lyze.gdxUnBox2d.UnBox;
 import net.dermetfan.gdx.physics.box2d.Box2DUtils;
 
@@ -57,6 +56,8 @@ public class GameState {
     public ShapeRenderer shapeRenderer;
     public UnBox unbox;
     public HUDInputListener HUDIL;
+    public GameServer server;
+    public GameClient client;
 
     public void tester(){
         player.takeItem(ItemsFactory.getItem("10mm_fmj"));
@@ -120,12 +121,6 @@ public class GameState {
         }
 
         console.draw();
-    }
-
-    public void fireBullet(Player pla){
-        Vector3 mousePos = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-        Vector2 vv = new Vector2(mousePos.x-player.getPosition().x, mousePos.y-player.getPosition().y);
-        new Bullet(TileResolver.getTile("bullet"), pla.getPosition(), vv);
     }
 
     Vector2 beginV;

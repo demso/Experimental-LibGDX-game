@@ -10,6 +10,7 @@ buildscript {
     maven { url 'https://jitpack.io' }
   }
   dependencies {
+
   }
 }
 
@@ -31,8 +32,6 @@ allprojects {
       testOutputDir file('build/classes/java/test')
     }
   }
-
-
 }
 
 configure(subprojects) {

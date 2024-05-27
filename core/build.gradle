@@ -18,5 +18,6 @@ dependencies {
   implementation 'org.jetbrains:annotations:24.0.0'
   implementation "space.earlygrey:shapedrawer:$shapedrawerVersion"
   //implementation "net.onedaybeard.artemis:artemis-odb:$artemisOdbVersion"
+  implementation 'com.github.crykn:kryonet:2.22.9'
 }
 

@@ -37,7 +37,6 @@ public class Gun extends Item {
         super(tileName, itemName);
         spriteWidth = 0.4f;
         spiteHeight = 0.4f;
-        //spriteBehaviour = new GunSpriteBehaviour(GO, 1, 1, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
     }
 
     public void fireBullet(Player player){

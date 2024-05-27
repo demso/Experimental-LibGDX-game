@@ -13,8 +13,6 @@ import dev.lyze.gdxUnBox2d.GameObject;
 import dev.lyze.gdxUnBox2d.behaviours.BehaviourAdapter;
 
 public class PlayerHandler extends BehaviourAdapter {
-
-
     public boolean moveUp,
             moveDown,
             moveToTheRight,
@@ -79,7 +77,7 @@ public class PlayerHandler extends BehaviourAdapter {
             batch.draw(currentFrame, player.getPosition().x - player.WIDTH/2, player.getPosition().y - player.WIDTH * 1/4, player.WIDTH, player.HEIGHT);
         if (player.equipedItem != null){
             if (player.equipedItem instanceof Gun gun) {
-               // gun.getSpriteBehaviour().render(batch);
+
             } else {
                 TextureRegion tileTextureRegion = player.equipedItem.tile.getTextureRegion();
                 float width = 0.5f;
@@ -98,7 +96,7 @@ public class PlayerHandler extends BehaviourAdapter {
     }
 
     @Override
-    public void fixedUpdate() {
+    public void fixedUpdate()  {
         if (player.isAlive() && (moveUp || moveDown || moveToTheRight || moveToTheLeft)){
             movingImpulse.set(0,0);
             movingVector.set(0,0);

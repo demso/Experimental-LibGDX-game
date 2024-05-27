@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.mygdx.game.client.GameClient;
 import com.mygdx.game.gamestate.GameStageInputListener;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.*;
@@ -25,6 +26,7 @@ import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.player.PlayerConstructor;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTmxMapLoader;
+import com.mygdx.game.server.GameServer;
 import dev.lyze.gdxUnBox2d.UnBox;
 
 public class GameConstructor {
@@ -73,6 +75,9 @@ public class GameConstructor {
         gameState.console.setCommandExecutor(new ConsoleCommands(gameState));
 
         gameState.tester();
+
+        gameState.server = new GameServer();
+        gameState.client = new GameClient();
 
         return gameState;
     }
