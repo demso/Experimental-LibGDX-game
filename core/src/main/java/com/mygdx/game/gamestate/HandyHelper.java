@@ -20,6 +20,7 @@ public class HandyHelper {
     }
 
     String lastString = "";
+
     public void noSpamLog(String toLog) {
         if (!lastString.equals(toLog)){
             System.out.println(toLog);

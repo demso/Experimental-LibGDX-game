@@ -15,7 +15,7 @@ public class GameScreen implements Screen {
     public SecondGDXGame game;
     public GameScreen(){
         this.game = SecondGDXGame.instance;
-        gameState = new GameConstructor().createGameState(null);
+        //gameState = new GameConstructor().createGameState(null);
         GameState.instance = gameState;
     }
 

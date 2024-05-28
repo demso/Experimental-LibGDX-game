@@ -68,4 +68,12 @@ public class Log {
 			return false;
 		}
 	}
+
+	public String printToString(){
+		String toWrite = "";
+		for (LogEntry l : logEntries) {
+			toWrite += l.toString() + "\n";
+		}
+		return toWrite;
+	}
 }

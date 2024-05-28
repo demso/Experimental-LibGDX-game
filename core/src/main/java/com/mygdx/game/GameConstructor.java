@@ -6,7 +6,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.kryonet.Server;
+import com.mygdx.game.gamestate.tiledmap.tiled.TmxMapLoader;
 import com.mygdx.game.net.GameClient;
 import com.mygdx.game.gamestate.GameStageInputListener;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.*;
@@ -21,6 +23,7 @@ import com.mygdx.game.gamestate.UI.console.InGameConsole;
 import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 import com.mygdx.game.gamestate.UI.console.ConsoleCommands;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
+import com.mygdx.game.net.PlayerInfo;
 import com.mygdx.game.net.messages.server.OnConnection;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.gamestate.UI.HUD;
@@ -40,6 +43,7 @@ public class GameConstructor {
         gameState.gameScreen = SecondGDXGame.instance.gameScreen;
         gameState.font = SecondGDXGame.font;
         gameState.skin = SecondGDXGame.skin;
+        gameState.players = new ObjectMap<>();
 
         gameState.debugRenderer = new ShapeRenderer();
         gameState.shapeRenderer = new ShapeRenderer();
@@ -55,7 +59,7 @@ public class GameConstructor {
 
         gameState.camera.setToOrtho(false, 30, 20);
 
-        gameState.map = new MyTmxMapLoader(gameState.world).load(gameState.mapToLoad);
+        gameState.map = new MyTmxMapLoader(gameState.world).load(msg.map, new TmxMapLoader.Parameters());
 
         gameState.shapeRenderer.setProjectionMatrix(gameState.camera.combined);
         gameState.renderer = new OrthogonalTiledMapRenderer(gameState.map, 1f / (float) GameState.TILE_SIDE);
@@ -69,16 +73,21 @@ public class GameConstructor {
         initPhysics();
 
         gameState.player = new PlayerConstructor().createPlayer(gameState);
+        gameState.player.setPosition(msg.spawnX, msg.spawnY);
+
+        for (PlayerInfo plInf : msg.players){
+            if (plInf.getName().equals(SecondGDXGame.instance.name))
+                continue;
+            gameState.playerJoined(plInf.getName(), plInf.x, plInf.y);
+        }
 
         gameState.console = new InGameConsole(SecondGDXGame.instance.skin1x,true);
         gameState.console.setDisplayKeyID(Input.Keys.GRAVE);
         //gameState.console.setNoHoverAlpha(0.5f);
         gameState.console.setCommandExecutor(new ConsoleCommands(gameState));
+        gameState.console.setMaxEntries(50);
 
         gameState.tester();
-
-        gameState.client = new GameClient();
-        gameState.client.connect("127.0.0.1");
 
         return gameState;
     }

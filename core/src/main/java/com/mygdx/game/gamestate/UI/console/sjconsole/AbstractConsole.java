@@ -78,6 +78,10 @@ public abstract class AbstractConsole implements Console, Disposable {
 		this.log(exception, LogLevel.ERROR);
 	}
 
+	public Log getLog(){
+		return log;
+	}
+
 	@Override public void printLogToFile (String file) {
 		this.printLogToFile(Gdx.files.local(file));
 	}

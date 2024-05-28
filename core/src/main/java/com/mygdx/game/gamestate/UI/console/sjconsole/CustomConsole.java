@@ -258,11 +258,11 @@ public class CustomConsole extends AbstractConsole {
         if (disabled) {
             return;
         }
-        stage.act();
 
         if (hidden) {
             return;
         }
+        stage.act();
         stage.draw();
     }
 

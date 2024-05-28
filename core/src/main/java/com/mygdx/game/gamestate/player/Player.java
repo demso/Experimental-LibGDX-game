@@ -38,6 +38,7 @@ public class Player extends Entity implements Storage {
     public Item equipedItem;
 
     public GameObject playerObject;
+    public PlayerMoveReceiver playerHandler;
 
     float normalSpeedMultiplier = 1;
     float currentSpeedMultiplier = normalSpeedMultiplier;
@@ -87,11 +88,6 @@ public class Player extends Entity implements Storage {
         equipedItem.unequip();
         equipedItem = null;
     }
-    public Item freeHands(){
-        Item item = equipedItem;
-        equipedItem = null;
-        return item;
-    }
 
     @Override
     public String getName() {
@@ -118,5 +114,9 @@ public class Player extends Entity implements Storage {
     public void fire(){
         if (equipedItem != null && equipedItem instanceof Gun gun)
             gun.fireBullet(this);
+    }
+
+    public void setPosition(float x, float y){
+        getBody().setTransform(x, y, getBody().getTransform().getRotation());
     }
 }

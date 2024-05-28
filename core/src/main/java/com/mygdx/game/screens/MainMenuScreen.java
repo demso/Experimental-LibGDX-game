@@ -10,10 +10,13 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.*;
 import com.mygdx.game.SecondGDXGame;
@@ -35,7 +38,9 @@ public class MainMenuScreen implements Screen {
     TextButton connectButton;
     Table connectionDialog;
     Table errorDialog;
+    Dialog infoDialog;
     String ip = "127.0.0.1";
+    public TextField nameField;
 
     public MainMenuScreen(final SecondGDXGame gam) {
         game = gam;
@@ -48,7 +53,7 @@ public class MainMenuScreen implements Screen {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y){
-                game.createServerAndConnect();
+                game.createServerAndConnect(nameField.getText());
             }
         });
         stage.addListener(new InputListener(){
@@ -92,7 +97,10 @@ public class MainMenuScreen implements Screen {
         connectDialogBut.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.connectToServer(ipField.getText());
+                if (nameField.getText().trim().equals("Destroyer of Ass"))
+                    showClosableInfoDialog("Change nickname");
+                else
+                    game.connectToServer(ipField.getText(), nameField.getText());
             }
         });
         TextButton cancelDialogBut = new TextButton("Cancel", skin);
@@ -108,6 +116,12 @@ public class MainMenuScreen implements Screen {
         connectionDialog.add(connectDialogBut).pad(5);
         connectionDialog.add(cancelDialogBut).pad(5);
         connectionDialog.pack();
+
+        nameField = new TextField("Destroyer of Ass",skin);
+        nameField.setWidth(300);
+        nameField.setAlignment(Align.center);
+        nameField.setPosition(stage.getWidth() - nameField.getWidth() - 10, stage.getHeight() - nameField.getHeight() - 10);
+        stage.addActor(nameField);
     }
 
     public String getIp(){
@@ -150,6 +164,32 @@ public class MainMenuScreen implements Screen {
         stage.addActor(errorDialog);
     }
 
+    public void showInfoDialog(String s){
+        stage.getRoot().removeActor(infoDialog);
+        infoDialog = new Dialog("Info", skin1x);
+        infoDialog.text(s);
+        infoDialog.setPosition(stage.getWidth()/2 - infoDialog.getWidth()/2, stage.getHeight()/2 - infoDialog.getHeight()/2 );
+        stage.addActor(infoDialog);
+    }
+
+    public void showClosableInfoDialog(String s){
+        stage.getRoot().removeActor(infoDialog);
+        infoDialog = new Dialog("Info", skin1x);
+        infoDialog.text(s);
+
+        TextButton okButton = new TextButton("OK", skin);
+        okButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                stage.getRoot().removeActor(infoDialog);
+            }
+        });
+
+        infoDialog.button(okButton);
+        infoDialog.setPosition(stage.getWidth()/2 - infoDialog.getWidth()/2, stage.getHeight()/2 - infoDialog.getHeight()/2 );
+        stage.addActor(infoDialog);
+    }
+
     @Override
     public void render(float delta) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -169,6 +209,10 @@ public class MainMenuScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
+        if (infoDialog != null)
+            stage.getRoot().removeActor(infoDialog);
+        if (connectionDialog != null)
+            stage.getRoot().removeActor(connectionDialog);
     }
     @Override
     public void hide() {

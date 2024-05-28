@@ -23,7 +23,8 @@ public abstract class Entity implements BodyData {
     }
     public enum Kind {
         ZOMBIE,
-        PLAYER
+        PLAYER,
+        ANOTHER_PLAYER
     }
     @Getter int hp = 1;
     @Getter int maxHp = 1;
@@ -32,6 +33,7 @@ public abstract class Entity implements BodyData {
     @Setter @Getter Body body;
     @Setter @Getter Friendliness friendliness = Friendliness.NEUTRAL;
     @Getter @Setter Kind kind;
+    @Setter String name;
 
     public Entity(){}
 
@@ -64,7 +66,7 @@ public abstract class Entity implements BodyData {
     }
     @Override
     public String getName() {
-        return friendliness + " Entity";
+        return name == null ? friendliness + " Entity" : name;
     }
     public void kill(){
         isAlive = false;

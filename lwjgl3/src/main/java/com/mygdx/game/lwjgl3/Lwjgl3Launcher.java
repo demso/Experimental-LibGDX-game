@@ -4,15 +4,56 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.mygdx.game.SecondGDXGame;
 
+import java.io.*;
+import java.net.URISyntaxException;
+
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
     public static void main(String[] args) {
         if (StartupHelper.startNewJvmIfRequired()) return; // This handles macOS support and helps on Windows.
-        createApplication();
+
+        try {
+            createApplication();
+        } catch (Exception ex) {
+            StringWriter errors = new StringWriter();
+            ex.printStackTrace(new PrintWriter(errors));
+            ex.printStackTrace();
+            saveLog(errors.toString());
+        }
+
     }
 
     private static Lwjgl3Application createApplication() {
+
         return new Lwjgl3Application(new SecondGDXGame(), getDefaultConfiguration());
+    }
+
+    private static void saveLog(String s){
+        try {
+            File file = new File(Lwjgl3Launcher.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath() + "crashlog.txt");
+            if (file.exists())
+                file.delete();
+            file.createNewFile();
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            String consoleLog = null;
+
+            if (SecondGDXGame.instance != null
+                    && SecondGDXGame.instance.gameScreen != null
+                    && SecondGDXGame.instance.gameScreen.gameState != null
+                    && SecondGDXGame.instance.gameScreen.gameState.console != null)
+                consoleLog = SecondGDXGame.instance.gameScreen.gameState.console.getLog().printToString();
+            if (SecondGDXGame.instance != null && SecondGDXGame.instance.server != null) {
+                SecondGDXGame.instance.server.dispose();
+            }
+            if (SecondGDXGame.instance != null && SecondGDXGame.instance.client != null) {
+                SecondGDXGame.instance.client.dispose();
+            }
+            writer.write(consoleLog + "\n Exception: \n" + s);
+            writer.flush();
+            writer.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {

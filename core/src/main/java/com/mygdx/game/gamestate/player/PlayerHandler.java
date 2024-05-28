@@ -7,12 +7,14 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
+import com.mygdx.game.net.messages.client.PlayerMove;
 import dev.lyze.gdxUnBox2d.GameObject;
 import dev.lyze.gdxUnBox2d.behaviours.BehaviourAdapter;
 
-public class PlayerHandler extends BehaviourAdapter {
+public class PlayerHandler extends BehaviourAdapter implements PlayerMoveReceiver {
     public boolean moveUp,
             moveDown,
             moveToTheRight,
@@ -39,8 +41,28 @@ public class PlayerHandler extends BehaviourAdapter {
 
     Vector2 zeroVector = new Vector2(0, 0);
 
+    boolean needsUpdate;
+
+    PlayerMove playerMove;
+
+    float accumulator;
+
     @Override
     public void update(float delta) {
+        accumulator += delta;
+
+        if (accumulator > 0.050f){
+            SecondGDXGame.instance.client.sendPlayerMove(SecondGDXGame.instance.name, player.getPosition(), player.getBody().getLinearVelocity());
+            accumulator = 0;
+        }
+
+        if (needsUpdate && playerMove != null){
+            player.getBody().setTransform(playerMove.x, playerMove.y, player.getBody().getTransform().getRotation());
+            player.getBody().setLinearVelocity(playerMove.xSpeed, playerMove.ySpeed);
+            needsUpdate = false;
+            playerMove = null;
+        }
+
         if (delta > 0.1f) delta = 0.1f;
         stateTime += delta;
         switch (player.getState()) {
@@ -94,6 +116,8 @@ public class PlayerHandler extends BehaviourAdapter {
             }
         }
     }
+
+    byte indexer = 0;
 
     @Override
     public void fixedUpdate()  {
@@ -152,7 +176,21 @@ public class PlayerHandler extends BehaviourAdapter {
             player.playerObject.getBehaviour(PlayerCollisionBehaviour.class).updatePlayerClosestObject();
         }
 
+        if (indexer == 2){
+            SecondGDXGame.instance.client.sendPlayerMove(SecondGDXGame.instance.name, player.getPosition(), player.getBody().getLinearVelocity());
+            indexer = 0;
+        }
+        indexer += 1;
+    }
 
-
+    @Override
+    public void receivePlayerUpdate(PlayerMove move) {
+//        Vector2 pos = player.getBody().getPosition();
+//        Vector2 speed = player.getBody().getLinearVelocity();
+//        if (Math.abs(pos.x - move.x) < 0.05 && Math.abs(pos.y - move.y) < 0.05
+//                && Math.abs(speed.x - move.xSpeed) < 0.05 && Math.abs(speed.y - move.ySpeed) < 0.05)
+//            return;
+//        needsUpdate = true;
+//        playerMove = move;
     }
 }

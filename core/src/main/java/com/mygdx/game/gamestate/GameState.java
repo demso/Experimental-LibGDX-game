@@ -6,6 +6,9 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.mygdx.game.gamestate.player.AnotherPlayerConstructor;
+import com.mygdx.game.gamestate.player.PlayerConstructor;
 import com.mygdx.game.net.GameClient;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.*;
@@ -17,6 +20,9 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
 import com.mygdx.game.gamestate.UI.console.InGameConsole;
 import com.mygdx.game.gamestate.factories.ItemsFactory;
+import com.mygdx.game.net.messages.client.PlayerMove;
+import com.mygdx.game.net.messages.server.PlayerJoined;
+import com.mygdx.game.net.messages.server.PlayerMoves;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.UI.HUD;
@@ -27,7 +33,6 @@ import net.dermetfan.gdx.physics.box2d.Box2DUtils;
 
 public class GameState {
     public static GameState instance;
-    public final String mapToLoad = "tiled/firstmap/worldmap.tmx";
     public SecondGDXGame game;
     public GameScreen gameScreen;
     public Player player;
@@ -48,12 +53,16 @@ public class GameState {
     public static final float TILE_SIDE = 32f;
     public HUD hud;
     public Stage gameStage;
-    public float physicsStep = 1/144f;
+    public float physicsStep = 1/75f;
     public InGameConsole console;
     public ShapeRenderer shapeRenderer;
     public UnBox unbox;
     public HUDInputListener HUDIL;
     public GameClient client;
+    public ObjectMap<String, Player> players;
+    public PlayerJoined playerJoined;
+    public boolean playersNeedUpdate;
+    public PlayerMoves moves;
 
     public void tester(){
         player.takeItem(ItemsFactory.getItem("10mm_fmj"));
@@ -70,6 +79,11 @@ public class GameState {
         //CAMERA UPDATE
         camera.position.set(player.getPosition(), 0);
         camera.update();
+
+        if (playersNeedUpdate)
+            for (PlayerMove move : moves.moves){
+                players.get(move.name).playerHandler.receivePlayerUpdate(move);
+            }
     }
 
     public void render(float deltaTime){
@@ -116,7 +130,13 @@ public class GameState {
             debugRendererPh.render(world, camera.combined);
         }
 
-        console.draw();
+        if (console.isVisible())
+            console.draw();
+
+        if (playerJoined != null){
+            playerJoined(playerJoined);
+            playerJoined = null;
+        }
     }
 
     Vector2 beginV;
@@ -132,6 +152,17 @@ public class GameState {
         }
     }
 
+    public void playerJoined(PlayerJoined plJoin){
+        Player anotherPlayer = AnotherPlayerConstructor.createPlayer(plJoin.name);
+        anotherPlayer.setPosition(plJoin.x, plJoin.y);
+        players.put(plJoin.name, anotherPlayer);
+    }
+
+    public void playerJoined(String name, float x, float y){
+        Player anotherPlayer = AnotherPlayerConstructor.createPlayer(name);
+        anotherPlayer.setPosition(x, y);
+        players.put(name, anotherPlayer);
+    }
 
 }
 

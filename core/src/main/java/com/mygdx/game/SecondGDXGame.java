@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.net.GameClient;
@@ -23,6 +24,9 @@ public class SecondGDXGame extends Game {
     public static BitmapFont fontRoboto14;
     public static HandyHelper helper;
     public GameClient client;
+    public GameServer server;
+    public boolean readyToStart = false;
+    public String name;
 
     @Override
     public void create() {
@@ -54,17 +58,21 @@ public class SecondGDXGame extends Game {
         this.setScreen(menuScreen);
     }
 
-    public void createServerAndConnect(){
-        GameServer server = new GameServer();
-        client = new GameClient();
-        client.connect("127.0.0.1");
-        setScreen(gameScreen);
+    public void createServerAndConnect(String name){
+        this.name = menuScreen.nameField.getText();
+        server = new GameServer();
+
+        connectToServer("127.0.0.1", name);
+
+        //setScreen(gameScreen);
     }
 
-    public boolean connectToServer(String ip){
+    public boolean connectToServer(String ip, String name){
+        this.name = name;
         client = new GameClient();
         String er = client.connect(ip);
         if (er == null) {
+            menuScreen.showInfoDialog("Connecting...");
             HandyHelper.instance.log("[Client] Waiting for data from server to start game");
         } else {
             menuScreen.showErrorDialog(er);
@@ -74,13 +82,32 @@ public class SecondGDXGame extends Game {
     }
 
     public void startGame(OnConnection msg){
+        if (getScreen() == gameScreen)
+            setScreen(menuScreen);
+
         gameScreen.gameState = new GameConstructor().createGameState(msg); //создаем клиент
 
         setScreen(gameScreen);
     }
 
     @Override
+    public void render() {
+        super.render();
+        if (readyToStart){
+            startGame(client.startMessage);
+            client.startMessage = null;
+            readyToStart = false;
+        }
+    }
+
+    @Override
     public void dispose() {
         super.dispose();
+        if (server != null){
+            server.dispose();
+        }
+        if (client != null) {
+            client.dispose();
+        }
     }
 }
