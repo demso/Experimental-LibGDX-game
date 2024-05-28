@@ -21,6 +21,7 @@ import com.mygdx.game.gamestate.UI.console.InGameConsole;
 import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 import com.mygdx.game.gamestate.UI.console.ConsoleCommands;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
+import com.mygdx.game.net.messages.server.OnConnection;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.objects.items.Item;
@@ -31,12 +32,12 @@ import dev.lyze.gdxUnBox2d.UnBox;
 
 public class GameConstructor {
     GameState gameState;
-    public GameState createGameState(GameScreen gameScreen){
+    public GameState createGameState(OnConnection msg){
         gameState = new GameState();
         GameState.instance = gameState;
 
-        gameState.game = gameScreen.game;
-        gameState.gameScreen = gameScreen;
+        gameState.game = SecondGDXGame.instance;
+        gameState.gameScreen = SecondGDXGame.instance.gameScreen;
         gameState.font = SecondGDXGame.font;
         gameState.skin = SecondGDXGame.skin;
 

@@ -5,6 +5,6 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
 
 public class OnConnection {
-    String map;
-    Vector2 spawnPoint;
+   public String map;
+   public Vector2 spawnPoint;
 }

@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.net.GameClient;
 import com.mygdx.game.net.GameServer;
+import com.mygdx.game.net.messages.server.OnConnection;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.screens.MainMenuScreen;
 
@@ -15,7 +16,7 @@ public class SecondGDXGame extends Game {
     public static SecondGDXGame instance;
     public SpriteBatch batch;
     public static MainMenuScreen menuScreen;
-    public static GameScreen gameScreen;
+    public GameScreen gameScreen;
     public static Skin skin;
     public Skin skin1x;
     public static BitmapFont font;
@@ -48,7 +49,7 @@ public class SecondGDXGame extends Game {
         Button.ButtonStyle bs = skin.get(Button.ButtonStyle.class);
 
         menuScreen = new MainMenuScreen(this);
-        gameScreen = new GameScreen(this);
+        gameScreen = new GameScreen();
 
         this.setScreen(menuScreen);
     }
@@ -57,22 +58,25 @@ public class SecondGDXGame extends Game {
         GameServer server = new GameServer();
         client = new GameClient();
         client.connect("127.0.0.1");
-
-        setScreen(SecondGDXGame.gameScreen);
+        setScreen(gameScreen);
     }
 
     public boolean connectToServer(String ip){
         client = new GameClient();
-        if (client.connect(ip)) {
-            setScreen(SecondGDXGame.gameScreen);
+        String er = client.connect(ip);
+        if (er == null) {
+            HandyHelper.instance.log("[Client] Waiting for data from server to start game");
         } else {
+            menuScreen.showErrorDialog(er);
             return false;
         }
         return  true;
     }
 
-    public void startGame(){
+    public void startGame(OnConnection msg){
+        gameScreen.gameState = new GameConstructor().createGameState(msg); //создаем клиент
 
+        setScreen(gameScreen);
     }
 
     @Override

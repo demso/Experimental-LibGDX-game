@@ -27,7 +27,7 @@ import net.dermetfan.gdx.physics.box2d.Box2DUtils;
 
 public class GameState {
     public static GameState instance;
-    public final String mapToLoad = "tiled/worldmap.tmx";
+    public final String mapToLoad = "tiled/firstmap/worldmap.tmx";
     public SecondGDXGame game;
     public GameScreen gameScreen;
     public Player player;

@@ -15,7 +15,7 @@ public class GameServer {
     MyTiledMap map;
     World world;
 
-    public final String mapToLoad = "tiled/worldmap.tmx";
+    public final String mapToLoad = "tiled/firstmap/worldmap.tmx";
     public GameServer() {
         try {
             init();

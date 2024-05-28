@@ -45,6 +45,25 @@ public class MyTmxMapLoader extends TmxMapLoader {
         return map;
     }
 
+//    public MyTiledMap loadFromString(String xml, TmxMapLoader.Parameters parameter) {
+//
+//        this.root = this.xml.parse(xml);
+//
+//        ObjectMap<String, Texture> textures = new ObjectMap<String, Texture>();
+//
+//        final Array<FileHandle> textureFiles = getDependencyFileHandles(tmxFile);
+//        for (FileHandle textureFile : textureFiles) {
+//            Texture texture = new Texture(textureFile, parameter.generateMipMaps);
+//            texture.setFilter(parameter.textureMinFilter, parameter.textureMagFilter);
+//            textures.put(textureFile.path(), texture);
+//        }
+//
+//        MyTiledMap map = loadTiledMap(tmxFile, parameter, new ImageResolver.DirectImageResolver(textures));
+//        map.setOwnedResources(textures.values().toArray());
+//
+//        return map;
+//    }
+
     @Override
     protected MyTiledMap loadTiledMap (FileHandle tmxFile, TmxMapLoader.Parameters parameter, ImageResolver imageResolver) {
         this.map = new MyTiledMap(world);

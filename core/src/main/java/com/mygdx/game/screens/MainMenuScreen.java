@@ -10,10 +10,16 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.*;
 import com.mygdx.game.SecondGDXGame;
+
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 
 public class MainMenuScreen implements Screen {
     int viewportWidth = 640, viewportHeight = 480;
@@ -21,12 +27,14 @@ public class MainMenuScreen implements Screen {
     final SecondGDXGame game;
     OrthographicCamera camera;
     Skin skin;
+    Skin skin1x = SecondGDXGame.instance.skin1x;
     VerticalGroup buttonsGroup;
     TextButton playButton;
     TextButton settingsButton;
     TextButton exitButton;
     TextButton connectButton;
     Table connectionDialog;
+    Table errorDialog;
     String ip = "127.0.0.1";
 
     public MainMenuScreen(final SecondGDXGame gam) {
@@ -78,7 +86,6 @@ public class MainMenuScreen implements Screen {
 
         connectionDialog = new Table(skin);
         //connectionDialog.debugAll();
-        connectionDialog.remove();
         connectionDialog.setBackground("connection-dialog");
         TextField ipField = new TextField("127.0.0.1", skin);
         TextButton connectDialogBut = new TextButton("Connect", skin);
@@ -105,6 +112,42 @@ public class MainMenuScreen implements Screen {
 
     public String getIp(){
         return ip;
+    }
+
+    public void showErrorDialog(String s){
+        stage.getRoot().removeActor(errorDialog);
+        errorDialog = new Table(skin);
+        errorDialog.setBackground("connection-dialog");
+        Label errorName = new Label("Problems with connection: ", skin1x);
+        TextArea errorMessage = new TextArea("",skin1x);
+        errorMessage.setTouchable(Touchable.disabled);
+        errorMessage.setText(s);
+        errorMessage.setPrefRows(10);
+        errorMessage.setSize(1000, 200);
+        TextButton errorCopy = new TextButton("Cope", skin1x);
+        errorCopy.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Toolkit.getDefaultToolkit()
+                        .getSystemClipboard()
+                        .setContents(new StringSelection(errorMessage.getText()), null);
+            }
+        });
+        TextButton errorClose = new TextButton("Close", skin1x);
+        errorClose.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                stage.getRoot().removeActor(errorDialog);
+            }
+        });
+        errorDialog.add(errorName).colspan(2).expandX().pad(5).row();
+        errorDialog.add(errorMessage).colspan(2).fillX().expandX().pad(5).center().row();
+        errorDialog.add(errorCopy).pad(5);
+        errorDialog.add(errorClose).pad(5);
+        errorDialog.pack();
+        errorDialog.setWidth(500);
+        errorDialog.setPosition(stage.getWidth()/2 - errorDialog.getWidth()/2, stage.getHeight()/2 - errorDialog.getHeight()/2);
+        stage.addActor(errorDialog);
     }
 
     @Override
