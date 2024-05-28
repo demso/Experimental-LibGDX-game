@@ -15,6 +15,7 @@ public class GameScreen implements Screen {
     HUD hudStage;
     public GameScreen(@NotNull SecondGDXGame game){
         this.game = game;
+        SecondGDXGame.menuScreen.getIp();
         gameState = new GameConstructor().createGameState(this);
         GameState.instance = gameState;
         this.hudStage = gameState.hud;

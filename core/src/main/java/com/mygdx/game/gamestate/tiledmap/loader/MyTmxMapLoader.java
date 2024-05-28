@@ -18,10 +18,10 @@ import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
 public class MyTmxMapLoader extends TmxMapLoader {
-    GameState gameState;
-    public MyTmxMapLoader(GameState gameState){
+    World world;
+    public MyTmxMapLoader(World world){
         super();
-        this.gameState = gameState;
+        this.world = world;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class MyTmxMapLoader extends TmxMapLoader {
 
     @Override
     protected MyTiledMap loadTiledMap (FileHandle tmxFile, TmxMapLoader.Parameters parameter, ImageResolver imageResolver) {
-        this.map = new MyTiledMap(gameState);
+        this.map = new MyTiledMap(world);
         this.idToObject = new IntMap<>();
         this.runOnEndOfLoadTiled = new Array<>();
 

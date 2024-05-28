@@ -254,6 +254,14 @@ default-select-selection
   orig: 3, 3
   offset: 0, 0
   index: -1
+connection-dialog
+  rotate: false
+  xy: 508, 78
+  size: 3, 3
+  split: 1, 1, 1, 1
+  orig: 3, 3
+  offset: 0, 0
+  index: -1
 font-small
   rotate: false
   xy: 1, 114

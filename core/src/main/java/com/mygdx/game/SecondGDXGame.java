@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.game.gamestate.HandyHelper;
+import com.mygdx.game.net.GameClient;
+import com.mygdx.game.net.GameServer;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.screens.MainMenuScreen;
 
@@ -19,6 +21,8 @@ public class SecondGDXGame extends Game {
     public static BitmapFont font;
     public static BitmapFont fontRoboto14;
     public static HandyHelper helper;
+    public GameClient client;
+
     @Override
     public void create() {
         instance = this;
@@ -46,6 +50,33 @@ public class SecondGDXGame extends Game {
         menuScreen = new MainMenuScreen(this);
         gameScreen = new GameScreen(this);
 
-        this.setScreen(gameScreen);
+        this.setScreen(menuScreen);
+    }
+
+    public void createServerAndConnect(){
+        GameServer server = new GameServer();
+        client = new GameClient();
+        client.connect("127.0.0.1");
+
+        setScreen(SecondGDXGame.gameScreen);
+    }
+
+    public boolean connectToServer(String ip){
+        client = new GameClient();
+        if (client.connect(ip)) {
+            setScreen(SecondGDXGame.gameScreen);
+        } else {
+            return false;
+        }
+        return  true;
+    }
+
+    public void startGame(){
+
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
     }
 }

@@ -10,8 +10,8 @@ public class MyTiledMap extends TiledMap {
     World world;
     public Array<Body> staticObjects = new Array<>();
 
-    MyTiledMap(GameState gameState){
+    MyTiledMap(World world){
         super();
-        this.world = gameState.world;
+        this.world = world;
     }
 }

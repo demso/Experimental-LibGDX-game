@@ -160,12 +160,12 @@ public class HUD extends Stage {
 
     public void showPopup(Actor actor){
         addEscClosable(actor);
-        //addActor(actor);
+        //addActor(actor); ItemPopup не показывается изза этого
     }
 
     public void closePopup(Actor actor){
         esClosablePopups.removeValue(actor, true);
-        //getActors().removeValue(actor, true);
+        //getActors().removeValue(actor, true); заменить на removeActor()
     }
 
     public boolean closeTopPopup(){

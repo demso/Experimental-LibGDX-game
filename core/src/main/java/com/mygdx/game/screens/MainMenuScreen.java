@@ -9,9 +9,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.*;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.*;
@@ -27,6 +25,9 @@ public class MainMenuScreen implements Screen {
     TextButton playButton;
     TextButton settingsButton;
     TextButton exitButton;
+    TextButton connectButton;
+    Table connectionDialog;
+    String ip = "127.0.0.1";
 
     public MainMenuScreen(final SecondGDXGame gam) {
         game = gam;
@@ -35,11 +36,11 @@ public class MainMenuScreen implements Screen {
         buttonsGroup = new VerticalGroup().space(30);
         buttonsGroup.setColor(Color.BLUE);
         buttonsGroup.fill();
-        playButton = new TextButton("Play", skin);
+        playButton = new TextButton("Create server", skin);
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y){
-                game.setScreen(game.gameScreen);
+                game.createServerAndConnect();
             }
         });
         stage.addListener(new InputListener(){
@@ -59,11 +60,51 @@ public class MainMenuScreen implements Screen {
             }
         });
         settingsButton = new TextButton("Settings", skin);
+        connectButton = new TextButton("Connect", skin);
+        connectButton.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                stage.getRoot().removeActor(connectionDialog, true);
+                stage.addActor(connectionDialog);
+                connectionDialog.setPosition(stage.getWidth()/2 - connectionDialog.getWidth()/2, stage.getHeight()/2 - connectionDialog.getHeight()/2);
+            }
+        });
         exitButton = new TextButton("Exit", skin);
         buttonsGroup.addActor(playButton);
+        buttonsGroup.addActor(connectButton);
         buttonsGroup.addActor(settingsButton);
         buttonsGroup.setPosition(230,stage.getHeight()-200);
         stage.addActor(buttonsGroup);
+
+        connectionDialog = new Table(skin);
+        //connectionDialog.debugAll();
+        connectionDialog.remove();
+        connectionDialog.setBackground("connection-dialog");
+        TextField ipField = new TextField("127.0.0.1", skin);
+        TextButton connectDialogBut = new TextButton("Connect", skin);
+        connectDialogBut.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.connectToServer(ipField.getText());
+            }
+        });
+        TextButton cancelDialogBut = new TextButton("Cancel", skin);
+        cancelDialogBut.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                stage.getRoot().removeActor(connectionDialog, true);
+            }
+        });
+
+        connectionDialog.clear();
+        connectionDialog.add(ipField).colspan(2).expandX().pad(5).center().row();
+        connectionDialog.add(connectDialogBut).pad(5);
+        connectionDialog.add(cancelDialogBut).pad(5);
+        connectionDialog.pack();
+    }
+
+    public String getIp(){
+        return ip;
     }
 
     @Override

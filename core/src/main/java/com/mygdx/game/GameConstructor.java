@@ -6,9 +6,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.mygdx.game.client.GameClient;
+import com.esotericsoftware.kryonet.Server;
+import com.mygdx.game.net.GameClient;
 import com.mygdx.game.gamestate.GameStageInputListener;
-import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -26,7 +26,7 @@ import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.player.PlayerConstructor;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTmxMapLoader;
-import com.mygdx.game.server.GameServer;
+import com.mygdx.game.net.GameServer;
 import dev.lyze.gdxUnBox2d.UnBox;
 
 public class GameConstructor {
@@ -54,7 +54,7 @@ public class GameConstructor {
 
         gameState.camera.setToOrtho(false, 30, 20);
 
-        gameState.map = new MyTmxMapLoader(gameState).load(gameState.mapToLoad);
+        gameState.map = new MyTmxMapLoader(gameState.world).load(gameState.mapToLoad);
 
         gameState.shapeRenderer.setProjectionMatrix(gameState.camera.combined);
         gameState.renderer = new OrthogonalTiledMapRenderer(gameState.map, 1f / (float) GameState.TILE_SIDE);
@@ -76,8 +76,8 @@ public class GameConstructor {
 
         gameState.tester();
 
-        gameState.server = new GameServer();
         gameState.client = new GameClient();
+        gameState.client.connect("127.0.0.1");
 
         return gameState;
     }

@@ -6,9 +6,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.esotericsoftware.kryonet.Client;
-import com.esotericsoftware.kryonet.Server;
-import com.mygdx.game.client.GameClient;
+import com.mygdx.game.net.GameClient;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.*;
 import com.badlogic.gdx.math.Vector2;
@@ -23,13 +21,13 @@ import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.player.Player;
-import com.mygdx.game.server.GameServer;
+import com.mygdx.game.net.GameServer;
 import dev.lyze.gdxUnBox2d.UnBox;
 import net.dermetfan.gdx.physics.box2d.Box2DUtils;
 
 public class GameState {
     public static GameState instance;
-
+    public final String mapToLoad = "tiled/worldmap.tmx";
     public SecondGDXGame game;
     public GameScreen gameScreen;
     public Player player;
@@ -47,7 +45,6 @@ public class GameState {
     public Array<Body> bodies;
     public Box2DDebugRenderer debugRendererPh;
     public float zoom = 2 ;
-    public final String mapToLoad = "tiled/worldmap.tmx";
     public static final float TILE_SIDE = 32f;
     public HUD hud;
     public Stage gameStage;
@@ -56,7 +53,6 @@ public class GameState {
     public ShapeRenderer shapeRenderer;
     public UnBox unbox;
     public HUDInputListener HUDIL;
-    public GameServer server;
     public GameClient client;
 
     public void tester(){
