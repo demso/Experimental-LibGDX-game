@@ -11,6 +11,8 @@ public class ItemsFactory {
     public static Item getItem(String itemId) {
         if (itemNames.isEmpty())
             init();
+        if (itemId == null)
+            return null;
         switch (itemId) {
             case "deagle_44" -> {
                 Gun gun = new Gun(TileResolver.getTile(itemId), getNameForID(itemId));

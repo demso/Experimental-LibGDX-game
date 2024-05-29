@@ -1,6 +1,7 @@
 package com.mygdx.game.gamestate.objects.items.guns;
 
 import com.badlogic.gdx.Gdx;
+import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -65,6 +66,11 @@ public class Gun extends Item {
 
         if (gunSpriteBehaviour == null || gunSpriteBehaviour.getState().equals(BehaviourState.DESTROYED))
                 gunSpriteBehaviour = new GunSpriteBehaviour(GO, this, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
+
+        if (getOwner() == instance.player)
+            gunSpriteBehaviour.setRenderOrder(Globals.PLAYER_RENDER_ORDER);
+        else
+            gunSpriteBehaviour.setRenderOrder(Globals.DEFAULT_RENDER_ORDER);
 
         if (isEquipped()) {
         } else {

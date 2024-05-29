@@ -62,8 +62,6 @@ public class PistolAnimation {
     boolean flip = false;
 
     public void update(float delta, float rotation) {
-        Vector3 mousePos = GameState.instance.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-
         if ((rotation < -90 && rotation >= -180) || rotation <= 180 && rotation > 90) {
             flip = true;
             offsetRotationTransform.setToRotation(-rotationOffset);

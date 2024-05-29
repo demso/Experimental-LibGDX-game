@@ -1,23 +1,19 @@
 package com.mygdx.game.gamestate.player;
 
-import box2dLight.PointLight;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
-import com.mygdx.game.gamestate.objects.bodies.userdata.SimpleUserData;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
-public class AnotherPlayerConstructor extends PlayerConstructor {
+public class AnotherPlayerConstructor extends ClientPlayerConstructor {
     public static Player createPlayer(String name){
         Player player = new Player();
 

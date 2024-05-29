@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.*;
+import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.behaviours.SpriteBehaviour;
 import com.mygdx.game.gamestate.objects.items.PistolAnimation;
@@ -62,9 +63,14 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
     public void update(float delta) {
         if (gun.isEquipped()) {
             Player player = gun.getOwner();
-            Vector3 mousePos = GameState.instance.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-            float rotation = Double.valueOf(Math.toDegrees(Math.atan2(mousePos.y - player.getPosition().y, mousePos.x - player.getPosition().x))).floatValue();
-
+            float rotation = 0;
+            if (!player.getName().equals(SecondGDXGame.instance.name))
+                rotation = player.itemRotation;
+            else {
+                Vector3 mousePos = GameState.instance.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+                rotation = Double.valueOf(Math.toDegrees(Math.atan2(mousePos.y - player.getPosition().y, mousePos.x - player.getPosition().x))).floatValue();
+                player.itemRotation = rotation;
+            }
             pistolAnimation.updateAndTransform(delta, rotation, sprite);
         } else {
             super.update(delta);

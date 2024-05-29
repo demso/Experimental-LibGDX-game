@@ -113,10 +113,38 @@ tasks.register('dist') {
   dependsOn 'jar'
 }
 
-//jpackage {
-//  installerOutputDir = file(layout.buildDirectory.dir"my-packaging-installer")
-//}
-
 if(enableGraalNative == 'true') {
   apply from: file("nativeimage.gradle")
+}
+
+
+
+tasks.register('cleanForJPackageImage', Exec) {
+
+  //on windows: rd /s /q
+  commandLine "cmd", "/k", "del /f \"D:\\Coding\\Libgdx\\Custom Zombie Game\\lwjgl3\\build\\jpackage\\Custom Zombie Survivor\\Custom Zombie Survivor.exe\""
+
+  //println(layout.getBuildDirectory().dir("/jpackage/SecondGDXGame").get())
+}
+
+tasks.register("runAndPackageRun") {
+  dependsOn(jpackageImage)
+  dependsOn(run)//commandLine "cmd", "/k", "\"D:\\Coding\\Libgdx\\Custom Zombie Game\\lwjgl3\\build\\jpackage\\Custom Zombie Survivor\\Custom Zombie Survivor.exe\""
+}
+
+//run.dependsOn(jpackageImage)
+jpackageImage.dependsOn(cleanForJPackageImage)
+
+runtime {
+  jpackage {
+    //outputDir = 'my-packaging'
+    // imageOutputDir = file("$buildDir/my-packaging-image")
+    // installerOutputDir = file("$buildDir/my-packaging-installer")
+//    imageName = 'MyApp'
+//    imageOptions = ['--win-console']
+//    skipInstaller = false
+//    installerName = 'MyApp'
+//    installerType = 'msi'
+//    installerOptions = ['--win-menu', '--win-shortcut']
+  }
 }

@@ -6,7 +6,8 @@ import com.esotericsoftware.kryonet.Listener;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.HandyHelper;
-import com.mygdx.game.gamestate.player.Player;
+import com.mygdx.game.gamestate.factories.ItemsFactory;
+import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.net.messages.*;
 import com.mygdx.game.net.messages.client.Begin;
 import com.mygdx.game.net.messages.client.PlayerMove;
@@ -15,6 +16,7 @@ import com.mygdx.game.net.messages.server.PlayerJoined;
 import com.mygdx.game.net.messages.server.PlayerMoves;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class GameClient {
     GameClient instance;
@@ -47,9 +49,27 @@ public class GameClient {
                 });
         listener.addTypeHandler(PlayerMoves.class,
                 (con, msg) -> {
-                    //if (GameState.instance.players.get())
-//                    GameState.instance.playersNeedUpdate = true;
-//                    GameState.instance.moves = msg;
+                        GameState.instance.playersNeedUpdate = true;
+                        GameState.instance.moves = msg;
+                });
+        listener.addTypeHandler(PlayerEquip.class,
+                (con, msg) -> {
+                    if (msg.itemId == null || !msg.isEquipped)
+                        if (msg.playerName.equals(SecondGDXGame.instance.name)) {
+                            if (!Objects.equals(msg.senderName, SecondGDXGame.instance.name)) {
+                                GameState.instance.player.uneqipItem();
+                            }
+                        } else {
+                            GameState.instance.players.get(msg.playerName).uneqipItem();
+                        }
+                    else
+                        if (msg.playerName.equals(SecondGDXGame.instance.name)) {
+                            if (!Objects.equals(msg.senderName, SecondGDXGame.instance.name)) {
+                                GameState.instance.player.equipItem(ItemsFactory.getItem(msg.itemId));
+                            }
+                        } else {
+                            GameState.instance.players.get(msg.playerName).equipItem(ItemsFactory.getItem(msg.itemId));
+                        }
                 });
 
         client.addListener(listener);
@@ -62,8 +82,15 @@ public class GameClient {
 //
 //    }
 
+    public void itemEquipped(Item item, boolean isEquipped){
+        if (item != null)
+            client.sendTCP(new PlayerEquip().set(item.tileName, SecondGDXGame.instance.name, SecondGDXGame.instance.name, isEquipped));
+        else
+            client.sendTCP(new PlayerEquip().set(null, SecondGDXGame.instance.name,  SecondGDXGame.instance.name, false));
+    }
+
     public void sendPlayerMove(String playerName, Vector2 pos, Vector2 speed){
-        client.sendTCP(new PlayerMove(playerName, pos.x, pos.y, speed.x,speed.y));
+        client.sendTCP(new PlayerMove().set(playerName, pos.x, pos.y, speed.x,speed.y, GameState.instance.player.itemRotation));
     }
 
     public String connect(String host){

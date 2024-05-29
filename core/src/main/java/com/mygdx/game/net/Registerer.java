@@ -22,5 +22,7 @@ public class Registerer {
         kryo.register(PlayerInfo[].class);
         kryo.register(PlayerMoves.class);
         kryo.register(PlayerMove[].class);
+        kryo.register(ItemInfo.class);
+        kryo.register(PlayerEquip.class);
     }
 }

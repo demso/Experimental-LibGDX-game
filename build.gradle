@@ -67,7 +67,7 @@ configure(subprojects) {
 
 subprojects {
   version = '1.0.0'
-  ext.appName = 'SecondGDXGame'
+  ext.appName = 'Custom Zombie Survivor'
   repositories {
     mavenCentral()
     maven { url 'https://s01.oss.sonatype.org' }
@@ -80,3 +80,15 @@ subprojects {
 }
 
 eclipse.project.name = 'SecondGDXGame' + '-parent'
+
+
+
+
+
+//tasks.register('hello'){
+//  description = "Hello"
+//  group = "mytasks"
+//
+//  tasks.named('run')
+//}
+

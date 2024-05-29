@@ -17,9 +17,9 @@ import com.mygdx.game.gamestate.objects.bodies.userdata.SimpleUserData;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
-public class PlayerConstructor {
-    public Player createPlayer(GameState gg){
-        Player player = new Player();
+public class ClientPlayerConstructor {
+    public ClientPlayer createPlayer(GameState gg){
+        ClientPlayer player = new ClientPlayer();
 
         player.setName(SecondGDXGame.instance.name);
         player.setHp(10);

@@ -1,11 +1,12 @@
 package com.mygdx.game.gamestate;
 
-import com.badlogic.gdx.physics.box2d.Filter;
-
 public class Globals {
-    public static final float DEFAULT_RENDER_ORDER = 0,
-        ZOMBIE_RO = DEFAULT_RENDER_ORDER,
-        PLAYER_RO = DEFAULT_RENDER_ORDER;
+    public static final int DEFAULT_RENDER_ORDER = 0,
+        ZOMBIE_RENDER_ORDER = DEFAULT_RENDER_ORDER,
+        PLAYER_RENDER_ORDER = 1,
+        ANOTHER_PLAYER_RENDER_ORDER = DEFAULT_RENDER_ORDER;
+
+    public static float SERVER_UPDATE_TIME = 0.017f;
 
     public final static short
             DEFAULT_CONTACT_FILTER =            0x0001,                 //00000000 00000001

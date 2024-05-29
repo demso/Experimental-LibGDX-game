@@ -117,7 +117,7 @@ public class MainMenuScreen implements Screen {
         connectionDialog.add(cancelDialogBut).pad(5);
         connectionDialog.pack();
 
-        nameField = new TextField("Destroyer of Ass",skin);
+        nameField = new TextField("Destroyer of Ass" + Math.round(Math.random()*1000),skin);
         nameField.setWidth(300);
         nameField.setAlignment(Align.center);
         nameField.setPosition(stage.getWidth() - nameField.getWidth() - 10, stage.getHeight() - nameField.getHeight() - 10);

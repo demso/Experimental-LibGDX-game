@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.mygdx.game.gamestate.player.AnotherPlayerConstructor;
-import com.mygdx.game.gamestate.player.PlayerConstructor;
+import com.mygdx.game.gamestate.player.ClientPlayer;
 import com.mygdx.game.net.GameClient;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.*;
@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
 import com.mygdx.game.gamestate.UI.console.InGameConsole;
 import com.mygdx.game.gamestate.factories.ItemsFactory;
+import com.mygdx.game.net.PlayerInfo;
 import com.mygdx.game.net.messages.client.PlayerMove;
 import com.mygdx.game.net.messages.server.PlayerJoined;
 import com.mygdx.game.net.messages.server.PlayerMoves;
@@ -27,7 +28,6 @@ import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.player.Player;
-import com.mygdx.game.net.GameServer;
 import dev.lyze.gdxUnBox2d.UnBox;
 import net.dermetfan.gdx.physics.box2d.Box2DUtils;
 
@@ -35,7 +35,7 @@ public class GameState {
     public static GameState instance;
     public SecondGDXGame game;
     public GameScreen gameScreen;
-    public Player player;
+    public ClientPlayer player;
     public Skin skin;
     public BitmapFont  font;
     public Batch batch;
@@ -58,7 +58,6 @@ public class GameState {
     public ShapeRenderer shapeRenderer;
     public UnBox unbox;
     public HUDInputListener HUDIL;
-    public GameClient client;
     public ObjectMap<String, Player> players;
     public PlayerJoined playerJoined;
     public boolean playersNeedUpdate;
@@ -80,10 +79,14 @@ public class GameState {
         camera.position.set(player.getPosition(), 0);
         camera.update();
 
-        if (playersNeedUpdate)
+        if (playersNeedUpdate){
             for (PlayerMove move : moves.moves){
+                if (players.get(move.name) == null)
+                    continue;
                 players.get(move.name).playerHandler.receivePlayerUpdate(move);
             }
+            playersNeedUpdate = false;
+        }
     }
 
     public void render(float deltaTime){
@@ -158,10 +161,12 @@ public class GameState {
         players.put(plJoin.name, anotherPlayer);
     }
 
-    public void playerJoined(String name, float x, float y){
-        Player anotherPlayer = AnotherPlayerConstructor.createPlayer(name);
-        anotherPlayer.setPosition(x, y);
-        players.put(name, anotherPlayer);
+    public void playerJoined(PlayerInfo plInf){
+        Player anotherPlayer = AnotherPlayerConstructor.createPlayer(plInf.getName());
+        anotherPlayer.setPosition(plInf.x, plInf.y);
+        if (plInf.equippedItemId != null)
+            anotherPlayer.equipItem(ItemsFactory.getItem(plInf.equippedItemId));
+        players.put(plInf.getName(), anotherPlayer);
     }
 
 }

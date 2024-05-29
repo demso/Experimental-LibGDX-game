@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.gamestate.GameState;
+import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
 import com.mygdx.game.net.PlayerInfo;
 import com.mygdx.game.net.messages.client.PlayerMove;
@@ -32,13 +33,30 @@ public class AnotherPlayerHandler extends BehaviourAdapter implements PlayerMove
 
     public AnotherPlayerHandler(Player player) {
         super(player.playerObject);
+        setRenderOrder(Globals.ANOTHER_PLAYER_RENDER_ORDER);
     }
+
+    Vector2 tempVec = new Vector2();
+    Vector2 velocity = new Vector2();
 
     @Override
     public void update(float delta) {
+        player.getBody().setLinearVelocity(velocity);
+
         if (needsUpdate && playerMove != null){
-            player.getBody().setTransform(playerMove.x, playerMove.y, player.getBody().getTransform().getRotation());
-            player.getBody().setLinearVelocity(playerMove.xSpeed, playerMove.ySpeed);
+            Vector2 pos = player.getBody().getPosition();
+            Vector2 speed = player.getBody().getLinearVelocity();
+
+            tempVec.set(playerMove.xSpeed, playerMove.ySpeed);
+            velocity.set(tempVec);
+
+            if (Math.abs(playerMove.x - pos.x) > 0.1f && Math.abs(playerMove.y - pos.y) > 0.1f){
+                tempVec.add(playerMove.x - pos.x, playerMove.y - pos.y);
+            }
+
+            player.getBody().setLinearVelocity(tempVec);
+            player.itemRotation = playerMove.rotation;
+
             needsUpdate = false;
             playerMove = null;
         }
@@ -72,13 +90,30 @@ public class AnotherPlayerHandler extends BehaviourAdapter implements PlayerMove
 
     @Override
     public void render(Batch batch) {
-        if (Math.abs(player.getBody().getLinearVelocity().len2()) < 0.5f) {
+        if (Math.abs(player.getVelocity().len2()) < 0.5f) {
             player.state = Player.State.Standing;
+        } else {
+            Vector2 vel = player.getVelocity();
+            float velX = Math.abs(vel.x);
+            float velY = Math.abs(vel.y);
+            player.state = Player.State.Walking;
+            if (velX >= velY)
+                if (vel.x > 0)
+                    player.setFacing(Player.Facing.Right);
+                else
+                    player.setFacing(Player.Facing.Left);
+            else
+                if (vel.y > 0)
+                    player.setFacing(Player.Facing.Up);
+                else
+                    player.setFacing(Player.Facing.Down);
         }
+
         if (player.facing == Player.Facing.Right)
             batch.draw(currentFrame, player.getPosition().x - player.WIDTH/2 + player.WIDTH, player.getPosition().y - player.WIDTH * 1/4, -player.WIDTH, player.HEIGHT);
         else
             batch.draw(currentFrame, player.getPosition().x - player.WIDTH/2, player.getPosition().y - player.WIDTH * 1/4, player.WIDTH, player.HEIGHT);
+
         if (player.equipedItem != null){
             if (player.equipedItem instanceof Gun gun) {
 
@@ -101,11 +136,6 @@ public class AnotherPlayerHandler extends BehaviourAdapter implements PlayerMove
 
     @Override
     public void receivePlayerUpdate(PlayerMove move) {
-        Vector2 pos = player.getBody().getPosition();
-        Vector2 speed = player.getBody().getLinearVelocity();
-        if (Math.abs(pos.x - move.x) < 0.05 && Math.abs(pos.y - move.y) < 0.05
-                && Math.abs(speed.x - move.xSpeed) < 0.05 && Math.abs(speed.y - move.ySpeed) < 0.05)
-            return;
         needsUpdate = true;
         playerMove = move;
     }

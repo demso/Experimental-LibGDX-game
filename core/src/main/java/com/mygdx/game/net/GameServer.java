@@ -1,14 +1,13 @@
 package com.mygdx.game.net;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
-import com.mygdx.game.gamestate.HandyHelper;
+import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
-import com.mygdx.game.gamestate.tiledmap.loader.MyTmxMapLoader;
+import com.mygdx.game.net.messages.PlayerEquip;
 import com.mygdx.game.net.messages.client.Begin;
 import com.mygdx.game.net.messages.Message;
 import com.mygdx.game.net.messages.client.PlayerMove;
@@ -23,8 +22,10 @@ public class GameServer {
     Listener.TypeListener listener;
     MyTiledMap map;
     World world;
-    ObjectMap<String, PlayerInfo> players;
+    volatile ObjectMap<String, PlayerInfo> players;
     Vector2 spawnPoint = new Vector2(10,87);
+    Thread endlessThread;
+    long sleepTime = Math.round(Globals.SERVER_UPDATE_TIME * 1000);
 
     public final String mapToLoad = "tiled/firstmap/worldmap.tmx";
     public GameServer() {
@@ -41,7 +42,7 @@ public class GameServer {
                     });
             listener.addTypeHandler(Begin.class,
                     (con, msg) -> {
-                        PlayerInfo plInf = new PlayerInfo(msg.name, con).update(spawnPoint.x, spawnPoint.y, 0, 0);
+                        PlayerInfo plInf = new PlayerInfo(msg.name, con).update(spawnPoint.x, spawnPoint.y, 0, 0, 0);
                         players.put(msg.name, plInf);
                         con.sendTCP(new OnConnection(mapToLoad, plInf.x, plInf.y).addPlayers(players.values().toArray().toArray(PlayerInfo.class)));
                         newPlayerJoined(plInf);
@@ -49,48 +50,62 @@ public class GameServer {
 
             listener.addTypeHandler(PlayerMove.class,
                     (con, msg) -> {
-                        players.get(msg.name).update(msg.x, msg.y, msg.xSpeed, msg.ySpeed);
+                        players.get(msg.name).update(msg.x, msg.y, msg.xSpeed, msg.ySpeed, msg.rotation);
                         //sendToAllPlayersBut(new PlayerMove(msg.name, msg.x, msg.y, msg.xSpeed, msg.ySpeed), players.get(msg.name));
                         //PlayerInfo pl = players.get(msg.name);
                        // HandyHelper.instance.log(Math.round(pl.x * 10f)/10f + " " + Math.round(pl.y*10f)/10f + " " + Math.round(pl.xSpeed*10f)/10f + " " + Math.round(pl.ySpeed*10f)/10f);
                     });
 
+            listener.addTypeHandler(PlayerEquip.class,
+                    (con, msg) -> {
+                            players.get(msg.playerName).equip(msg.itemId);
+                            sendToAllPlayers(msg);
+                        });
+
             server.addListener(listener);
             server.bind(54555,54777);
             server.start();
 
-            new Thread(() -> {
+            endlessThread = new Thread(() -> {
                 try {
                     update();
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             });
+            endlessThread.start();
         } catch (Exception ex) {
 
         }
     }
 
     public void update() throws InterruptedException {
-//        while (true){
-//            if (players.size > 1)
-//                sendUpdatePlayers();
-//            Thread.sleep(50);
-//        }
+        while (true){
+            if (players.size > 1)
+                sendUpdatePlayers();
+            Thread.sleep(50);
+        }
     }
 
+    PlayerMove[] playerMoves = new PlayerMove[]{};
     public void sendUpdatePlayers(){
-//        PlayerMove[] mov = new PlayerMove[players.size];
-//
-//        players.values().forEach(new Consumer<PlayerInfo>() {
-//            int i = 0;
-//            @Override
-//            public void accept(PlayerInfo playerInfo) {
-//                mov[i] = new PlayerMove(playerInfo.name, playerInfo.x, playerInfo.y, playerInfo.xSpeed, playerInfo.ySpeed);
-//                i++;
-//            }
-//        });
-//        sendToAllPlayers(new PlayerMoves().setMoves(mov));
+        if (playerMoves.length != players.size){
+            playerMoves = new PlayerMove[players.size];
+            for (int i = 0; i < playerMoves.length; i ++){
+                playerMoves[i] = new PlayerMove();
+            }
+        }
+
+        players.values().forEach(new Consumer<>() {
+            int i = 0;
+            @Override
+            public void accept(PlayerInfo playerInfo) {
+                playerMoves[i].set(playerInfo.name, playerInfo.x, playerInfo.y, playerInfo.xSpeed, playerInfo.ySpeed, playerInfo.itemRotation);
+                i++;
+            }
+        });
+
+        sendToAllPlayers(new PlayerMoves().setMoves(playerMoves));
     }
 
     public void newPlayerJoined(PlayerInfo beg){
@@ -117,6 +132,7 @@ public class GameServer {
     public void dispose(){
         try {
             server.dispose();
+            endlessThread.interrupt();
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

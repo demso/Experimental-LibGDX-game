@@ -53,7 +53,7 @@ public class Zombie extends Entity {
         zombieObject = new GameObject(getName(), GameState.instance.unbox);
 
         new Box2dBehaviour(getBody(), zombieObject);
-        new SpriteBehaviour(zombieObject, tile.getTextureRegion(), Globals.ZOMBIE_RO);
+        new SpriteBehaviour(zombieObject, tile.getTextureRegion(), Globals.ZOMBIE_RENDER_ORDER);
         new ZombieCollisionBehaviour(zombieObject);
         new ZombieAIBehaviour(zombieObject);
         //new SoutBehaviour("zombieLogger", false, zombieObject);

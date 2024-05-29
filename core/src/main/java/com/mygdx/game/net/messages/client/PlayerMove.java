@@ -9,13 +9,16 @@ public class PlayerMove {
     public float y;
     public float xSpeed;
     public float ySpeed;
+    public float rotation;
     public PlayerMove(){}
 
-    public PlayerMove(String name, float x, float y, float xS, float yS){
+    public PlayerMove set(String name, float x, float y, float xS, float yS, float rot){
         this.x = x;
         this.y = y;
         xSpeed = xS;
         ySpeed = yS;
         this.name = name;
+        rotation = rot;
+        return this;
     }
 }

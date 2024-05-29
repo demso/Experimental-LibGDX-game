@@ -1,5 +1,6 @@
 package com.mygdx.game.gamestate.player;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.SecondGDXGame;
@@ -9,6 +10,7 @@ import com.mygdx.game.gamestate.objects.items.guns.Gun;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
 import dev.lyze.gdxUnBox2d.GameObject;
 import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
 import static com.mygdx.game.gamestate.GameState.instance;
@@ -26,7 +28,8 @@ public class Player extends Entity implements Storage {
     float startY = 87;
 
     @Getter Player.State state =  Player.State.Walking;
-    @Getter Player.Facing facing = Player.Facing.Down;
+    @Getter @Setter
+    Player.Facing facing = Player.Facing.Down;
 
     public float WIDTH = 0.8f;
     public float HEIGHT = 0.8f;
@@ -44,6 +47,8 @@ public class Player extends Entity implements Storage {
     float currentSpeedMultiplier = normalSpeedMultiplier;
     float runMultiplier = 1.5f;
     float sneakMultiplier = 0.5f;
+
+    public float itemRotation;
 
     @Nullable
     public Body getClosestObject(){
@@ -74,6 +79,8 @@ public class Player extends Entity implements Storage {
     }
 
     public void equipItem(Item item){
+        if (item == null)
+            return;
         if (!inventoryContains(item))
             takeItem(item);
         if (equipedItem != null)
@@ -84,14 +91,18 @@ public class Player extends Entity implements Storage {
         }
     }
 
-    public void uneqipItem(){
+    public Item uneqipItem(){
+        if (equipedItem == null)
+            return null;
         equipedItem.unequip();
+        Item tmpItem = equipedItem;
         equipedItem = null;
+        return tmpItem;
     }
 
     @Override
     public String getName() {
-        return "player";
+       return super.getName();
     }
 
     @Override
@@ -118,5 +129,9 @@ public class Player extends Entity implements Storage {
 
     public void setPosition(float x, float y){
         getBody().setTransform(x, y, getBody().getTransform().getRotation());
+    }
+
+    public Vector2 getVelocity(){
+        return getBody().getLinearVelocity();
     }
 }

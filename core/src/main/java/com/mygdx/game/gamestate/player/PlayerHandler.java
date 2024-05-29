@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
+import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
 import com.mygdx.game.net.messages.client.PlayerMove;
 import dev.lyze.gdxUnBox2d.GameObject;
@@ -34,6 +35,7 @@ public class PlayerHandler extends BehaviourAdapter implements PlayerMoveReceive
 
     public PlayerHandler(GameObject gameObject, Player player) {
         super(gameObject);
+        setRenderOrder(Globals.PLAYER_RENDER_ORDER);
     }
 
     Vector2 movingVector = new Vector2();
@@ -47,11 +49,13 @@ public class PlayerHandler extends BehaviourAdapter implements PlayerMoveReceive
 
     float accumulator;
 
+    float rotation;
+
     @Override
     public void update(float delta) {
         accumulator += delta;
 
-        if (accumulator > 0.050f){
+        if (accumulator > Globals.SERVER_UPDATE_TIME){
             SecondGDXGame.instance.client.sendPlayerMove(SecondGDXGame.instance.name, player.getPosition(), player.getBody().getLinearVelocity());
             accumulator = 0;
         }
@@ -176,11 +180,11 @@ public class PlayerHandler extends BehaviourAdapter implements PlayerMoveReceive
             player.playerObject.getBehaviour(PlayerCollisionBehaviour.class).updatePlayerClosestObject();
         }
 
-        if (indexer == 2){
-            SecondGDXGame.instance.client.sendPlayerMove(SecondGDXGame.instance.name, player.getPosition(), player.getBody().getLinearVelocity());
-            indexer = 0;
-        }
-        indexer += 1;
+//        if (indexer == 2){
+//            SecondGDXGame.instance.client.sendPlayerMove(SecondGDXGame.instance.name, player.getPosition(), player.getBody().getLinearVelocity());
+//            indexer = 0;
+//        }
+//        indexer += 1;
     }
 
     @Override

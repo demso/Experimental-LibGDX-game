@@ -7,9 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.esotericsoftware.kryonet.Server;
 import com.mygdx.game.gamestate.tiledmap.tiled.TmxMapLoader;
-import com.mygdx.game.net.GameClient;
 import com.mygdx.game.gamestate.GameStageInputListener;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.*;
 import com.badlogic.gdx.math.Vector2;
@@ -25,12 +23,10 @@ import com.mygdx.game.gamestate.UI.console.ConsoleCommands;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
 import com.mygdx.game.net.PlayerInfo;
 import com.mygdx.game.net.messages.server.OnConnection;
-import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.objects.items.Item;
-import com.mygdx.game.gamestate.player.PlayerConstructor;
+import com.mygdx.game.gamestate.player.ClientPlayerConstructor;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTmxMapLoader;
-import com.mygdx.game.net.GameServer;
 import dev.lyze.gdxUnBox2d.UnBox;
 
 public class GameConstructor {
@@ -72,13 +68,14 @@ public class GameConstructor {
         initScene2D();
         initPhysics();
 
-        gameState.player = new PlayerConstructor().createPlayer(gameState);
+        gameState.player = new ClientPlayerConstructor().createPlayer(gameState);
         gameState.player.setPosition(msg.spawnX, msg.spawnY);
+        gameState.player.setName(SecondGDXGame.instance.name);
 
         for (PlayerInfo plInf : msg.players){
             if (plInf.getName().equals(SecondGDXGame.instance.name))
                 continue;
-            gameState.playerJoined(plInf.getName(), plInf.x, plInf.y);
+            gameState.playerJoined(plInf);
         }
 
         gameState.console = new InGameConsole(SecondGDXGame.instance.skin1x,true);
