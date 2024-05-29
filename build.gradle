@@ -79,16 +79,4 @@ subprojects {
   }
 }
 
-eclipse.project.name = 'SecondGDXGame' + '-parent'
-
-
-
-
-
-//tasks.register('hello'){
-//  description = "Hello"
-//  group = "mytasks"
-//
-//  tasks.named('run')
-//}
-
+eclipse.project.name = 'Custom Zombie Survivor' + '-parent'

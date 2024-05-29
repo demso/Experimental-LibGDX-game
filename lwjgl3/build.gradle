@@ -117,22 +117,17 @@ if(enableGraalNative == 'true') {
   apply from: file("nativeimage.gradle")
 }
 
-
-
 tasks.register('cleanForJPackageImage', Exec) {
-
   //on windows: rd /s /q
   commandLine "cmd", "/k", "del /f \"D:\\Coding\\Libgdx\\Custom Zombie Game\\lwjgl3\\build\\jpackage\\Custom Zombie Survivor\\Custom Zombie Survivor.exe\""
-
   //println(layout.getBuildDirectory().dir("/jpackage/SecondGDXGame").get())
 }
 
-tasks.register("runAndPackageRun") {
+tasks.register("packageAndRun") {
   dependsOn(jpackageImage)
   dependsOn(run)//commandLine "cmd", "/k", "\"D:\\Coding\\Libgdx\\Custom Zombie Game\\lwjgl3\\build\\jpackage\\Custom Zombie Survivor\\Custom Zombie Survivor.exe\""
 }
 
-//run.dependsOn(jpackageImage)
 jpackageImage.dependsOn(cleanForJPackageImage)
 
 runtime {
