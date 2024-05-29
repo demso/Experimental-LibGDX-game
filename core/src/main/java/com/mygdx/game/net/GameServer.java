@@ -83,7 +83,7 @@ public class GameServer {
         while (true){
             if (players.size > 1)
                 sendUpdatePlayers();
-            Thread.sleep(50);
+            Thread.sleep(sleepTime);
         }
     }
 

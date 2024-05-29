@@ -43,6 +43,7 @@ public class AnotherPlayerHandler extends BehaviourAdapter implements PlayerMove
     public void update(float delta) {
         player.getBody().setLinearVelocity(velocity);
 
+
         if (needsUpdate && playerMove != null){
             Vector2 pos = player.getBody().getPosition();
             Vector2 speed = player.getBody().getLinearVelocity();
@@ -50,15 +51,19 @@ public class AnotherPlayerHandler extends BehaviourAdapter implements PlayerMove
             tempVec.set(playerMove.xSpeed, playerMove.ySpeed);
             velocity.set(tempVec);
 
-            if (Math.abs(playerMove.x - pos.x) > 0.1f && Math.abs(playerMove.y - pos.y) > 0.1f){
-                tempVec.add(playerMove.x - pos.x, playerMove.y - pos.y);
+            float offsetX = Math.abs(playerMove.x - pos.x), offsetY = Math.abs(playerMove.y - pos.y);
+            if (offsetX > 0.5 || offsetY > 0.5)
+                player.setPosition(playerMove.x, playerMove.y);
+            else if (offsetX > 0.1f || offsetY > 0.1f) {
+                tempVec.add(Math.signum(playerMove.x - pos.x), Math.signum(playerMove.y - pos.y));
+                //player.getBody().setTransform(playerMove.x, playerMove.y, player.getBody().getTransform().getRotation());
             }
 
             player.getBody().setLinearVelocity(tempVec);
             player.itemRotation = playerMove.rotation;
 
             needsUpdate = false;
-            playerMove = null;
+            //playerMove = null;
         }
 
         if (delta > 0.1f) delta = 0.1f;
