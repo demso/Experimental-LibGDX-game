@@ -12,6 +12,7 @@ import com.mygdx.game.net.messages.*;
 import com.mygdx.game.net.messages.client.Begin;
 import com.mygdx.game.net.messages.client.End;
 import com.mygdx.game.net.messages.client.PlayerMove;
+import com.mygdx.game.net.messages.client.Ready;
 import com.mygdx.game.net.messages.server.*;
 
 import java.io.IOException;
@@ -46,9 +47,9 @@ public class GameClient {
                     //if (GameState.instance.players.get())
                     GameState.instance.players.get(msg.name).playerHandler.receivePlayerUpdate(msg);
                 });
-        listener.addTypeHandler(PlayerMoves.class,
+        listener.addTypeHandler(EntitiesMoves.class,
                 (con, msg) -> {
-                        GameState.instance.playersNeedUpdate = true;
+                        GameState.instance.entitiesNeedUpdate = true;
                         GameState.instance.moves = msg;
                 });
         listener.addTypeHandler(PlayerEquip.class,
@@ -119,6 +120,10 @@ public class GameClient {
             return ex.getLocalizedMessage();
         }
         return null;
+    }
+
+    public void ready(){
+        client.sendTCP(new Ready());
     }
 
     public void end() {

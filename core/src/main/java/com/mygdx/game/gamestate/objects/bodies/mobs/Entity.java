@@ -3,6 +3,7 @@ package com.mygdx.game.gamestate.objects.bodies.mobs;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
+import com.mygdx.game.net.messages.server.ZombieMove;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -72,4 +73,10 @@ public abstract class Entity implements BodyData {
     public void kill(){
         isAlive = false;
     };
+
+    public void serverUpdate(ZombieMove move){}
+
+    public void setPosition(float x, float y){
+        getBody().setTransform(x, y, getBody().getTransform().getRotation());
+    }
 }

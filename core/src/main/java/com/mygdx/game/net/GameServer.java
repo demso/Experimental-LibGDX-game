@@ -2,19 +2,20 @@ package com.mygdx.game.net;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.mygdx.game.gamestate.Globals;
+import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
 import com.mygdx.game.net.messages.PlayerEquip;
 import com.mygdx.game.net.messages.client.Begin;
 import com.mygdx.game.net.messages.Message;
 import com.mygdx.game.net.messages.client.End;
 import com.mygdx.game.net.messages.client.PlayerMove;
-import com.mygdx.game.net.messages.server.OnConnection;
-import com.mygdx.game.net.messages.server.PlayerJoined;
-import com.mygdx.game.net.messages.server.PlayerMoves;
+import com.mygdx.game.net.messages.client.Ready;
+import com.mygdx.game.net.messages.server.*;
 
 import java.util.function.Consumer;
 
@@ -23,7 +24,9 @@ public class GameServer {
     Listener.TypeListener listener;
     MyTiledMap map;
     World world;
-    volatile ObjectMap<String, PlayerInfo> players;
+    public volatile ObjectMap<String, PlayerInfo> players;
+    public volatile ObjectMap<Long, ZombieInfo> entities;
+    long entitiesCounter  = 0;
     Vector2 spawnPoint = new Vector2(10,87);
     Thread endlessThread;
     long sleepTime = Math.round(Globals.SERVER_UPDATE_TIME * 1000);
@@ -67,6 +70,11 @@ public class GameServer {
                         PlayerInfo inf = players.remove(msg.playerName);
                         sendToAllPlayersBut(msg, inf);
                     });
+            listener.addTypeHandler(Ready.class,
+                    (con, msg) -> {
+                        startWave();
+                        //con.sendTCP();
+                    });
 
             server.addListener(listener);
             server.bind(54555,54777);
@@ -93,7 +101,8 @@ public class GameServer {
         }
     }
 
-    PlayerMove[] playerMoves = new PlayerMove[]{};
+    PlayerMove[] playerMoves = new PlayerMove[0];
+    ZombieMove[] zombieMoves = new ZombieMove[0];
     public void sendUpdatePlayers(){
         if (playerMoves.length != players.size){
             playerMoves = new PlayerMove[players.size];
@@ -102,7 +111,7 @@ public class GameServer {
             }
         }
 
-        players.values().forEach(new Consumer<>() {
+        new Array.ArrayIterator<>(players.values().toArray()).forEach(new Consumer<>() {
             int i = 0;
             @Override
             public void accept(PlayerInfo playerInfo) {
@@ -111,7 +120,26 @@ public class GameServer {
             }
         });
 
-        sendToAllPlayers(new PlayerMoves().setMoves(playerMoves));
+        if (zombieMoves.length != entities.size){
+            zombieMoves = new ZombieMove[entities.size];
+            for (int i = 0; i < zombieMoves.length; i ++){
+                zombieMoves[i] = new ZombieMove();
+            }
+        }
+
+        int z = 0;
+        for (ZombieInfo zomb :  new Array.ArrayIterator<>(entities.values().toArray())){
+            zomb.setMove(zombieMoves[z]);
+            z++;
+        }
+
+        sendToAllPlayers(new EntitiesMoves().setPlayersMoves(playerMoves).setZMoves(zombieMoves));
+    }
+
+    public void sendUpdateEntities(){
+        for (ZombieInfo zomb :  new Array.ArrayIterator<>(entities.values().toArray())){
+            zomb.getMove();
+        }
     }
 
     public void newPlayerJoined(PlayerInfo beg){
@@ -138,6 +166,13 @@ public class GameServer {
 
     void init(){
         players = new ObjectMap<>();
+        entities = new ObjectMap<>();
+    }
+
+    void startWave() {
+        entities.put(entitiesCounter, new ZombieInfo().set(entitiesCounter,  MobsFactory.Type.ZOMBIE,
+                "zombie" + entitiesCounter, 10, 10, 95, 0, 0));
+        sendToAllPlayers(new SpawnEntity().set(entities.get(entitiesCounter)));
     }
 
     public void dispose(){

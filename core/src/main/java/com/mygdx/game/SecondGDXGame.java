@@ -105,6 +105,10 @@ public class SecondGDXGame extends Game {
         }
     }
 
+    public void ready(){
+        client.ready();
+    }
+
     private void clean() {
         try {
             try {

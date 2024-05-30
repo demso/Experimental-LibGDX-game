@@ -9,6 +9,7 @@ import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.objects.behaviours.SpriteBehaviour;
 import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
+import com.mygdx.game.net.messages.server.ZombieMove;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 import lombok.Getter;
@@ -20,6 +21,7 @@ public class Zombie extends Entity {
     @Getter @Setter float speed = 10f;
     @Getter @Setter float maxAttackCoolDown = 1f;
     @Getter @Setter float attackCoolDown = 0;
+    ZombieAIBehaviour zombieHandler;
     public Zombie(TiledMapTile tile, long id, World world, Vector2 position){
         setId(id);
         setFriendliness(Friendliness.HOSTILE);
@@ -56,13 +58,18 @@ public class Zombie extends Entity {
         new Box2dBehaviour(getBody(), zombieObject);
         new SpriteBehaviour(zombieObject, tile.getTextureRegion(), Globals.ZOMBIE_RENDER_ORDER);
         new ZombieCollisionBehaviour(zombieObject);
-        new ZombieAIBehaviour(zombieObject);
+        zombieHandler = new ZombieAIBehaviour(zombieObject);
         //new SoutBehaviour("zombieLogger", false, zombieObject);
     }
 
     @Override
     public String getName(){
         return "zombie";
+    }
+
+    @Override
+    public void serverUpdate(ZombieMove move){
+        zombieHandler.serverUpdate(move);
     }
 
     @Override

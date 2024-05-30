@@ -127,10 +127,6 @@ public class Player extends Entity implements Storage {
             gun.fireBullet(this);
     }
 
-    public void setPosition(float x, float y){
-        getBody().setTransform(x, y, getBody().getTransform().getRotation());
-    }
-
     public Vector2 getVelocity(){
         return getBody().getLinearVelocity();
     }

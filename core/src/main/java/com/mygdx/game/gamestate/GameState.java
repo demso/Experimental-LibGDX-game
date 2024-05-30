@@ -24,7 +24,8 @@ import com.mygdx.game.net.PlayerInfo;
 import com.mygdx.game.net.messages.EntityInfo;
 import com.mygdx.game.net.messages.client.PlayerMove;
 import com.mygdx.game.net.messages.server.PlayerJoined;
-import com.mygdx.game.net.messages.server.PlayerMoves;
+import com.mygdx.game.net.messages.server.EntitiesMoves;
+import com.mygdx.game.net.messages.server.ZombieMove;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.UI.HUD;
@@ -61,8 +62,8 @@ public class GameState {
     public HUDInputListener HUDIL;
     public ObjectMap<String, Player> players;
     public PlayerJoined playerJoined;
-    public boolean playersNeedUpdate;
-    public PlayerMoves moves;
+    public boolean entitiesNeedUpdate;
+    public EntitiesMoves moves;
     volatile public Array<Player> playersToKill;
     volatile public Array<EntityInfo> entitiesToSpawn;
     volatile public LongArray entitiesToKill;
@@ -103,13 +104,18 @@ public class GameState {
             }
         }
 
-        if (playersNeedUpdate) {
-            for (PlayerMove move : moves.moves) {
+        if (entitiesNeedUpdate) {
+            for (PlayerMove move : moves.pmoves) {
                 if (players.get(move.name) == null)
                     continue;
                 players.get(move.name).playerHandler.receivePlayerUpdate(move);
             }
-            playersNeedUpdate = false;
+            for (ZombieMove move : moves.zmoves) {
+                if (entities.get(move.id) == null)
+                    continue;
+                entities.get(move.id).serverUpdate(move);
+            }
+            entitiesNeedUpdate = false;
         }
     }
 

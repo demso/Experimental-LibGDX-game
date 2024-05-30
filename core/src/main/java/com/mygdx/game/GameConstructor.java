@@ -92,6 +92,8 @@ public class GameConstructor {
 
         gameState.tester();
 
+        SecondGDXGame.instance.ready();
+
         return gameState;
     }
     private void initTextures(){
