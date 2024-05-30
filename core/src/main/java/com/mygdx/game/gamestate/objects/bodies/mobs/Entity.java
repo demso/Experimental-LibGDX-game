@@ -26,6 +26,7 @@ public abstract class Entity implements BodyData {
         PLAYER,
         ANOTHER_PLAYER
     }
+    @Getter @Setter long id;
     @Getter int hp = 1;
     @Getter int maxHp = 1;
     protected boolean isAlive = true;

@@ -10,6 +10,7 @@ import com.mygdx.game.gamestate.factories.ItemsFactory;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.net.messages.*;
 import com.mygdx.game.net.messages.client.Begin;
+import com.mygdx.game.net.messages.client.End;
 import com.mygdx.game.net.messages.client.PlayerMove;
 import com.mygdx.game.net.messages.server.OnConnection;
 import com.mygdx.game.net.messages.server.PlayerJoined;
@@ -71,7 +72,15 @@ public class GameClient {
                             GameState.instance.players.get(msg.playerName).equipItem(ItemsFactory.getItem(msg.itemId));
                         }
                 });
+        listener.addTypeHandler(End.class,
+                (con, msg) -> {
+                    if (msg.playerName == null)
+                        SecondGDXGame.instance.endCause = SecondGDXGame.EndCause.SERVER_LOST;
+                    else {
+                        GameState.instance.playerExited(msg.playerName);
+                    }
 
+                });
         client.addListener(listener);
     }
 
@@ -106,8 +115,13 @@ public class GameClient {
         return null;
     }
 
+    public void end() {
+        client.sendTCP(new End().set(SecondGDXGame.instance.name));
+    }
+
     public void dispose(){
         try {
+            end();
             client.dispose();
         } catch (IOException e) {
             throw new RuntimeException(e);

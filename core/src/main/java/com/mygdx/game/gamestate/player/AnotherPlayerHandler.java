@@ -57,6 +57,8 @@ public class AnotherPlayerHandler extends BehaviourAdapter implements PlayerMove
             else if (offsetX > 0.1f || offsetY > 0.1f) {
                 tempVec.add(Math.signum(playerMove.x - pos.x), Math.signum(playerMove.y - pos.y));
                 //player.getBody().setTransform(playerMove.x, playerMove.y, player.getBody().getTransform().getRotation());
+            } else if ( offsetX >= 0.05 || offsetY >= 0.05f) {
+                tempVec.add(playerMove.x - pos.x, playerMove.y - pos.y);
             }
 
             player.getBody().setLinearVelocity(tempVec);
@@ -145,69 +147,5 @@ public class AnotherPlayerHandler extends BehaviourAdapter implements PlayerMove
         playerMove = move;
     }
 
-    //   byte indexer = 0;
 
-//    @Override
-//    public void fixedUpdate()  {
-//        if (player.isAlive() && (moveUp || moveDown || moveToTheRight || moveToTheLeft)){
-//            movingImpulse.set(0,0);
-//            movingVector.set(0,0);
-//            if (!(moveToTheRight && moveToTheLeft)) {
-//                if (moveToTheLeft) {
-//                    movingVector.x = -1;
-//                    player.state = Player.State.Walking;
-//                    player.facing = Player.Facing.Left;
-//                }
-//
-//                if (moveToTheRight) {
-//                    movingVector.x = 1;
-//                    player.state = Player.State.Walking;
-//                    player.facing = Player.Facing.Right;
-//                }
-//            }
-//            if (!(moveUp && moveDown)){
-//                if (moveUp) {
-//                    movingVector.y = 1;
-//                    player.state = Player.State.Walking;
-//                    player.facing = Player.Facing.Up;
-//                }
-//
-//                if (moveDown) {
-//                    movingVector.y = -1;
-//                    player.state = Player.State.Walking;
-//                    player.facing = Player.Facing.Down;
-//                }
-//            }
-//            movingVector.nor();
-//
-//            if (Gdx.input.isKeyPressed(Input.Keys.C)) {
-//                player.state = Player.State.Sneaking;
-//                player.currentSpeedMultiplier = player.sneakMultiplier;
-//            }
-//            else if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
-//                player.state =  Player.State.Running;
-//                player.currentSpeedMultiplier = player.runMultiplier;
-//            } else {
-//                player.currentSpeedMultiplier = player.normalSpeedMultiplier;
-//            }
-//
-//            movingImpulse = movingVector.scl(player.currentSpeedMultiplier * player.normalSpeed * player.getBody().getMass() *  player.getBody().getLinearDamping() * GameState.instance.physicsStep);
-//
-//            player.getBody().applyLinearImpulse(movingImpulse, zeroVector, true);
-//
-//        }
-//        if (Math.abs(player.getBody().getLinearVelocity().len2()) < 0.5f) {
-//            player.state = Player.State.Standing;
-//        }
-//        //update selection of object to interact with
-//        if (player.closestObject != null){
-//            player.playerObject.getBehaviour(PlayerCollisionBehaviour.class).updatePlayerClosestObject();
-//        }
-//
-//        if (indexer == 2){
-//            SecondGDXGame.instance.client.sendPlayerMove(SecondGDXGame.instance.name, player.getPosition(), player.getBody().getLinearVelocity());
-//            indexer = 0;
-//        }
-//        indexer += 1;
-//    }
 }

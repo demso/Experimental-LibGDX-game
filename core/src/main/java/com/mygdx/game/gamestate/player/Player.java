@@ -134,4 +134,11 @@ public class Player extends Entity implements Storage {
     public Vector2 getVelocity(){
         return getBody().getLinearVelocity();
     }
+
+    public void destroy() {
+        if (equipedItem != null){
+            equipedItem.destroy();
+        }
+        playerObject.destroy();
+    }
 }

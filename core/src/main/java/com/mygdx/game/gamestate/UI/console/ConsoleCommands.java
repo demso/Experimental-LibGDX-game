@@ -18,7 +18,7 @@ public class ConsoleCommands extends CommandExecutor {
 
     @ConsoleDoc(description = "Spawns certain mob.", paramDescriptions = {"mob type", "x", "y"})
     public final void summon(String type, float x, float y) {
-        MobsFactory.spawnEntity(MobsFactory.Type.valueOf(type.toUpperCase()), x, y);
+        //MobsFactory.spawnEntity(MobsFactory.Type.valueOf(type.toUpperCase()), x, y);
     }
 
     @ConsoleDoc(description = "Prints all types of mobs.")

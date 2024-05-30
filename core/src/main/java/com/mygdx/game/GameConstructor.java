@@ -40,6 +40,10 @@ public class GameConstructor {
         gameState.font = SecondGDXGame.font;
         gameState.skin = SecondGDXGame.skin;
         gameState.players = new ObjectMap<>();
+        gameState.entities = new Array<>();
+        gameState.playersToKill = new Array<>();
+        gameState.entitiesToKill = new Array<>();
+        gameState.entitiesToSpawn = new Array<>();
 
         gameState.debugRenderer = new ShapeRenderer();
         gameState.shapeRenderer = new ShapeRenderer();

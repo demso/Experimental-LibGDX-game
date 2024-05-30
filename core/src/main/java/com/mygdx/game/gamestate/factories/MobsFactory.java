@@ -27,16 +27,16 @@ public class MobsFactory {
     static World world = GameState.instance.world;
     private static Vector2 tempPosition = new Vector2();
 
-    public static Zombie spawnZombie(float x, float y){
+    public static Zombie spawnZombie(long id, float x, float y){
         tempPosition.set(x,y);
-        Zombie zombie = new Zombie(TileResolver.getTile("zombie"), world, tempPosition);
+        Zombie zombie = new Zombie(TileResolver.getTile("zombie"), id, world, tempPosition);
         return zombie;
     }
 
-    public static Entity spawnEntity(Type type, float x, float y){
+    public static Entity spawnEntity(long id, Type type, float x, float y){
         Entity entity = null;
         switch (type){
-            case ZOMBIE -> entity = spawnZombie(x, y);
+            case ZOMBIE -> entity = spawnZombie(id, x, y);
         }
         return entity;
     }

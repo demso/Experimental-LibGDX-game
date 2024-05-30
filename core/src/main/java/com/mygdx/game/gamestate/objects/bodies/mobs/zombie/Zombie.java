@@ -20,7 +20,8 @@ public class Zombie extends Entity {
     @Getter @Setter float speed = 10f;
     @Getter @Setter float maxAttackCoolDown = 1f;
     @Getter @Setter float attackCoolDown = 0;
-    public Zombie(TiledMapTile tile, World world, Vector2 position){
+    public Zombie(TiledMapTile tile, long id, World world, Vector2 position){
+        setId(id);
         setFriendliness(Friendliness.HOSTILE);
         setHp(10);
         setMaxHp(10);

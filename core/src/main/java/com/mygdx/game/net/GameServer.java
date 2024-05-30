@@ -10,6 +10,7 @@ import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
 import com.mygdx.game.net.messages.PlayerEquip;
 import com.mygdx.game.net.messages.client.Begin;
 import com.mygdx.game.net.messages.Message;
+import com.mygdx.game.net.messages.client.End;
 import com.mygdx.game.net.messages.client.PlayerMove;
 import com.mygdx.game.net.messages.server.OnConnection;
 import com.mygdx.game.net.messages.server.PlayerJoined;
@@ -42,7 +43,7 @@ public class GameServer {
                     });
             listener.addTypeHandler(Begin.class,
                     (con, msg) -> {
-                        PlayerInfo plInf = new PlayerInfo(msg.name, con).update(spawnPoint.x, spawnPoint.y, 0, 0, 0);
+                        PlayerInfo plInf = new PlayerInfo(msg.name, con).playerSet(spawnPoint.x, spawnPoint.y, 0, 0, 0);
                         players.put(msg.name, plInf);
                         con.sendTCP(new OnConnection(mapToLoad, plInf.x, plInf.y).addPlayers(players.values().toArray().toArray(PlayerInfo.class)));
                         newPlayerJoined(plInf);
@@ -50,7 +51,7 @@ public class GameServer {
 
             listener.addTypeHandler(PlayerMove.class,
                     (con, msg) -> {
-                        players.get(msg.name).update(msg.x, msg.y, msg.xSpeed, msg.ySpeed, msg.rotation);
+                        players.get(msg.name).playerSet(msg.x, msg.y, msg.xSpeed, msg.ySpeed, msg.rotation);
                         //sendToAllPlayersBut(new PlayerMove(msg.name, msg.x, msg.y, msg.xSpeed, msg.ySpeed), players.get(msg.name));
                         //PlayerInfo pl = players.get(msg.name);
                        // HandyHelper.instance.log(Math.round(pl.x * 10f)/10f + " " + Math.round(pl.y*10f)/10f + " " + Math.round(pl.xSpeed*10f)/10f + " " + Math.round(pl.ySpeed*10f)/10f);
@@ -61,6 +62,11 @@ public class GameServer {
                             players.get(msg.playerName).equip(msg.itemId);
                             sendToAllPlayers(msg);
                         });
+            listener.addTypeHandler(End.class,
+                    (con, msg) -> {
+                        PlayerInfo inf = players.remove(msg.playerName);
+                        sendToAllPlayersBut(msg, inf);
+                    });
 
             server.addListener(listener);
             server.bind(54555,54777);
@@ -113,9 +119,14 @@ public class GameServer {
     }
 
     public void sendToAllPlayers(Object obj){
-        for (PlayerInfo plInf : players.values()){
+        var pls = players.values().toArray();
+        for (int i = 0; i < players.size; i ++) {
+            PlayerInfo plInf = pls.get(i);
             plInf.connection.sendTCP(obj);
         }
+//        for (PlayerInfo plInf : players.values()){
+//            plInf.connection.sendTCP(obj);
+//        }
     }
     public void sendToAllPlayersBut(Object obj, PlayerInfo... playerInfos){
         for (PlayerInfo plInf : players.values()){
@@ -131,6 +142,7 @@ public class GameServer {
 
     public void dispose(){
         try {
+            sendToAllPlayers(new End());
             server.dispose();
             endlessThread.interrupt();
         } catch (Exception ex) {

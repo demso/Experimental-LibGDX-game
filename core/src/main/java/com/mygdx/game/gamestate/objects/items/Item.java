@@ -139,4 +139,9 @@ public class Item implements BodyData, Interactable {
     public boolean isEquipped(){
         return isEquipped;
     }
+
+    public void destroy(){
+        unequip();
+        GO.destroy();
+    }
 }

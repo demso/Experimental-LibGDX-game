@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.net.GameClient;
 import com.mygdx.game.net.GameServer;
@@ -27,6 +28,7 @@ public class SecondGDXGame extends Game {
     public GameServer server;
     public boolean readyToStart = false;
     public String name;
+    public EndCause endCause;
 
     @Override
     public void create() {
@@ -53,7 +55,6 @@ public class SecondGDXGame extends Game {
         Button.ButtonStyle bs = skin.get(Button.ButtonStyle.class);
 
         menuScreen = new MainMenuScreen(this);
-        gameScreen = new GameScreen();
 
         this.setScreen(menuScreen);
     }
@@ -85,13 +86,57 @@ public class SecondGDXGame extends Game {
         if (getScreen() == gameScreen)
             setScreen(menuScreen);
 
+        gameScreen = new GameScreen();
         gameScreen.gameState = new GameConstructor().createGameState(msg); //создаем клиент
 
         setScreen(gameScreen);
     }
 
+    public void endGame(EndCause cause){
+        setScreen(menuScreen);
+        switch (cause) {
+            case SERVER_LOST -> {
+                menuScreen.showClosableInfoDialog("Connection lost.");
+                clean();
+            }
+            case OK_END -> {
+                clean();
+            }
+        }
+    }
+
+    private void clean() {
+        try {
+            try {
+                if (gameScreen != null)
+                    gameScreen.dispose();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            gameScreen = null;
+            name = null;
+            try {
+                if (client != null) {
+                    client.dispose();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            client = null;
+            if (server != null)
+                server.dispose();
+            server = null;
+        }   catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void render() {
+        if (endCause != null){
+            endGame(endCause);
+            endCause = null;
+        }
         super.render();
         if (readyToStart){
             startGame(client.startMessage);
@@ -109,5 +154,10 @@ public class SecondGDXGame extends Game {
         if (client != null) {
             client.dispose();
         }
+    }
+
+    public enum EndCause {
+        SERVER_LOST,
+        OK_END
     }
 }

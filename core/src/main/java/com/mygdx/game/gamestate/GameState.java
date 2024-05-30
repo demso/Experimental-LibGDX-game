@@ -7,9 +7,10 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.mygdx.game.gamestate.factories.MobsFactory;
+import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.player.AnotherPlayerConstructor;
 import com.mygdx.game.gamestate.player.ClientPlayer;
-import com.mygdx.game.net.GameClient;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.*;
 import com.badlogic.gdx.math.Vector2;
@@ -62,6 +63,10 @@ public class GameState {
     public PlayerJoined playerJoined;
     public boolean playersNeedUpdate;
     public PlayerMoves moves;
+    volatile public Array<Player> playersToKill;
+    volatile public Array<Entity> entitiesToSpawn;
+    volatile public Array<Entity> entitiesToKill;
+    volatile public Array<Entity> entities;
 
     public void tester(){
         player.takeItem(ItemsFactory.getItem("10mm_fmj"));
@@ -79,8 +84,15 @@ public class GameState {
         camera.position.set(player.getPosition(), 0);
         camera.update();
 
-        if (playersNeedUpdate){
-            for (PlayerMove move : moves.moves){
+        if (playersToKill.size != 0) {
+            for (Player p : playersToKill){
+                p.destroy();
+                players.remove(p.getName());
+            }
+        }
+
+        if (playersNeedUpdate) {
+            for (PlayerMove move : moves.moves) {
                 if (players.get(move.name) == null)
                     continue;
                 players.get(move.name).playerHandler.receivePlayerUpdate(move);
@@ -155,6 +167,14 @@ public class GameState {
         }
     }
 
+    public void spawnEntity(MobsFactory.Type type, long id, float x, float y){
+        entitiesToSpawn.add(MobsFactory.spawnEntity(id, type, x, y));
+    }
+
+    public void killEntity(long id){
+
+    }
+
     public void playerJoined(PlayerJoined plJoin){
         Player anotherPlayer = AnotherPlayerConstructor.createPlayer(plJoin.name);
         anotherPlayer.setPosition(plJoin.x, plJoin.y);
@@ -167,6 +187,10 @@ public class GameState {
         if (plInf.equippedItemId != null)
             anotherPlayer.equipItem(ItemsFactory.getItem(plInf.equippedItemId));
         players.put(plInf.getName(), anotherPlayer);
+    }
+
+    public void playerExited(String playerName) {
+        playersToKill.add(players.get(playerName));
     }
 
 }
