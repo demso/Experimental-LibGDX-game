@@ -12,9 +12,7 @@ import com.mygdx.game.net.messages.*;
 import com.mygdx.game.net.messages.client.Begin;
 import com.mygdx.game.net.messages.client.End;
 import com.mygdx.game.net.messages.client.PlayerMove;
-import com.mygdx.game.net.messages.server.OnConnection;
-import com.mygdx.game.net.messages.server.PlayerJoined;
-import com.mygdx.game.net.messages.server.PlayerMoves;
+import com.mygdx.game.net.messages.server.*;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -80,6 +78,14 @@ public class GameClient {
                         GameState.instance.playerExited(msg.playerName);
                     }
 
+                });
+        listener.addTypeHandler(SpawnEntity.class,
+                (con, msg) -> {
+                    GameState.instance.spawnEntity(msg.entity);
+                });
+        listener.addTypeHandler(KillEntity.class,
+                (con, msg) -> {
+                    GameState.instance.killEntity(msg.entity.id);
                 });
         client.addListener(listener);
     }

@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.*;
 import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.player.AnotherPlayerConstructor;
@@ -17,11 +17,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
 import com.mygdx.game.gamestate.UI.console.InGameConsole;
 import com.mygdx.game.gamestate.factories.ItemsFactory;
 import com.mygdx.game.net.PlayerInfo;
+import com.mygdx.game.net.messages.EntityInfo;
 import com.mygdx.game.net.messages.client.PlayerMove;
 import com.mygdx.game.net.messages.server.PlayerJoined;
 import com.mygdx.game.net.messages.server.PlayerMoves;
@@ -64,9 +64,9 @@ public class GameState {
     public boolean playersNeedUpdate;
     public PlayerMoves moves;
     volatile public Array<Player> playersToKill;
-    volatile public Array<Entity> entitiesToSpawn;
-    volatile public Array<Entity> entitiesToKill;
-    volatile public Array<Entity> entities;
+    volatile public Array<EntityInfo> entitiesToSpawn;
+    volatile public LongArray entitiesToKill;
+    volatile public ObjectMap<Long, Entity> entities;
 
     public void tester(){
         player.takeItem(ItemsFactory.getItem("10mm_fmj"));
@@ -84,8 +84,20 @@ public class GameState {
         camera.position.set(player.getPosition(), 0);
         camera.update();
 
+        if (entitiesToKill.size != 0) {
+            for (long id : entitiesToKill.items)
+                entities.get(id).kill();
+            entitiesToKill.clear();
+        }
+
+        if (entitiesToSpawn.size != 0) {
+            for (EntityInfo inf :  new Array.ArrayIterator<>(entitiesToSpawn))
+                entities.put(inf.id, MobsFactory.spawnEntity(inf.id, inf.type, inf.x, inf.y));
+            entitiesToSpawn.clear();
+        }
+
         if (playersToKill.size != 0) {
-            for (Player p : playersToKill){
+            for (Player p :  new Array.ArrayIterator<>(playersToKill)){
                 p.destroy();
                 players.remove(p.getName());
             }
@@ -167,12 +179,12 @@ public class GameState {
         }
     }
 
-    public void spawnEntity(MobsFactory.Type type, long id, float x, float y){
-        entitiesToSpawn.add(MobsFactory.spawnEntity(id, type, x, y));
+    public void spawnEntity(EntityInfo info){
+        entitiesToSpawn.add(info);
     }
 
     public void killEntity(long id){
-
+        entitiesToKill.add(id);
     }
 
     public void playerJoined(PlayerJoined plJoin){
@@ -182,11 +194,11 @@ public class GameState {
     }
 
     public void playerJoined(PlayerInfo plInf){
-        Player anotherPlayer = AnotherPlayerConstructor.createPlayer(plInf.getName());
+        Player anotherPlayer = AnotherPlayerConstructor.createPlayer(plInf.name);
         anotherPlayer.setPosition(plInf.x, plInf.y);
         if (plInf.equippedItemId != null)
             anotherPlayer.equipItem(ItemsFactory.getItem(plInf.equippedItemId));
-        players.put(plInf.getName(), anotherPlayer);
+        players.put(plInf.name, anotherPlayer);
     }
 
     public void playerExited(String playerName) {

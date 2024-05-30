@@ -9,6 +9,6 @@ public class PlayerJoined extends PlayerMove {
     public PlayerJoined(PlayerInfo plInf){
         this.x = plInf.x;
         this.y = plInf.y;
-        this.name = plInf.getName();
+        this.name = plInf.name;
     }
 }

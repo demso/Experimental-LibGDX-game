@@ -6,6 +6,8 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.LongArray;
+import com.badlogic.gdx.utils.ObjectLongMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.mygdx.game.gamestate.tiledmap.tiled.TmxMapLoader;
 import com.mygdx.game.gamestate.GameStageInputListener;
@@ -40,9 +42,9 @@ public class GameConstructor {
         gameState.font = SecondGDXGame.font;
         gameState.skin = SecondGDXGame.skin;
         gameState.players = new ObjectMap<>();
-        gameState.entities = new Array<>();
+        gameState.entities = new ObjectMap<>();
         gameState.playersToKill = new Array<>();
-        gameState.entitiesToKill = new Array<>();
+        gameState.entitiesToKill = new LongArray();
         gameState.entitiesToSpawn = new Array<>();
 
         gameState.debugRenderer = new ShapeRenderer();
@@ -77,7 +79,7 @@ public class GameConstructor {
         gameState.player.setName(SecondGDXGame.instance.name);
 
         for (PlayerInfo plInf : msg.players){
-            if (plInf.getName().equals(SecondGDXGame.instance.name))
+            if (plInf.name.equals(SecondGDXGame.instance.name))
                 continue;
             gameState.playerJoined(plInf);
         }
