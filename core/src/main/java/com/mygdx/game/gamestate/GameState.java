@@ -68,6 +68,7 @@ public class GameState {
     volatile public Array<EntityInfo> entitiesToSpawn;
     volatile public LongArray entitiesToKill;
     volatile public ObjectMap<Long, Entity> entities;
+    volatile public ServerHandler serverHandler;
 
     public void tester(){
         player.takeItem(ItemsFactory.getItem("10mm_fmj"));

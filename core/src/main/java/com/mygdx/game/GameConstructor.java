@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.LongArray;
 import com.badlogic.gdx.utils.ObjectLongMap;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.mygdx.game.gamestate.ServerHandler;
 import com.mygdx.game.gamestate.tiledmap.tiled.TmxMapLoader;
 import com.mygdx.game.gamestate.GameStageInputListener;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.*;
@@ -47,6 +48,7 @@ public class GameConstructor {
         gameState.entitiesToKill = new LongArray();
         gameState.entitiesToSpawn = new Array<>();
 
+        gameState.serverHandler = new ServerHandler();
         gameState.debugRenderer = new ShapeRenderer();
         gameState.shapeRenderer = new ShapeRenderer();
         gameState.bodies = new Array<>();
