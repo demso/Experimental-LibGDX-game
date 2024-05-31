@@ -12,7 +12,7 @@ public class TileResolver {
     public static TiledMapTile getTile(String id){
         var tile = tilesets.getTile(tilemapa.get(id, NO_TILE_ID));
         if (tile.getId() == NO_TILE_ID)
-            SecondGDXGame.helper.log("[Warning] [TileResolver] No tile for name: " + id);
+            SecondGDXGame.instance.helper.log("[Warning] [TileResolver] No tile for name: " + id);
         return tile;
     }
 }

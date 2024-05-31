@@ -113,13 +113,13 @@ public class Player extends Entity implements Storage {
     @Override
     public void kill() {
         super.kill();
-        SecondGDXGame.helper.log("Oh no im killed!");
+        SecondGDXGame.instance.helper.log("Oh no im killed!");
     }
 
     public void revive(){
         setHp(getMaxHp());
         isAlive = true;
-        SecondGDXGame.helper.log("Player revived");
+        SecondGDXGame.instance.helper.log("Player revived");
     }
 
     public void fire(){

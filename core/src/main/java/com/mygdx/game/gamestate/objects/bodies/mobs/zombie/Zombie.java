@@ -87,7 +87,7 @@ public class Zombie extends Entity {
         if (attackCoolDown <= 0 && entity.getKind() == Kind.PLAYER && entity.isAlive()) {
             entity.hurt(getDamage());
             attackCoolDown = maxAttackCoolDown;
-            SecondGDXGame.helper.log("["+getName()+ "] Hurted "+ entity.getName() + ", entity hp: "+ entity.getHp());
+            SecondGDXGame.instance.helper.log("["+getName()+ "] Hurted "+ entity.getName() + ", entity hp: "+ entity.getHp());
         }
     }
 

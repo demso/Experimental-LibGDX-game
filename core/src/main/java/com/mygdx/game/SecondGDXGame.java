@@ -23,7 +23,7 @@ public class SecondGDXGame extends Game {
     public Skin skin1x;
     public static BitmapFont font;
     public static BitmapFont fontRoboto14;
-    public static HandyHelper helper;
+    public HandyHelper helper;
     public GameClient client;
     public GameServer server;
     public boolean readyToStart = false;
@@ -119,6 +119,7 @@ public class SecondGDXGame extends Game {
             }
             gameScreen = null;
             name = null;
+            GameState.instance = null;
             try {
                 if (client != null) {
                     client.dispose();

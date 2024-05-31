@@ -6,6 +6,7 @@ import com.esotericsoftware.kryonet.Listener;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.HandyHelper;
+import com.mygdx.game.gamestate.ServerHandler;
 import com.mygdx.game.gamestate.factories.ItemsFactory;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.net.messages.*;
@@ -19,10 +20,10 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class GameClient {
-    GameClient instance;
     Client client;
     Listener.TypeListener listener;
     public OnConnection startMessage;
+    public ServerHandler handler;
 
     public GameClient(){
         client = new Client();
@@ -40,20 +41,31 @@ public class GameClient {
                 });
         listener.addTypeHandler(PlayerJoined.class,
                 (con, msg) -> {
-                    GameState.instance.playerJoined = msg;
+                    if (GameState.instance == null){
+                        HandyHelper.instance.log("[GameClient:45] PlayerJoined fail GameState.Instance = null");
+                        return;
+                    }
+                    handler.playerJoined = msg;
                 });
         listener.addTypeHandler(PlayerMove.class,
                 (con, msg) -> {
-                    //if (GameState.instance.players.get())
+                if (GameState.instance == null){
+                    HandyHelper.instance.log("[GameClient:53] PlayerMove fail GameState.Instance = null");
+                    return;
+                }
                     GameState.instance.players.get(msg.name).playerHandler.receivePlayerUpdate(msg);
                 });
         listener.addTypeHandler(EntitiesMoves.class,
                 (con, msg) -> {
-                        GameState.instance.entitiesNeedUpdate = true;
-                        GameState.instance.moves = msg;
+                    handler.entitiesNeedUpdate = true;
+                    handler.moves = msg;
                 });
         listener.addTypeHandler(PlayerEquip.class,
                 (con, msg) -> {
+                    if (GameState.instance == null){
+                        HandyHelper.instance.log("[GameClient:66] PlayerEquip fail GameState.Instance = null");
+                        return;
+                    }
                     if (msg.itemId == null || !msg.isEquipped)
                         if (msg.playerName.equals(SecondGDXGame.instance.name)) {
                             if (!Objects.equals(msg.senderName, SecondGDXGame.instance.name)) {
@@ -73,30 +85,35 @@ public class GameClient {
                 });
         listener.addTypeHandler(End.class,
                 (con, msg) -> {
+                    if (GameState.instance == null){
+                        HandyHelper.instance.log("[GameClient:89] End fail GameState.Instance = null");
+                        return;
+                    }
                     if (msg.playerName == null)
                         SecondGDXGame.instance.endCause = SecondGDXGame.EndCause.SERVER_LOST;
                     else {
-                        GameState.instance.playerExited(msg.playerName);
+                        handler.playerExited(msg.playerName);
                     }
 
                 });
         listener.addTypeHandler(SpawnEntity.class,
                 (con, msg) -> {
-                    GameState.instance.spawnEntity(msg.entity);
+                    if (GameState.instance == null){
+                        HandyHelper.instance.log("[GameClient:102] SpawnEntity fail GameState.Instance = null");
+                        return;
+                    }
+                    handler.spawnEntity(msg.entity);
                 });
         listener.addTypeHandler(KillEntity.class,
                 (con, msg) -> {
-                    GameState.instance.killEntity(msg.entity.id);
+                    if (GameState.instance == null){
+                        HandyHelper.instance.log("[GameClient:110] KillEntity fail GameState.Instance = null");
+                        return;
+                    }
+                    handler.killEntity(msg.entity.id);
                 });
         client.addListener(listener);
     }
-
-//    public void updatePlayers(PlayerMoves moves){
-//        for (PlayerMove move : moves.moves){
-//            GameState.instance.players.get(move.name).playerHandler.receivePlayerUpdate(move);
-//        }
-//
-//    }
 
     public void itemEquipped(Item item, boolean isEquipped){
         if (item != null)

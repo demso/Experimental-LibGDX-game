@@ -34,21 +34,23 @@ public class Lwjgl3Launcher {
             if (file.exists())
                 file.delete();
             file.createNewFile();
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            String consoleLog = null;
-
-            if (SecondGDXGame.instance != null
-                    && SecondGDXGame.instance.gameScreen != null
-                    && SecondGDXGame.instance.gameScreen.gameState != null
-                    && SecondGDXGame.instance.gameScreen.gameState.console != null)
-                consoleLog = SecondGDXGame.instance.gameScreen.gameState.console.getLog().printToString();
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+//            String consoleLog = null;
+//
+//            if (SecondGDXGame.instance != null
+//                    && SecondGDXGame.instance.gameScreen != null
+//                    && SecondGDXGame.instance.gameScreen.gameState != null
+//                    && SecondGDXGame.instance.gameScreen.gameState.console != null)
+//                consoleLog = SecondGDXGame.instance.gameScreen.gameState.console.getLog().printToString();
             if (SecondGDXGame.instance != null && SecondGDXGame.instance.server != null) {
                 SecondGDXGame.instance.server.dispose();
             }
             if (SecondGDXGame.instance != null && SecondGDXGame.instance.client != null) {
                 SecondGDXGame.instance.client.dispose();
             }
-            writer.write(consoleLog + "\n Exception: \n" + s);
+            if (SecondGDXGame.instance != null && SecondGDXGame.instance.helper != null)
+                SecondGDXGame.instance.helper.dispose();
+            writer.write("Exception: \n" + s);
             writer.flush();
             writer.close();
         } catch (Exception ex) {

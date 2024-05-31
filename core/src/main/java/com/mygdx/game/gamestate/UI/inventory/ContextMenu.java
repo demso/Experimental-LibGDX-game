@@ -140,7 +140,7 @@ public class ContextMenu extends Table {
         clearChildren();
         var buttons = actions.values().toArray();
         buttons.sort(Comparator.comparingInt(Actor::getZIndex));
-        SecondGDXGame.helper.log(buttons.toString(", "), false);
+        SecondGDXGame.instance.helper.log(buttons.toString(", "), false);
         for (Button button : buttons)
             addButton(button);
         validate();

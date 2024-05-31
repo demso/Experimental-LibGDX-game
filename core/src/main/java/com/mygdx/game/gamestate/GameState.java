@@ -61,12 +61,6 @@ public class GameState {
     public UnBox unbox;
     public HUDInputListener HUDIL;
     public ObjectMap<String, Player> players;
-    public PlayerJoined playerJoined;
-    public boolean entitiesNeedUpdate;
-    public EntitiesMoves moves;
-    volatile public Array<Player> playersToKill;
-    volatile public Array<EntityInfo> entitiesToSpawn;
-    volatile public LongArray entitiesToKill;
     volatile public ObjectMap<Long, Entity> entities;
     volatile public ServerHandler serverHandler;
 
@@ -86,38 +80,7 @@ public class GameState {
         camera.position.set(player.getPosition(), 0);
         camera.update();
 
-        if (entitiesToKill.size != 0) {
-            for (long id : entitiesToKill.items)
-                entities.get(id).kill();
-            entitiesToKill.clear();
-        }
-
-        if (entitiesToSpawn.size != 0) {
-            for (EntityInfo inf :  new Array.ArrayIterator<>(entitiesToSpawn))
-                entities.put(inf.id, MobsFactory.spawnEntity(inf.id, inf.type, inf.x, inf.y));
-            entitiesToSpawn.clear();
-        }
-
-        if (playersToKill.size != 0) {
-            for (Player p :  new Array.ArrayIterator<>(playersToKill)){
-                p.destroy();
-                players.remove(p.getName());
-            }
-        }
-
-        if (entitiesNeedUpdate) {
-            for (PlayerMove move : moves.pmoves) {
-                if (players.get(move.name) == null)
-                    continue;
-                players.get(move.name).playerHandler.receivePlayerUpdate(move);
-            }
-            for (ZombieMove move : moves.zmoves) {
-                if (entities.get(move.id) == null)
-                    continue;
-                entities.get(move.id).serverUpdate(move);
-            }
-            entitiesNeedUpdate = false;
-        }
+        getServerHandler().update(deltaTime);
     }
 
     public void render(float deltaTime){
@@ -167,10 +130,7 @@ public class GameState {
         if (console.isVisible())
             console.draw();
 
-        if (playerJoined != null){
-            playerJoined(playerJoined.playerInfo);
-            playerJoined = null;
-        }
+
     }
 
     Vector2 beginV;
@@ -186,24 +146,8 @@ public class GameState {
         }
     }
 
-    public void spawnEntity(EntityInfo info){
-        entitiesToSpawn.add(info);
-    }
-
-    public void killEntity(long id){
-        entitiesToKill.add(id);
-    }
-
-    public void playerJoined(PlayerInfo plInf){
-        Player anotherPlayer = AnotherPlayerConstructor.createPlayer(plInf.name);
-        anotherPlayer.setPosition(plInf.x, plInf.y);
-        if (plInf.equippedItemId != null)
-            anotherPlayer.equipItem(ItemsFactory.getItem(plInf.equippedItemId));
-        players.put(plInf.name, anotherPlayer);
-    }
-
-    public void playerExited(String playerName) {
-        playersToKill.add(players.get(playerName));
+    public ServerHandler getServerHandler() {
+        return serverHandler;
     }
 
 }

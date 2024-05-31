@@ -250,7 +250,7 @@ public class HUD extends Stage {
             label.setText("");
 
         if (debug)
-            SecondGDXGame.helper.log("[HUD:250] " + esClosablePopups.toString());
+            SecondGDXGame.instance.helper.log("[HUD:250] " + esClosablePopups.toString());
     }
 
     public HUD(GameState gi, ScreenViewport screenViewport, SpriteBatch batch) {

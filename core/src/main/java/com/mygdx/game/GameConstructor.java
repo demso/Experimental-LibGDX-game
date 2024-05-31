@@ -44,11 +44,10 @@ public class GameConstructor {
         gameState.skin = SecondGDXGame.skin;
         gameState.players = new ObjectMap<>();
         gameState.entities = new ObjectMap<>();
-        gameState.playersToKill = new Array<>();
-        gameState.entitiesToKill = new LongArray();
-        gameState.entitiesToSpawn = new Array<>();
 
         gameState.serverHandler = new ServerHandler();
+        SecondGDXGame.instance.client.handler = gameState.getServerHandler();
+
         gameState.debugRenderer = new ShapeRenderer();
         gameState.shapeRenderer = new ShapeRenderer();
         gameState.bodies = new Array<>();
@@ -83,7 +82,7 @@ public class GameConstructor {
         for (PlayerInfo plInf : msg.players){
             if (plInf.name.equals(SecondGDXGame.instance.name))
                 continue;
-            gameState.playerJoined(plInf);
+            gameState.getServerHandler().playerJoined(plInf);
         }
 
         gameState.console = new InGameConsole(SecondGDXGame.instance.skin1x,true);
@@ -95,7 +94,6 @@ public class GameConstructor {
         gameState.tester();
 
         SecondGDXGame.instance.ready();
-
         return gameState;
     }
     private void initTextures(){
