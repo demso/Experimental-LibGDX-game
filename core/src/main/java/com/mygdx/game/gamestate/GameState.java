@@ -167,7 +167,7 @@ public class GameState {
             console.draw();
 
         if (playerJoined != null){
-            playerJoined(playerJoined);
+            playerJoined(playerJoined.playerInfo);
             playerJoined = null;
         }
     }
@@ -191,12 +191,6 @@ public class GameState {
 
     public void killEntity(long id){
         entitiesToKill.add(id);
-    }
-
-    public void playerJoined(PlayerJoined plJoin){
-        Player anotherPlayer = AnotherPlayerConstructor.createPlayer(plJoin.name);
-        anotherPlayer.setPosition(plJoin.x, plJoin.y);
-        players.put(plJoin.name, anotherPlayer);
     }
 
     public void playerJoined(PlayerInfo plInf){
