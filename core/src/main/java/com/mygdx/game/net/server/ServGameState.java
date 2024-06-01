@@ -27,7 +27,7 @@ import com.mygdx.game.gamestate.tiledmap.tiled.renderers.OrthogonalTiledMapRende
 import com.mygdx.game.net.GameServer;
 import dev.lyze.gdxUnBox2d.UnBox;
 
-public class ServGameState implements HasBodyResolver {
+public class ServGameState {
     public static ServGameState instance;
     public SecondGDXGame game;
     //public GameScreen gameScreen;
@@ -73,7 +73,7 @@ public class ServGameState implements HasBodyResolver {
         return serverHandler;
     }
 
-    @Override
+
     public BodyResolver getBodyResolver() {
         return bodyResolver;
     }

@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.mygdx.game.gamestate.ClientHandler;
+import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.factories.BodyResolver;
 import com.mygdx.game.gamestate.factories.MobsFactoryC;
 import com.mygdx.game.gamestate.tiledmap.tiled.TmxMapLoader;
@@ -25,6 +26,7 @@ import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 import com.mygdx.game.gamestate.UI.console.ConsoleCommands;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
 import com.mygdx.game.net.PlayerInfo;
+import com.mygdx.game.net.messages.EntityInfo;
 import com.mygdx.game.net.messages.server.OnConnection;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.objects.items.Item;
@@ -81,12 +83,6 @@ public class GameConstructor {
         gameState.player.setPosition(msg.spawnX, msg.spawnY);
         gameState.player.setName(SecondGDXGame.instance.name);
 
-        for (PlayerInfo plInf : msg.players){
-            if (plInf.name.equals(SecondGDXGame.instance.name))
-                continue;
-            gameState.getServerHandler().playerJoined(plInf);
-        }
-
         gameState.console = new InGameConsole(SecondGDXGame.instance.skin1x,true);
         gameState.console.setDisplayKeyID(Input.Keys.GRAVE);
         //gameState.console.setNoHoverAlpha(0.5f);
@@ -94,6 +90,22 @@ public class GameConstructor {
         gameState.console.setMaxEntries(50);
 
         gameState.tester();
+
+        if (msg.playersInfo != null) {
+            for (PlayerInfo plInf : msg.playersInfo) {
+                if (plInf.name.equals(SecondGDXGame.instance.name)) continue;
+                gameState.getServerHandler().playerJoined(plInf);
+            }
+        } else
+            HandyHelper.instance.log("[GameConstructor:95] PlayersInfo null in OnConnection");
+
+        if (msg.entitiesInfo != null) {
+            for (EntityInfo enInf : msg.entitiesInfo) {
+                if (enInf.name.equals(SecondGDXGame.instance.name)) continue;
+                gameState.getServerHandler().spawnEntity(enInf);
+            }
+        } else
+            HandyHelper.instance.log("[GameConstructor:95] EntitiesInfo null in OnConnection");
 
         return gameState;
     }

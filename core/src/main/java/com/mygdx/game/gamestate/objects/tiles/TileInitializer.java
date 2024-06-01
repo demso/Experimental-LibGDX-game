@@ -9,7 +9,6 @@ import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
 import com.mygdx.game.gamestate.objects.bodies.userdata.SimpleUserData;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
 import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
-import com.mygdx.game.net.server.HasBodyResolver;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 import dev.lyze.gdxUnBox2d.UnBox;

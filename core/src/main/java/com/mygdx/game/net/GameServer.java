@@ -7,11 +7,12 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.mygdx.game.gamestate.Globals;
-import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.factories.MobsFactoryC;
 import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.Zombie;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
+import com.mygdx.game.net.messages.EntityInfo;
 import com.mygdx.game.net.messages.PlayerEquip;
+import com.mygdx.game.net.messages.ZombieInfo;
 import com.mygdx.game.net.messages.client.Begin;
 import com.mygdx.game.net.messages.Message;
 import com.mygdx.game.net.messages.client.End;
@@ -20,6 +21,7 @@ import com.mygdx.game.net.messages.client.Ready;
 import com.mygdx.game.net.messages.server.*;
 import com.mygdx.game.net.server.ServGameState;
 import com.mygdx.game.net.server.ServGameStateConstructor;
+import com.mygdx.game.net.server.ZombieHelper;
 
 import java.util.function.Consumer;
 
@@ -35,6 +37,7 @@ public class GameServer {
     Thread endlessThread;
     long sleepTime = Math.round(Globals.SERVER_UPDATE_TIME * 1000);
     public ServGameState gameState;
+    public ZombieHelper zhelper = new ZombieHelper(this);
 
     public final String mapToLoad = "tiled/firstmap/worldmap.tmx";
     public GameServer() {
@@ -53,7 +56,9 @@ public class GameServer {
                     (con, msg) -> {
                         PlayerInfo plInf = new PlayerInfo(msg.name, con).playerSet(spawnPoint.x, spawnPoint.y, 0, 0, 0);
                         players.put(msg.name, plInf);
-                        con.sendTCP(new OnConnection(mapToLoad, plInf.x, plInf.y).addPlayers(players.values().toArray().toArray(PlayerInfo.class)));
+                        con.sendTCP(new OnConnection(mapToLoad, plInf.x, plInf.y)
+                                .addPlayers(players.values().toArray().toArray(PlayerInfo.class))
+                                .addEntities(entities.values().toArray().toArray(EntityInfo.class)));
                         newPlayerJoined(plInf);
                     });
 
@@ -93,7 +98,6 @@ public class GameServer {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
             });
             endlessThread.start();
         } catch (Exception ex) {
@@ -103,16 +107,12 @@ public class GameServer {
     long tempTime;
     public void update() throws InterruptedException {
         while (true){
-            try {
                 //if (players.size > 1)
                 long curTime = System.currentTimeMillis();
                 gameState.update((curTime - tempTime)/1000f);
                 tempTime = curTime;
                 sendUpdatePlayersAndEntities();
                 Thread.sleep(sleepTime);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -145,8 +145,8 @@ public class GameServer {
         int z = 0;
         for (ZombieInfo zomb :  new Array.ArrayIterator<>(entities.values().toArray())){
             Zombie zo = (Zombie) gameState.entities.get(zomb.id);
-            zomb.setInfo((Zombie) gameState.entities.get(zomb.id));
-            zomb.getMove(zombieMoves[z]);
+            zomb.setInfoFromZombie((Zombie) gameState.entities.get(zomb.id));
+            zhelper.fillMove(zomb, zombieMoves[z]);
             //HandyHelper.instance.periodicLog(zo.getPosition().x + " " + zo.getPosition().y + " " + zomb.xSpeed + " " + zomb.ySpeed);
             z++;
         }
@@ -200,6 +200,7 @@ public class GameServer {
     public void dispose(){
         try {
             sendToAllPlayers(new End());
+
             server.dispose();
             endlessThread.interrupt();
         } catch (Exception ex) {
