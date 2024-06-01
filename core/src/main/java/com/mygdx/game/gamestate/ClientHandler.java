@@ -3,7 +3,6 @@ package com.mygdx.game.gamestate;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongArray;
 import com.mygdx.game.gamestate.factories.ItemsFactory;
-import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.player.AnotherPlayerConstructor;
 import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.net.PlayerInfo;
@@ -13,7 +12,7 @@ import com.mygdx.game.net.messages.server.EntitiesMoves;
 import com.mygdx.game.net.messages.server.PlayerJoined;
 import com.mygdx.game.net.messages.server.ZombieMove;
 
-public class ServerHandler {
+public class ClientHandler {
 
     public PlayerJoined playerJoined;
     public boolean entitiesNeedUpdate;
@@ -31,7 +30,7 @@ public class ServerHandler {
 
         if (entitiesToSpawn.size != 0) {
             for (EntityInfo inf :  new Array.ArrayIterator<>(entitiesToSpawn))
-                GameState.instance.entities.put(inf.id, MobsFactory.spawnEntity(inf.id, inf.type, inf.x, inf.y));
+                GameState.instance.entities.put(inf.id, GameState.instance.mobsFactory.spawnEntity(inf.id, inf.type, inf.x, inf.y));
             entitiesToSpawn.clear();
         }
 

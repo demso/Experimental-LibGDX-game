@@ -34,14 +34,19 @@ public class ZombieAIBehaviour extends BehaviourAdapter {
             float offsetX = Math.abs(zombieMove.x - pos.x), offsetY = Math.abs(zombieMove.y - pos.y);
             if (offsetX > 0.5 || offsetY > 0.5)
                 zombie.setPosition(zombieMove.x, zombieMove.y);
-            else if (offsetX > 0.1f || offsetY > 0.1f) {
-                tempVec.add(Math.signum(zombieMove.x - pos.x), Math.signum(zombieMove.y - pos.y));
-                //player.getBody().setTransform(playerMove.x, playerMove.y, player.getBody().getTransform().getRotation());
-            } else if ( offsetX >= 0.05 || offsetY >= 0.05f) {
+            else if (offsetX > 0.05f || offsetY > 0.05f) {
+                //tempVec.add(Math.signum(zombieMove.x - pos.x), Math.signum(zombieMove.y - pos.y));
                 tempVec.add(zombieMove.x - pos.x, zombieMove.y - pos.y);
+                //player.getBody().setTransform(playerMove.x, playerMove.y, player.getBody().getTransform().getRotation());
             }
+//            else if ( offsetX >= 0.01 || offsetY >= 0.01f) {
+//                tempVec.add(zombieMove.x - pos.x, zombieMove.y - pos.y);
+//            }
 
             zombie.getBody().setLinearVelocity(tempVec);
+
+//            zombie.getBody().setLinearVelocity(0, -1.5f);
+            zombie.getBody().setLinearDamping(0);
 
             needsUpdate = false;
             //playerMove = null;

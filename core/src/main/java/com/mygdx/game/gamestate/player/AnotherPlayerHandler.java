@@ -54,10 +54,10 @@ public class AnotherPlayerHandler extends BehaviourAdapter implements PlayerMove
             float offsetX = Math.abs(playerMove.x - pos.x), offsetY = Math.abs(playerMove.y - pos.y);
             if (offsetX > 0.5 || offsetY > 0.5)
                 player.setPosition(playerMove.x, playerMove.y);
-            else if (offsetX > 0.1f || offsetY > 0.1f) {
+            else if (offsetX > 0.02f || offsetY > 0.02f) {
                 tempVec.add(Math.signum(playerMove.x - pos.x), Math.signum(playerMove.y - pos.y));
                 //player.getBody().setTransform(playerMove.x, playerMove.y, player.getBody().getTransform().getRotation());
-            } else if ( offsetX >= 0.05 || offsetY >= 0.05f) {
+            } else if ( offsetX >= 0.01 || offsetY >= 0.01f) {
                 tempVec.add(playerMove.x - pos.x, playerMove.y - pos.y);
             }
 

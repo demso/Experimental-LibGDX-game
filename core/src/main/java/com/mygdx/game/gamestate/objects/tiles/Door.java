@@ -23,7 +23,7 @@ public class Door implements Interactable, BodyData {
     boolean isBoarded;
     public boolean peep;
     @Getter boolean isOpen = false;
-    public Door( TiledMapTileLayer.Cell cell, Body body) {
+    public Door(TiledMapTileLayer.Cell cell, Body body) {
         this.gameState = GameState.instance;
         this.cell = cell;
         physicalBody = body;

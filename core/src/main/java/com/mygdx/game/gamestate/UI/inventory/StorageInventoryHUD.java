@@ -18,6 +18,8 @@ import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
 
+import static com.mygdx.game.gamestate.GameState.instance;
+
 public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
     HUD hud;
     public Storage storage;
@@ -77,6 +79,7 @@ public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
 
     public void putItemFromInventory(ItemEntry itemEntry){
         storage.dropItem(itemEntry.item);
+        instance.hud.updateInvHUDContent();
         itemEntry.item.allocate(GameState.instance.player.getPosition());
     }
 

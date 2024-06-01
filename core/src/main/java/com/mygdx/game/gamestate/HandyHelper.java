@@ -44,6 +44,7 @@ public class HandyHelper {
         else {
             if (GameState.instance != null && GameState.instance.console != null)
                 GameState.instance.console.log(toLog, LogLevel.DEFAULT);
+            saveLog(toLog);
             System.out.println(toLog);
         }
     }
@@ -53,13 +54,27 @@ public class HandyHelper {
     long logPeriod = 1000;
 
     public void noSpamLog(String toLog) {
-        if (!lastString.equals(toLog) || timeOfLastLog - System.currentTimeMillis() > logPeriod){
+        if (!lastString.equals(toLog) || System.currentTimeMillis() - timeOfLastLog > logPeriod){
             System.out.println(toLog);
             if (GameState.instance != null && GameState.instance.console != null)
                 GameState.instance.console.log(toLog, LogLevel.DEFAULT);
             lastString = toLog;
             saveLog(toLog);
             timeOfLastLog = System.currentTimeMillis();
+        }
+    }
+
+    long timeOfPeriodicLog;
+    long periodicLogTime = 1000;
+
+    public void periodicLog(String toLog){
+
+        if (System.currentTimeMillis() - timeOfPeriodicLog > periodicLogTime){
+            System.out.println(toLog);
+            if (GameState.instance != null && GameState.instance.console != null)
+                GameState.instance.console.log(toLog, LogLevel.DEFAULT);
+            saveLog(toLog);
+            timeOfPeriodicLog = System.currentTimeMillis();
         }
     }
 

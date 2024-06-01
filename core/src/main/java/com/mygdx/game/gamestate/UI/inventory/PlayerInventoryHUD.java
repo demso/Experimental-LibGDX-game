@@ -3,6 +3,8 @@ package com.mygdx.game.gamestate.UI.inventory;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.UI.HUD;
 
+import static com.mygdx.game.gamestate.GameState.instance;
+
 public class PlayerInventoryHUD extends StorageInventoryHUD{
 
     public void storageInventoryNear(){
@@ -18,6 +20,7 @@ public class PlayerInventoryHUD extends StorageInventoryHUD{
             case Store -> {
                 GameState.instance.player.dropItem(contextMenu.itemEntry.item);
                 hud.storageInventoryHUD.storage.takeItem(contextMenu.itemEntry.item);
+                instance.hud.updateInvHUDContent();
             }
             case Equip -> {
                 GameState.instance.player.equipItem(contextMenu.itemEntry.item);

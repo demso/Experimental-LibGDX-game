@@ -1,5 +1,6 @@
 package com.mygdx.game.gamestate.objects.bodies.mobs.zombie;
 
+import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -7,7 +8,7 @@ import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.objects.behaviours.SpriteBehaviour;
-import com.mygdx.game.gamestate.factories.MobsFactory;
+import com.mygdx.game.gamestate.factories.MobsFactoryC;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.net.messages.server.ZombieMove;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
@@ -17,18 +18,19 @@ import lombok.Setter;
 
 public class Zombie extends Entity {
     @Getter int damage = 4;
-    GameObject zombieObject;
-    @Getter @Setter float speed = 10f;
+    public GameObject zombieObject;
+    @Getter @Setter float speed = 1.5f;
     @Getter @Setter float maxAttackCoolDown = 1f;
     @Getter @Setter float attackCoolDown = 0;
-    ZombieAIBehaviour zombieHandler;
+    public ZombieAIBehaviour zombieHandler;
+    @Getter @Setter private Player target;
     public Zombie(TiledMapTile tile, long id, World world, Vector2 position){
         setId(id);
         setFriendliness(Friendliness.HOSTILE);
         setHp(10);
         setMaxHp(10);
 
-        BodyDef bodyDef = MobsFactory.bodyDef(position.x, position.y, BodyDef.BodyType.DynamicBody);
+        BodyDef bodyDef = MobsFactoryC.bodyDef(position.x, position.y, BodyDef.BodyType.DynamicBody);
 
         CircleShape circle = new CircleShape();
         circle.setRadius(0.2f);
@@ -52,13 +54,6 @@ public class Zombie extends Entity {
         getBody().setLinearDamping(10);
         getBody().setUserData(this);
         circle.dispose();
-
-        zombieObject = new GameObject(getName(), GameState.instance.unbox);
-
-        new Box2dBehaviour(getBody(), zombieObject);
-        new SpriteBehaviour(zombieObject, tile.getTextureRegion(), Globals.ZOMBIE_RENDER_ORDER);
-        new ZombieCollisionBehaviour(zombieObject);
-        zombieHandler = new ZombieAIBehaviour(zombieObject);
         //new SoutBehaviour("zombieLogger", false, zombieObject);
     }
 
@@ -93,6 +88,7 @@ public class Zombie extends Entity {
 
     @Override
     public void kill() {
-        zombieObject.destroy();
+        if (zombieObject != null)
+            zombieObject.destroy();
     }
 }

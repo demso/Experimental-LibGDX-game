@@ -3,12 +3,13 @@ package com.mygdx.game.net.messages.server;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.SecondGDXGame;
-import com.mygdx.game.gamestate.factories.MobsFactory;
+import com.mygdx.game.gamestate.factories.MobsFactoryC;
+import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.Zombie;
 import com.mygdx.game.net.PlayerInfo;
 import com.mygdx.game.net.messages.EntityInfo;
 
 public class ZombieInfo extends EntityInfo {
-    float maxSpeed = 10f;
+    float maxSpeed = 2f;
     Vector2 tempVec4 = new Vector2();
     @Override
     public ZombieMove getMove() {
@@ -20,7 +21,7 @@ public class ZombieInfo extends EntityInfo {
     }
 
 
-    public ZombieMove setMove(ZombieMove move) {
+    public ZombieMove getMove(ZombieMove move) {
         move.set(id, getPlayerTarget().name, x, y, xSpeed, ySpeed);
         return move;
     }
@@ -41,7 +42,7 @@ public class ZombieInfo extends EntityInfo {
         return plinf;
     }
 
-    public ZombieInfo set(long id, MobsFactory.Type type, String name, float hp, float x, float y, float xS, float yS){
+    public ZombieInfo set(long id, MobsFactoryC.Type type, String name, float hp, float x, float y, float xS, float yS){
         this.x = x;
         this.y = y;
         xSpeed = xS;
@@ -50,6 +51,12 @@ public class ZombieInfo extends EntityInfo {
         this.type = type;
         this.name = name;
         this.hp = hp;
+        return this;
+    }
+
+    public ZombieInfo setInfo(Zombie zombie) {
+        set(zombie.getPosition().x, zombie.getPosition().y,
+                zombie.getBody().getLinearVelocity().x, zombie.getBody().getLinearVelocity().y);
         return this;
     }
 }

@@ -1,20 +1,16 @@
 package com.mygdx.game.net.messages;
 
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.mygdx.game.SecondGDXGame;
-import com.mygdx.game.gamestate.factories.MobsFactory;
-import com.mygdx.game.net.PlayerInfo;
+import com.mygdx.game.gamestate.factories.MobsFactoryC;
 import com.mygdx.game.net.messages.server.EntitiesMove;
 
 public class EntityInfo {
     public long id;
     public float x, y, xSpeed, ySpeed;
-    public MobsFactory.Type type;
+    public MobsFactoryC.Type type;
     public String name;
     public float hp;
 
-    public EntityInfo set(long id, MobsFactory.Type type, String name, float hp, float x, float y, float xS, float yS){
+    public EntityInfo set(long id, MobsFactoryC.Type type, String name, float hp, float x, float y, float xS, float yS){
         this.x = x;
         this.y = y;
         xSpeed = xS;

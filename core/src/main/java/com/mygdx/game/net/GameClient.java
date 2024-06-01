@@ -6,7 +6,7 @@ import com.esotericsoftware.kryonet.Listener;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.HandyHelper;
-import com.mygdx.game.gamestate.ServerHandler;
+import com.mygdx.game.gamestate.ClientHandler;
 import com.mygdx.game.gamestate.factories.ItemsFactory;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.net.messages.*;
@@ -23,7 +23,7 @@ public class GameClient {
     Client client;
     Listener.TypeListener listener;
     public OnConnection startMessage;
-    public ServerHandler handler;
+    public ClientHandler handler;
 
     public GameClient(){
         client = new Client();
@@ -37,35 +37,27 @@ public class GameClient {
         listener.addTypeHandler(OnConnection.class,
                 (con, msg) -> {
                     startMessage = msg;
-                    SecondGDXGame.instance.readyToStart = true;
+                    SecondGDXGame.instance.readyToInit = true;
                 });
         listener.addTypeHandler(PlayerJoined.class,
                 (con, msg) -> {
-                    if (GameState.instance == null){
-                        HandyHelper.instance.log("[GameClient:45] PlayerJoined fail GameState.Instance = null");
-                        return;
-                    }
+                    if (!checkReady(msg)) return;
                     handler.playerJoined = msg;
                 });
         listener.addTypeHandler(PlayerMove.class,
                 (con, msg) -> {
-                if (GameState.instance == null){
-                    HandyHelper.instance.log("[GameClient:53] PlayerMove fail GameState.Instance = null");
-                    return;
-                }
+                    if (!checkReady(msg)) return;
                     GameState.instance.players.get(msg.name).playerHandler.receivePlayerUpdate(msg);
                 });
         listener.addTypeHandler(EntitiesMoves.class,
                 (con, msg) -> {
+                    if (!checkReady(msg)) return;
                     handler.entitiesNeedUpdate = true;
                     handler.moves = msg;
                 });
         listener.addTypeHandler(PlayerEquip.class,
                 (con, msg) -> {
-                    if (GameState.instance == null){
-                        HandyHelper.instance.log("[GameClient:66] PlayerEquip fail GameState.Instance = null");
-                        return;
-                    }
+                    if (!checkReady(msg)) return;
                     if (msg.itemId == null || !msg.isEquipped)
                         if (msg.playerName.equals(SecondGDXGame.instance.name)) {
                             if (!Objects.equals(msg.senderName, SecondGDXGame.instance.name)) {
@@ -85,10 +77,7 @@ public class GameClient {
                 });
         listener.addTypeHandler(End.class,
                 (con, msg) -> {
-                    if (GameState.instance == null){
-                        HandyHelper.instance.log("[GameClient:89] End fail GameState.Instance = null");
-                        return;
-                    }
+                    if (checkReady(msg)) return;
                     if (msg.playerName == null)
                         SecondGDXGame.instance.endCause = SecondGDXGame.EndCause.SERVER_LOST;
                     else {
@@ -98,21 +87,24 @@ public class GameClient {
                 });
         listener.addTypeHandler(SpawnEntity.class,
                 (con, msg) -> {
-                    if (GameState.instance == null){
-                        HandyHelper.instance.log("[GameClient:102] SpawnEntity fail GameState.Instance = null");
-                        return;
-                    }
+                    if (!checkReady(msg)) return;
                     handler.spawnEntity(msg.entity);
                 });
         listener.addTypeHandler(KillEntity.class,
                 (con, msg) -> {
-                    if (GameState.instance == null){
-                        HandyHelper.instance.log("[GameClient:110] KillEntity fail GameState.Instance = null");
-                        return;
-                    }
+                    if (!checkReady(msg)) return;
                     handler.killEntity(msg.entity.id);
                 });
         client.addListener(listener);
+    }
+
+    public boolean checkReady(Object obj) {
+        if (SecondGDXGame.instance.gameIsReady) {
+            return true;
+        } else {
+            HandyHelper.instance.log("[Warning] [GameClient:126] " + obj.getClass().getSimpleName() + " fail, game is not ready.");
+            return false;
+        }
     }
 
     public void itemEquipped(Item item, boolean isEquipped){

@@ -7,9 +7,9 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.*;
-import com.mygdx.game.gamestate.factories.MobsFactory;
+import com.mygdx.game.gamestate.factories.BodyResolver;
+import com.mygdx.game.gamestate.factories.MobsFactoryC;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
-import com.mygdx.game.gamestate.player.AnotherPlayerConstructor;
 import com.mygdx.game.gamestate.player.ClientPlayer;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.*;
@@ -20,12 +20,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
 import com.mygdx.game.gamestate.UI.console.InGameConsole;
 import com.mygdx.game.gamestate.factories.ItemsFactory;
-import com.mygdx.game.net.PlayerInfo;
-import com.mygdx.game.net.messages.EntityInfo;
-import com.mygdx.game.net.messages.client.PlayerMove;
-import com.mygdx.game.net.messages.server.PlayerJoined;
-import com.mygdx.game.net.messages.server.EntitiesMoves;
-import com.mygdx.game.net.messages.server.ZombieMove;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.UI.HUD;
@@ -62,7 +56,9 @@ public class GameState {
     public HUDInputListener HUDIL;
     public ObjectMap<String, Player> players;
     volatile public ObjectMap<Long, Entity> entities;
-    volatile public ServerHandler serverHandler;
+    volatile public ClientHandler clientHandler;
+    public BodyResolver bodyResolver;
+    public MobsFactoryC mobsFactory;
 
     public void tester(){
         player.takeItem(ItemsFactory.getItem("10mm_fmj"));
@@ -146,10 +142,9 @@ public class GameState {
         }
     }
 
-    public ServerHandler getServerHandler() {
-        return serverHandler;
+    public ClientHandler getServerHandler() {
+        return clientHandler;
     }
-
 }
 
 

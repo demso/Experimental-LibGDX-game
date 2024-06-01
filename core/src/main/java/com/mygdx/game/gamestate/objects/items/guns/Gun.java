@@ -51,7 +51,7 @@ public class Gun extends Item {
     public Body allocate(Vector2 position){
         prepareForRendering();
 
-        physicalBody = BodyResolver.itemBody(position.x, position.y, this);
+        physicalBody = GameState.instance.bodyResolver.itemBody(position.x, position.y, this);
         new Box2dBehaviour(physicalBody, GO);
         GO.setEnabled(true);
         mouseHandler.setPosition(getPosition().x - mouseHandler.getWidth()/2f, getPosition().y - mouseHandler.getHeight()/2f);

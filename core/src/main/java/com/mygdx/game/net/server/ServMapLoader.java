@@ -1,31 +1,38 @@
-package com.mygdx.game.gamestate.tiledmap.loader;
+package com.mygdx.game.net.server;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.*;
-import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
+import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.factories.ItemsFactory;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
 import com.mygdx.game.gamestate.objects.tiles.TileInitializer;
+import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
+import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
+import com.mygdx.game.gamestate.tiledmap.tiled.TiledMapTileLayer;
+import com.mygdx.game.gamestate.tiledmap.tiled.TmxMapLoader;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
-public class MyTmxMapLoader extends TmxMapLoader {
+public class ServMapLoader extends TmxMapLoader {
     World world;
-    public MyTmxMapLoader(World world){
+    ServGameState gameState;
+
+    public ServMapLoader(ServGameState gs) {
         super();
-        this.world = world;
+        this.world = gs.world;
+        gameState = gs;
     }
 
     @Override
-    public MyTiledMap load (String fileName, TmxMapLoader.Parameters parameter) {
+    public MyTiledMap load(String fileName, TmxMapLoader.Parameters parameter) {
         FileHandle tmxFile = resolve(fileName);
 
         this.root = xml.parse(tmxFile);
@@ -65,7 +72,7 @@ public class MyTmxMapLoader extends TmxMapLoader {
 //    }
 
     @Override
-    protected MyTiledMap loadTiledMap (FileHandle tmxFile, TmxMapLoader.Parameters parameter, ImageResolver imageResolver) {
+    protected MyTiledMap loadTiledMap(FileHandle tmxFile, TmxMapLoader.Parameters parameter, ImageResolver imageResolver) {
         this.map = new MyTiledMap(world);
         this.idToObject = new IntMap<>();
         this.runOnEndOfLoadTiled = new Array<>();
@@ -149,7 +156,7 @@ public class MyTmxMapLoader extends TmxMapLoader {
                 child.setParallaxY(child.getParallaxY() * group.getParallaxY());
                 if (child instanceof MapGroupLayer) {
                     // 2) handle any child groups
-                    groups.add((MapGroupLayer)child);
+                    groups.add((MapGroupLayer) child);
                 }
             }
         }
@@ -164,8 +171,7 @@ public class MyTmxMapLoader extends TmxMapLoader {
         //load tile resolver
         map.getTileSets().forEach(tiledMapTiles -> tiledMapTiles.forEach(tiledMapTile -> {
             String tileName = tiledMapTile.getProperties().get("name", String.class);
-            if (tileName != null)
-                TileResolver.tilemapa.put(tileName, tiledMapTile.getId());
+            if (tileName != null) TileResolver.tilemapa.put(tileName, tiledMapTile.getId());
         }));
 
         initPhysics();
@@ -173,20 +179,19 @@ public class MyTmxMapLoader extends TmxMapLoader {
         return (MyTiledMap) map;
     }
 
-    void initPhysics(){
+    void initPhysics() {
         MyTiledMap mymap = (MyTiledMap) map;
         MapLayers mlayers = mymap.getLayers();
         var obstaclesLayer = (TiledMapTileLayer) mlayers.get("obstacles");
-        TileInitializer initer = new TileInitializer(GameState.instance.bodyResolver, GameState.instance.unbox, mymap);
+        TileInitializer initer = new TileInitializer(ServGameState.instance.bodyResolver, ServGameState.instance.unbox, mymap);
 
-        for(var i = 0; i < obstaclesLayer.getWidth(); i++)
-            for(var j = 0; j < obstaclesLayer.getHeight(); j++){
+        for (var i = 0; i < obstaclesLayer.getWidth(); i++)
+            for (var j = 0; j < obstaclesLayer.getHeight(); j++) {
                 var cell = obstaclesLayer.getCell(i, j);
-                if (cell == null)
-                    continue;
+                if (cell == null) continue;
                 var properties = cell.getTile().getProperties();
                 String name = properties.get("name", String.class);
-                if (name != null && !name.trim().isEmpty()){
+                if (name != null && !name.trim().isEmpty()) {
                     initer.initTile(cell, i, j);
                 }
             }
@@ -194,13 +199,11 @@ public class MyTmxMapLoader extends TmxMapLoader {
         var objects = mlayers.get("chest_content").getObjects();
 
         for (MapObject object : objects) {
-            TiledMapTileLayer.Cell curCell = obstaclesLayer.getCell(
-                    (int) Math.ceil(object.getProperties().get("x", float.class)/GameState.TILE_SIDE) - 1,
-                    (int) Math.ceil(object.getProperties().get("y", float.class)/GameState.TILE_SIDE) - 1);
+            TiledMapTileLayer.Cell curCell = obstaclesLayer.getCell((int) Math.ceil(object.getProperties().get("x", float.class) / GameState.TILE_SIDE) - 1, (int) Math.ceil(object.getProperties().get("y", float.class) / GameState.TILE_SIDE) - 1);
             String s = object.getProperties().get("items", String.class);
-            if (curCell.getData() != null && curCell.getData() instanceof Storage storage && s != null && !s.trim().isEmpty()){
+            if (curCell.getData() != null && curCell.getData() instanceof Storage storage && s != null && !s.trim().isEmpty()) {
                 String[] items = object.getProperties().get("items", String.class).split(",");
-                for (String item : items){
+                for (String item : items) {
                     storage.takeItem(ItemsFactory.getItem(item.trim().toLowerCase()));
                 }
 
@@ -210,8 +213,8 @@ public class MyTmxMapLoader extends TmxMapLoader {
         //world borders
         BodyDef borderBodyDef = new BodyDef();
         borderBodyDef.type = BodyDef.BodyType.StaticBody;
-        Vector2 mapSize = new Vector2((int)mymap.getProperties().get("width"),(int) mymap.getProperties().get("width"));
-        borderBodyDef.position.set(0,0);
+        Vector2 mapSize = new Vector2((int) mymap.getProperties().get("width"), (int) mymap.getProperties().get("width"));
+        borderBodyDef.position.set(0, 0);
         Body borderBody = mymap.world.createBody(borderBodyDef);
         EdgeShape borderShape = new EdgeShape();
         FixtureDef borderFixture = new FixtureDef();
@@ -229,7 +232,7 @@ public class MyTmxMapLoader extends TmxMapLoader {
         borderShape.set(br, tr);
         borderBody.createFixture(borderFixture);
 
-        GameObject bordersObject = new GameObject("borderBody", GameState.instance.unbox);
+        GameObject bordersObject = new GameObject("borderBody", gameState.unbox);
 
         new Box2dBehaviour(borderBody, bordersObject);
 

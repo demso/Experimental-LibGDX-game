@@ -2,7 +2,7 @@ package com.mygdx.game.net;
 
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryo.Kryo;
-import com.mygdx.game.gamestate.factories.MobsFactory;
+import com.mygdx.game.gamestate.factories.MobsFactoryC;
 import com.mygdx.game.net.messages.*;
 import com.mygdx.game.net.messages.client.Begin;
 import com.mygdx.game.net.messages.client.End;
@@ -28,7 +28,7 @@ public class Registerer {
         kryo.register(SpawnEntity.class);
         kryo.register(KillEntity.class);
         kryo.register(EntityInfo.class);
-        kryo.register(MobsFactory.Type.class);
+        kryo.register(MobsFactoryC.Type.class);
         kryo.register(Ready.class);
         kryo.register(ZombieInfo.class);
         kryo.register(ZombieMove.class);

@@ -7,10 +7,10 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.gamestate.GameState;
 
 public class MyTiledMap extends TiledMap {
-    World world;
+    public World world;
     public Array<Body> staticObjects = new Array<>();
 
-    MyTiledMap(World world){
+    public MyTiledMap(World world){
         super();
         this.world = world;
     }

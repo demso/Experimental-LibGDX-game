@@ -2,7 +2,7 @@ package com.mygdx.game.gamestate.UI.console;
 
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.gamestate.GameState;
-import com.mygdx.game.gamestate.factories.MobsFactory;
+import com.mygdx.game.gamestate.factories.MobsFactoryC;
 import com.mygdx.game.gamestate.UI.console.sjconsole.CommandExecutor;
 import com.mygdx.game.gamestate.UI.console.sjconsole.annotation.ConsoleDoc;
 import com.mygdx.game.gamestate.objects.items.guns.GunSpriteBehaviour;
@@ -25,9 +25,9 @@ public class ConsoleCommands extends CommandExecutor {
     public final void mobs() {
         StringBuilder logs = new StringBuilder();
 
-        new Array<MobsFactory.Type>(MobsFactory.Type.values()).forEach(new Consumer<MobsFactory.Type>() {
+        new Array<MobsFactoryC.Type>(MobsFactoryC.Type.values()).forEach(new Consumer<MobsFactoryC.Type>() {
             @Override
-            public void accept(MobsFactory.Type type) {
+            public void accept(MobsFactoryC.Type type) {
                 logs.append(type.toString().toLowerCase()).append("\n");
             }
         });

@@ -9,17 +9,25 @@ import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
 import com.mygdx.game.gamestate.objects.bodies.userdata.SimpleUserData;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
 import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
+import com.mygdx.game.net.server.HasBodyResolver;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
+import dev.lyze.gdxUnBox2d.UnBox;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class TileInitializer {
     MyTiledMap mymap;
+    BodyResolver bodyResolver;
+    UnBox unBox;
 
-    public TileInitializer(MyTiledMap map) {
+    public TileInitializer(BodyResolver br, UnBox un, MyTiledMap map) {
         mymap = map;
+        bodyResolver = br;
+        unBox = un;
     }
 
     public void initTile(TiledMapTileLayer.Cell cell, int x, int y) {
@@ -31,10 +39,10 @@ public class TileInitializer {
             bodyType = tileProperties.get("body type", null, String.class);
             String name = tileProperties.get("name", null, String.class);
 
-            direction = BodyResolver.getDirection(cell);
+            direction = bodyResolver.getDirection(cell);
 
             if (bodyType != null) {
-                body = BodyResolver.resolveTileBody(x, y, null, BodyResolver.Type.valueOf(bodyType), direction);
+                body = bodyResolver.resolveTileBody(x, y, null, BodyResolver.Type.valueOf(bodyType), direction);
             } else {
                 return;
             }
@@ -93,11 +101,19 @@ public class TileInitializer {
             cell.setData(bodyData);
 
         } catch (Exception e) {
-            SecondGDXGame.instance.helper.log("[Error] [TileInitializer] Problem with creating tile \n Type: " + cell.getTile().getProperties().get("type", null, String.class) + ", name " + cell.getTile().getProperties().get("name", null, String.class) + ",  body type " + bodyType + ", direction " + direction + " at x: " + x + ", y: " + y + " \n " + e.getLocalizedMessage());
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            SecondGDXGame.instance.helper.log("[Error] [TileInitializer:96] Problem with creating tile \n Type: "
+                    + cell.getTile().getProperties().get("type", null, String.class) + ", name "
+                    + cell.getTile().getProperties().get("name", null, String.class) + ", body type "
+                    + bodyType + ", direction " + direction + " at x: " + x + ", y: " + y + " \n Error message: "
+                    + e.getLocalizedMessage() + "\n Stack trace: "
+                    + sw);
+            //e.printStackTrace();
         }
 
         if (body != null) {
-            GameObject object = new GameObject(GameState.instance.unbox);
+            GameObject object = new GameObject(unBox);
             object.setName(((BodyData) body.getUserData()).getName());
             new Box2dBehaviour(body, object);
 

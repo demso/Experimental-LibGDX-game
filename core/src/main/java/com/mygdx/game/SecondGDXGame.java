@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Collections;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.net.GameClient;
@@ -26,7 +26,8 @@ public class SecondGDXGame extends Game {
     public HandyHelper helper;
     public GameClient client;
     public GameServer server;
-    public boolean readyToStart = false;
+    public boolean readyToInit = false;
+    public boolean gameIsReady = false;
     public String name;
     public EndCause endCause;
 
@@ -35,6 +36,7 @@ public class SecondGDXGame extends Game {
         instance = this;
         helper = new HandyHelper();
         batch = new SpriteBatch();
+        Collections.allocateIterators = true;
         HandyHelper.instance = helper;
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Xolonium-Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -89,6 +91,8 @@ public class SecondGDXGame extends Game {
         gameScreen = new GameScreen();
         gameScreen.gameState = new GameConstructor().createGameState(msg); //создаем клиент
 
+        ready();
+
         setScreen(gameScreen);
     }
 
@@ -107,6 +111,7 @@ public class SecondGDXGame extends Game {
 
     public void ready(){
         client.ready();
+        gameIsReady = true;
     }
 
     private void clean() {
@@ -143,10 +148,10 @@ public class SecondGDXGame extends Game {
             endCause = null;
         }
         super.render();
-        if (readyToStart){
+        if (readyToInit){
             startGame(client.startMessage);
             client.startMessage = null;
-            readyToStart = false;
+            readyToInit = false;
         }
     }
 

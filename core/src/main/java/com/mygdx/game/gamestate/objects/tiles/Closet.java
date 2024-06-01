@@ -49,12 +49,12 @@ public class Closet implements BodyData, Interactable, Storage {
     public void takeItem(Item item){
         item.removeFromWorld();
         inventoryItems.add(item);
-        instance.hud.updateInvHUDContent();
+
     }
     @Override
     public void dropItem(Item item){
         inventoryItems.removeValue(item, true);
-        instance.hud.updateInvHUDContent();
+        //instance.hud.updateInvHUDContent();
     }
 
     public Vector2 getPosition() {

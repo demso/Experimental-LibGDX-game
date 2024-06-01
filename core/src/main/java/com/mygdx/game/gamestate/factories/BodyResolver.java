@@ -3,11 +3,12 @@ package com.mygdx.game.gamestate.factories;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
+import lombok.Setter;
 
 public class BodyResolver {
-    static World world = GameState.instance.world;
+    @Setter
+    World world;
     public enum Type {
         FULL_BODY,
         METAL_CLOSET_BODY,
@@ -19,8 +20,11 @@ public class BodyResolver {
         WEST,
         EAST
     }
+    public BodyResolver(World w) {
+        world = w;
+    }
 
-    public static Body resolveTileBody(float x, float y, Object userData, Type type, Direction direction){
+    public Body resolveTileBody(float x, float y, Object userData, Type type, Direction direction){
         Body body = null;
         switch (type){
             case FULL_BODY -> body = fullBody(x + 0.5f, y + 0.5f, userData);
@@ -30,7 +34,7 @@ public class BodyResolver {
         return body;
     }
 
-    public static Body metalClosetBody(float x, float y, Object userData){
+    public Body metalClosetBody(float x, float y, Object userData){
         Body body = null;
 
         BodyDef metalClosetBodyDef = new BodyDef();
@@ -48,7 +52,7 @@ public class BodyResolver {
         return body;
     }
 
-    public static Body window(float x, float y, Object userData, Direction direction, boolean offset){
+    public Body window(float x, float y, Object userData, Direction direction, boolean offset){
         BodyDef windowHorBodyDef = new BodyDef();
         PolygonShape windowHorBox = new PolygonShape();
         FixtureDef windowHorFixtureDef = new FixtureDef();
@@ -104,7 +108,7 @@ public class BodyResolver {
         return body;
     }
 
-    public static Body fullBody(float x, float y, Object userData){
+    public Body fullBody(float x, float y, Object userData){
         BodyDef fullBodyDef = new BodyDef();
         fullBodyDef.position.set(x, y);
 
@@ -121,7 +125,7 @@ public class BodyResolver {
         return body;
     }
 
-    public static Body transparentFullBody(float x, float y, Object userData){
+    public Body transparentFullBody(float x, float y, Object userData){
         BodyDef transparentBodyDef = new BodyDef();
         PolygonShape transparentBox = new PolygonShape();
         FixtureDef transparentFixtureDef = new FixtureDef();
@@ -136,7 +140,7 @@ public class BodyResolver {
         return body;
     }
 
-    public static Body itemBody(float x, float y, Object userData){
+    public Body itemBody(float x, float y, Object userData){
         BodyDef transparentBodyDef = new BodyDef();
         CircleShape transparentBox = new CircleShape();
         FixtureDef transparentFixtureDef = new FixtureDef();
@@ -155,8 +159,8 @@ public class BodyResolver {
         return body;
     }
 
-    public static Body bulletBody(float x, float y, Object userData){
-        BodyDef bodyDef = MobsFactory.bodyDef(x, y, BodyDef.BodyType.DynamicBody, true);
+    public Body bulletBody(float x, float y, Object userData){
+        BodyDef bodyDef = MobsFactoryC.bodyDef(x, y, BodyDef.BodyType.DynamicBody, true);
         Body body = world.createBody(bodyDef);
 
         CircleShape circle = new CircleShape();
