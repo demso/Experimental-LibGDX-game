@@ -183,7 +183,7 @@ public class ServMapLoader extends TmxMapLoader {
         MyTiledMap mymap = (MyTiledMap) map;
         MapLayers mlayers = mymap.getLayers();
         var obstaclesLayer = (TiledMapTileLayer) mlayers.get("obstacles");
-        TileInitializer initer = new TileInitializer(ServGameState.instance.bodyResolver, ServGameState.instance.unbox, mymap);
+        TileInitializer initer = new TileInitializer(gameState.bodyResolver, gameState.unbox, mymap);
 
         for (var i = 0; i < obstaclesLayer.getWidth(); i++)
             for (var j = 0; j < obstaclesLayer.getHeight(); j++) {

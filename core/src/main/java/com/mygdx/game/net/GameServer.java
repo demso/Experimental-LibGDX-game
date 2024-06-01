@@ -86,12 +86,14 @@ public class GameServer {
             server.start();
 
             endlessThread = new Thread(() -> {
-                try {
+
                     tempTime = System.currentTimeMillis();
+                try {
                     update();
                 } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
                 }
+
             });
             endlessThread.start();
         } catch (Exception ex) {
@@ -101,12 +103,16 @@ public class GameServer {
     long tempTime;
     public void update() throws InterruptedException {
         while (true){
-            //if (players.size > 1)
-            long curTime = System.currentTimeMillis();
-            gameState.update((curTime - tempTime)/1000f);
-            tempTime = curTime;
-            sendUpdatePlayersAndEntities();
-            Thread.sleep(sleepTime);
+            try {
+                //if (players.size > 1)
+                long curTime = System.currentTimeMillis();
+                gameState.update((curTime - tempTime)/1000f);
+                tempTime = curTime;
+                sendUpdatePlayersAndEntities();
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -141,7 +147,7 @@ public class GameServer {
             Zombie zo = (Zombie) gameState.entities.get(zomb.id);
             zomb.setInfo((Zombie) gameState.entities.get(zomb.id));
             zomb.getMove(zombieMoves[z]);
-            HandyHelper.instance.periodicLog(zo.getPosition().x + " " + zo.getPosition().y + " " + zomb.xSpeed + " " + zomb.ySpeed);
+            //HandyHelper.instance.periodicLog(zo.getPosition().x + " " + zo.getPosition().y + " " + zomb.xSpeed + " " + zomb.ySpeed);
             z++;
         }
 
