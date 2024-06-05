@@ -9,6 +9,7 @@ public class EntityInfo {
     public MobsFactoryC.Type type;
     public String name;
     public float hp;
+    public boolean isAlive;
 
     public EntityInfo set(long id, MobsFactoryC.Type type, String name, float hp, float x, float y, float xS, float yS){
         this.x = x;

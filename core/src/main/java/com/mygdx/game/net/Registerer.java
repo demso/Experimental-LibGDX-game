@@ -36,6 +36,7 @@ public class Registerer {
         kryo.register(EntitiesMove.class);
         kryo.register(Vector2.class);
         kryo.register(EntityInfo[].class);
+        kryo.register(EntityShot.class);
         //kryo.register();
     }
 }

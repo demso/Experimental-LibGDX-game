@@ -46,7 +46,7 @@ public class MobsFactoryS {
         zombie.zombieObject = new GameObject(zombie.getName(), ServGameState.instance.unbox);
 
         new Box2dBehaviour(zombie.getBody(), zombie.zombieObject);
-        //new SpriteBehaviour(zombie.zombieObject, TileResolver.getTile("zombie").getTextureRegion(), Globals.ZOMBIE_RENDER_ORDER);
+        new SpriteBehaviour(zombie.zombieObject, TileResolver.getTile("zombie").getTextureRegion(), Globals.ZOMBIE_RENDER_ORDER);
         new ZombieCollisionBehaviour(zombie.zombieObject);
         zombie.zombieHandler = new ServerZombieAIBehaviour(zombie.zombieObject);
         return zombie;

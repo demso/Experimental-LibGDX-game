@@ -73,8 +73,7 @@ public class Zombie extends Entity {
     }
 
     @Override
-    public int hurt(int damage) {
-        System.out.println("Hurting zombie");
+    public float hurt(float damage) {
         return super.hurt(damage);
     }
 
@@ -82,12 +81,13 @@ public class Zombie extends Entity {
         if (attackCoolDown <= 0 && entity.getKind() == Kind.PLAYER && entity.isAlive()) {
             entity.hurt(getDamage());
             attackCoolDown = maxAttackCoolDown;
-            SecondGDXGame.instance.helper.log("["+getName()+ "] Hurted "+ entity.getName() + ", entity hp: "+ entity.getHp());
+            //SecondGDXGame.instance.helper.log("["+getName()+ "] Hurted "+ entity.getName() + ", entity hp: "+ entity.getHp());
         }
     }
 
     @Override
     public void kill() {
+        super.kill();
         if (zombieObject != null)
             zombieObject.destroy();
     }

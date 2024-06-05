@@ -22,6 +22,7 @@ import com.mygdx.game.gamestate.factories.BodyResolver;
 import com.mygdx.game.gamestate.factories.MobsFactoryC;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.player.Player;
+import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
 import com.mygdx.game.gamestate.tiledmap.tiled.TiledMap;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.mygdx.game.net.GameServer;
@@ -34,7 +35,7 @@ public class ServGameState {
     public Skin skin;
     public BitmapFont font;
     public Batch batch;
-    public TiledMap map;
+    public MyTiledMap map;
     public OrthogonalTiledMapRenderer renderer;
     public OrthographicCamera camera;
     public boolean debug = false;

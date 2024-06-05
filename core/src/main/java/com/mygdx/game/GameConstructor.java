@@ -47,7 +47,8 @@ public class GameConstructor {
         gameState.players = new ObjectMap<>();
         gameState.entities = new ObjectMap<>();
 
-        gameState.clientHandler = new ClientHandler();
+        gameState.client = SecondGDXGame.instance.client;
+        gameState.clientHandler = new ClientHandler(gameState.client);
         SecondGDXGame.instance.client.handler = gameState.getServerHandler();
 
         gameState.debugRenderer = new ShapeRenderer();

@@ -1,6 +1,7 @@
 package com.mygdx.game.gamestate.objects.bullet;
 
 import com.badlogic.gdx.physics.box2d.Contact;
+import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.bodies.CollisionBehaviour;
 import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.Zombie;
 import dev.lyze.gdxUnBox2d.Behaviour;
@@ -22,7 +23,8 @@ public class BulletCollisionBehaviour extends CollisionBehaviour<Bullet> {
         switch (otherBodyUserName) {
             case "zombie" -> {
                 if (otherUserData instanceof Zombie zombie){
-                    zombie.hurt(data.getDamage());
+                    //zombie.hurt(data.getDamage());
+                    GameState.instance.client.hit(zombie.getId(), data.getDamage());
                 }
             }
         }

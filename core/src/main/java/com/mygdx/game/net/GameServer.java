@@ -4,17 +4,18 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.mygdx.game.gamestate.Globals;
+import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.factories.MobsFactoryC;
+import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.Zombie;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
-import com.mygdx.game.net.messages.EntityInfo;
-import com.mygdx.game.net.messages.PlayerEquip;
-import com.mygdx.game.net.messages.ZombieInfo;
+import com.mygdx.game.gamestate.tiledmap.tiled.TiledMapTileLayer;
+import com.mygdx.game.net.messages.*;
 import com.mygdx.game.net.messages.client.Begin;
-import com.mygdx.game.net.messages.Message;
 import com.mygdx.game.net.messages.client.End;
 import com.mygdx.game.net.messages.client.PlayerMove;
 import com.mygdx.game.net.messages.client.Ready;
@@ -23,13 +24,12 @@ import com.mygdx.game.net.server.ServGameState;
 import com.mygdx.game.net.server.ServGameStateConstructor;
 import com.mygdx.game.net.server.ZombieHelper;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class GameServer {
     Server server;
     Listener.TypeListener listener;
-    MyTiledMap map;
-    World world;
     public volatile ObjectMap<String, PlayerInfo> players;
     public volatile ObjectMap<Long, ZombieInfo> entities;
     long entitiesCounter  = 0;
@@ -73,7 +73,7 @@ public class GameServer {
             listener.addTypeHandler(PlayerEquip.class,
                     (con, msg) -> {
                             players.get(msg.playerName).equip(msg.itemId);
-                            sendToAllPlayers(msg);
+                            sendToAllPlayersBut(msg, players.get(msg.playerName));
                         });
             listener.addTypeHandler(End.class,
                     (con, msg) -> {
@@ -84,6 +84,23 @@ public class GameServer {
                     (con, msg) -> {
                         startWave();
                         //con.sendTCP();
+                    });
+            listener.addTypeHandler(EntityShot.class,
+                    (con, msg) -> {
+                        Entity zomb = gameState.entities.get(msg.id);
+                        if (zomb == null || !zomb.isAlive()){
+                            HandyHelper.instance.log("[GameServer:93] Entity is unreachable on server, is null = " + (zomb == null)
+                                    + ", hp = " + (zomb == null ? "" : zomb.getHp()));
+                            return;
+                        }
+                        gameState.entities.get(msg.id).hurt(msg.damage);
+                        ZombieInfo zInf = entities.get(msg.id);
+                        zInf.hp = entities.get(msg.id).hp = zomb.getHp();
+                        if (!gameState.entities.get(msg.id).isAlive()){
+                            killEntity(msg.id);
+                            sendToAllPlayers(new KillEntity().set(msg.id));
+                        } else
+                            server.sendToAllExceptTCP(players.get(msg.playerName).connection.getID(), msg);
                     });
 
             server.addListener(listener);
@@ -107,9 +124,9 @@ public class GameServer {
     long tempTime;
     public void update() throws InterruptedException {
         while (true){
-                //if (players.size > 1)
                 long curTime = System.currentTimeMillis();
                 gameState.update((curTime - tempTime)/1000f);
+                spawner();
                 tempTime = curTime;
                 sendUpdatePlayersAndEntities();
                 Thread.sleep(sleepTime);
@@ -154,11 +171,11 @@ public class GameServer {
         sendToAllPlayers(new EntitiesMoves().setPlayersMoves(playerMoves).setZMoves(zombieMoves));
     }
 
-    public void sendUpdateEntities(){
-        for (ZombieInfo zomb :  new Array.ArrayIterator<>(entities.values().toArray())){
-            zomb.getMove();
-        }
-    }
+//    public void sendUpdateEntities(){
+//        for (ZombieInfo zomb :  new Array.ArrayIterator<>(entities.values().toArray())){
+//            zomb.getMove();
+//        }
+//    }
 
     public void newPlayerJoined(PlayerInfo beg){
         sendToAllPlayersBut(new PlayerJoined(beg), beg);
@@ -189,12 +206,44 @@ public class GameServer {
     }
 
     void startWave() {
+        wave = 1;
+    }
+
+    Vector2 spawnCenter = new Vector2(10, 85);
+    float spawnRadius = 5f;
+    long spawnPeriod = 2000;
+    Vector2 zombieSpawnPoint = new Vector2(1, 1).nor().scl(spawnRadius);
+    int wave = 0;
+    long lastSpawnTime = 0;
+
+    void spawner(){
+        if (wave > 0 && (System.currentTimeMillis() - lastSpawnTime > spawnPeriod)){
+            float endSpawnPointX;
+            float endSpawnPointY;
+            do {
+                zombieSpawnPoint.rotateDeg((float) Math.random()*360);
+                endSpawnPointX = spawnCenter.x + zombieSpawnPoint.x;
+                endSpawnPointY = spawnCenter.y + zombieSpawnPoint.y;
+            } while (((TiledMapTileLayer)gameState.map.getLayers().get("obstacles")).getCell((int)endSpawnPointX, (int)endSpawnPointY) != null);
+            spawnZombie(endSpawnPointX, endSpawnPointY);
+            lastSpawnTime = System.currentTimeMillis();
+        }
+    }
+
+    void spawnZombie(float x, float y){
         ZombieInfo zomInf = new ZombieInfo().set(entitiesCounter,  MobsFactoryC.Type.ZOMBIE,
-                "zombie" + entitiesCounter, 10, 10, 95, 0, 0);
+                "zombie" + entitiesCounter, 10, x, y, 0, 0);
         gameState.getServerHandler().spawnEntity(zomInf);
         entities.put(entitiesCounter, zomInf);
-        sendToAllPlayers(new SpawnEntity().set(entities.get(entitiesCounter)));
+        sendToAllPlayers(new SpawnEntity().set(zomInf));
         entitiesCounter++;
+    }
+
+    public void killEntity(long id){
+        if (gameState.entities.get(id).isAlive())
+            gameState.entities.get(id).kill();
+        gameState.entities.remove(id);
+        entities.remove(id);
     }
 
     public void dispose(){

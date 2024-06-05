@@ -77,7 +77,7 @@ public class GameClient {
                 });
         listener.addTypeHandler(End.class,
                 (con, msg) -> {
-                    if (checkReady(msg)) return;
+                    if (!checkReady(msg)) return;
                     if (msg.playerName == null)
                         SecondGDXGame.instance.endCause = SecondGDXGame.EndCause.SERVER_LOST;
                     else {
@@ -93,7 +93,12 @@ public class GameClient {
         listener.addTypeHandler(KillEntity.class,
                 (con, msg) -> {
                     if (!checkReady(msg)) return;
-                    handler.killEntity(msg.entity.id);
+                    handler.receivedKillEntity(msg.entityId);
+                });
+        listener.addTypeHandler(EntityShot.class,
+                (con, msg) -> {
+                    if (!checkReady(msg)) return;
+                    GameState.instance.entities.get(msg.id).hurt(msg.damage);
                 });
         client.addListener(listener);
     }
@@ -116,6 +121,11 @@ public class GameClient {
 
     public void sendPlayerMove(String playerName, Vector2 pos, Vector2 speed){
         client.sendTCP(new PlayerMove().set(playerName, pos.x, pos.y, speed.x,speed.y, GameState.instance.player.itemRotation));
+    }
+
+
+    public void hit(long id, float damage){
+        client.sendTCP(new EntityShot().set(id, damage, SecondGDXGame.instance.name));
     }
 
     public String connect(String host){

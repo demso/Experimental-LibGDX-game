@@ -21,6 +21,8 @@ public class ServerZombieAIBehaviour extends ZombieAIBehaviour{
     @Override
     public void fixedUpdate() {
         ZombieInfo curZombInf = SecondGDXGame.instance.server.entities.get(zombie.getId());
+        if (curZombInf == null)
+            return;
         PlayerInfo target = SecondGDXGame.instance.server.zhelper.getPlayerTarget(curZombInf);
         tempVec.set(target.x, target.y);
         moveVec.set(tempVec.x - body.getPosition().x, tempVec.y - body.getPosition().y).nor();

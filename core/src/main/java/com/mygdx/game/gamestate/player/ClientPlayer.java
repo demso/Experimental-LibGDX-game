@@ -5,6 +5,10 @@ import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.items.Item;
 
 public class ClientPlayer extends Player{
+    @Override
+    public void fire() {
+        super.fire();
+    }
 
     @Override
     public Item uneqipItem() {

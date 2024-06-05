@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
 import com.mygdx.game.gamestate.UI.console.InGameConsole;
 import com.mygdx.game.gamestate.factories.ItemsFactory;
+import com.mygdx.game.net.GameClient;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.UI.HUD;
@@ -56,6 +57,7 @@ public class GameState {
     public HUDInputListener HUDIL;
     public ObjectMap<String, Player> players;
     volatile public ObjectMap<Long, Entity> entities;
+    volatile public GameClient client;
     volatile public ClientHandler clientHandler;
     public BodyResolver bodyResolver;
     public MobsFactoryC mobsFactory;

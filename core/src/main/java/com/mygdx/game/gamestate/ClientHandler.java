@@ -3,8 +3,11 @@ package com.mygdx.game.gamestate;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongArray;
 import com.mygdx.game.gamestate.factories.ItemsFactory;
+import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
+import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.Zombie;
 import com.mygdx.game.gamestate.player.AnotherPlayerConstructor;
 import com.mygdx.game.gamestate.player.Player;
+import com.mygdx.game.net.GameClient;
 import com.mygdx.game.net.PlayerInfo;
 import com.mygdx.game.net.messages.EntityInfo;
 import com.mygdx.game.net.messages.client.PlayerMove;
@@ -20,11 +23,19 @@ public class ClientHandler {
     volatile public Array<Player> playersToKill = new Array<>();
     volatile public Array<EntityInfo> entitiesToSpawn = new Array<>();
     volatile public LongArray entitiesToKill = new LongArray();
+    volatile public GameClient client;
+
+    public ClientHandler(GameClient cli){
+        client = cli;
+    }
 
     public void update(float delta){
         if (entitiesToKill.size != 0) {
-            for (long id : entitiesToKill.items)
-                GameState.instance.entities.get(id).kill();
+            for (long id : entitiesToKill.toArray()){
+                Entity entity = GameState.instance.entities.get(id);
+                entity.kill();
+                GameState.instance.entities.remove(entity.getId());
+            }
             entitiesToKill.clear();
         }
 
@@ -65,7 +76,7 @@ public class ClientHandler {
         entitiesToSpawn.add(info);
     }
 
-    public void killEntity(long id){
+    public void receivedKillEntity(long id){
         entitiesToKill.add(id);
     }
 

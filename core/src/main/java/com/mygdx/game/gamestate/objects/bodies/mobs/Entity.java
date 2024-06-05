@@ -28,7 +28,7 @@ public abstract class Entity implements BodyData {
         ANOTHER_PLAYER
     }
     @Getter @Setter long id;
-    @Getter int hp = 1;
+    @Getter float hp = 1;
     @Getter int maxHp = 1;
     protected boolean isAlive = true;
 
@@ -39,7 +39,7 @@ public abstract class Entity implements BodyData {
 
     public Entity(){}
 
-    public int hurt(int damage){
+    public float hurt(float damage){
         hp = Math.max(0, hp-damage);
         if (hp == 0)
             kill();
