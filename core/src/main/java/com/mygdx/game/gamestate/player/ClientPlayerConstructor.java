@@ -11,7 +11,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
-import com.mygdx.game.gamestate.factories.MobsFactoryC;
+import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.bodies.userdata.SimpleUserData;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
@@ -27,7 +27,7 @@ public class ClientPlayerConstructor {
         player.setFriendliness(Entity.Friendliness.PLAYER);
         player.setKind(Entity.Kind.PLAYER);
 
-        BodyDef bodyDef = MobsFactoryC.bodyDef(player.startX, player.startY, BodyDef.BodyType.DynamicBody);
+        BodyDef bodyDef = MobsFactory.bodyDef(player.startX, player.startY, BodyDef.BodyType.DynamicBody);
         Body body = GameState.instance.world.createBody(bodyDef);
         CircleShape circle = new CircleShape();
         circle.setRadius(0.2f);

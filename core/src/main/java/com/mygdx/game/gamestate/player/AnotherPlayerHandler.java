@@ -146,6 +146,4 @@ public class AnotherPlayerHandler extends BehaviourAdapter implements PlayerMove
         needsUpdate = true;
         playerMove = move;
     }
-
-
 }

@@ -55,8 +55,8 @@ public class PlayerHandler extends BehaviourAdapter implements PlayerMoveReceive
     public void update(float delta) {
         accumulator += delta;
 
-        if (accumulator > Globals.SERVER_UPDATE_TIME){
-            SecondGDXGame.instance.client.sendPlayerMove(SecondGDXGame.instance.name, player.getPosition(), player.getBody().getLinearVelocity());
+        if (accumulator >= Globals.SERVER_UPDATE_TIME){
+            SecondGDXGame.instance.client.sendPlayerMove(GameState.instance.player.getId(), player.getPosition(), player.getBody().getLinearVelocity());
             accumulator = 0;
         }
 

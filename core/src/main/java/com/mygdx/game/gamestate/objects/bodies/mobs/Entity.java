@@ -45,7 +45,7 @@ public abstract class Entity implements BodyData {
             kill();
         return hp;
     }
-    public void setHp(int hp) {
+    public void setHp(float hp) {
         this.hp = Math.max(0, hp);
         if (this.hp == 0)
             isAlive = false;
@@ -60,12 +60,7 @@ public abstract class Entity implements BodyData {
     public boolean isAlive(){
         return isAlive;
     }
-    public Vector2 getPosition(){
-        if (body != null)
-            return body.getPosition();
-        else
-            return null;
-    }
+
     @Override
     public String getName() {
         return name == null ? friendliness + " Entity" : name;
@@ -78,5 +73,15 @@ public abstract class Entity implements BodyData {
 
     public void setPosition(float x, float y){
         getBody().setTransform(x, y, getBody().getTransform().getRotation());
+    }
+    public Vector2 getPosition(){
+        if (body != null)
+            return body.getPosition();
+        else
+            return null;
+    }
+
+    public Vector2 getVelocity(){
+        return body.getLinearVelocity();
     }
 }

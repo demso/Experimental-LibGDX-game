@@ -8,6 +8,7 @@ public class ClientPlayer extends Player{
     @Override
     public void fire() {
         super.fire();
+        SecondGDXGame.instance.client.gunFire();
     }
 
     @Override

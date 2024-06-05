@@ -6,14 +6,11 @@ import com.esotericsoftware.kryonet.Listener;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.HandyHelper;
-import com.mygdx.game.gamestate.ClientHandler;
+import com.mygdx.game.gamestate.AcceptHandler;
 import com.mygdx.game.gamestate.factories.ItemsFactory;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.net.messages.*;
-import com.mygdx.game.net.messages.client.Begin;
-import com.mygdx.game.net.messages.client.End;
-import com.mygdx.game.net.messages.client.PlayerMove;
-import com.mygdx.game.net.messages.client.Ready;
+import com.mygdx.game.net.messages.client.*;
 import com.mygdx.game.net.messages.server.*;
 
 import java.io.IOException;
@@ -23,7 +20,7 @@ public class GameClient {
     Client client;
     Listener.TypeListener listener;
     public OnConnection startMessage;
-    public ClientHandler handler;
+    public AcceptHandler handler;
 
     public GameClient(){
         client = new Client();
@@ -47,7 +44,7 @@ public class GameClient {
         listener.addTypeHandler(PlayerMove.class,
                 (con, msg) -> {
                     if (!checkReady(msg)) return;
-                    GameState.instance.players.get(msg.name).playerHandler.receivePlayerUpdate(msg);
+                    GameState.instance.players.get(msg.playerId).playerHandler.receivePlayerUpdate(msg);
                 });
         listener.addTypeHandler(EntitiesMoves.class,
                 (con, msg) -> {
@@ -59,29 +56,29 @@ public class GameClient {
                 (con, msg) -> {
                     if (!checkReady(msg)) return;
                     if (msg.itemId == null || !msg.isEquipped)
-                        if (msg.playerName.equals(SecondGDXGame.instance.name)) {
+                        if (msg.playerId == (GameState.instance.player.getId())) {
                             if (!Objects.equals(msg.senderName, SecondGDXGame.instance.name)) {
                                 GameState.instance.player.uneqipItem();
                             }
                         } else {
-                            GameState.instance.players.get(msg.playerName).uneqipItem();
+                            GameState.instance.players.get(msg.playerId).uneqipItem();
                         }
                     else
-                        if (msg.playerName.equals(SecondGDXGame.instance.name)) {
+                        if (msg.playerId == (GameState.instance.player.getId())) {
                             if (!Objects.equals(msg.senderName, SecondGDXGame.instance.name)) {
                                 GameState.instance.player.equipItem(ItemsFactory.getItem(msg.itemId));
                             }
                         } else {
-                            GameState.instance.players.get(msg.playerName).equipItem(ItemsFactory.getItem(msg.itemId));
+                            GameState.instance.players.get(msg.playerId).equipItem(ItemsFactory.getItem(msg.itemId));
                         }
                 });
         listener.addTypeHandler(End.class,
                 (con, msg) -> {
                     if (!checkReady(msg)) return;
-                    if (msg.playerName == null)
+                    if (msg.playerId < 0)
                         SecondGDXGame.instance.endCause = SecondGDXGame.EndCause.SERVER_LOST;
                     else {
-                        handler.playerExited(msg.playerName);
+                        handler.playerExited(msg.playerId);
                     }
 
                 });
@@ -100,6 +97,11 @@ public class GameClient {
                     if (!checkReady(msg)) return;
                     GameState.instance.entities.get(msg.id).hurt(msg.damage);
                 });
+        listener.addTypeHandler(GunFire.class,
+                (con, msg) -> {
+                    if (!checkReady(msg)) return;
+                    handler.gunFire(msg);
+                });
         client.addListener(listener);
     }
 
@@ -114,18 +116,21 @@ public class GameClient {
 
     public void itemEquipped(Item item, boolean isEquipped){
         if (item != null)
-            client.sendTCP(new PlayerEquip().set(item.tileName, SecondGDXGame.instance.name, SecondGDXGame.instance.name, isEquipped));
+            client.sendTCP(new PlayerEquip().set(item.tileName, GameState.instance.player.getId(), SecondGDXGame.instance.name, isEquipped));
         else
-            client.sendTCP(new PlayerEquip().set(null, SecondGDXGame.instance.name,  SecondGDXGame.instance.name, false));
+            client.sendTCP(new PlayerEquip().set(null, GameState.instance.player.getId(),  SecondGDXGame.instance.name, false));
     }
 
-    public void sendPlayerMove(String playerName, Vector2 pos, Vector2 speed){
-        client.sendTCP(new PlayerMove().set(playerName, pos.x, pos.y, speed.x,speed.y, GameState.instance.player.itemRotation));
+    public void sendPlayerMove(long playerId, Vector2 pos, Vector2 speed){
+        client.sendTCP(new PlayerMove().set(playerId, pos.x, pos.y, speed.x,speed.y, GameState.instance.player.itemRotation));
     }
-
 
     public void hit(long id, float damage){
-        client.sendTCP(new EntityShot().set(id, damage, SecondGDXGame.instance.name));
+        client.sendTCP(new EntityShot().set(id, damage, GameState.instance.player.getId()));
+    }
+
+    public void gunFire(){
+        client.sendTCP(new GunFire().set(GameState.instance.player.getId()));
     }
 
     public String connect(String host){
@@ -146,7 +151,7 @@ public class GameClient {
     }
 
     public void end() {
-        client.sendTCP(new End().set(SecondGDXGame.instance.name));
+        client.sendTCP(new End().set(GameState.instance.player.getId()));
     }
 
     public void dispose(){

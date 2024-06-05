@@ -160,7 +160,7 @@ public class BodyResolver {
     }
 
     public Body bulletBody(float x, float y, Object userData){
-        BodyDef bodyDef = MobsFactoryC.bodyDef(x, y, BodyDef.BodyType.DynamicBody, true);
+        BodyDef bodyDef = MobsFactory.bodyDef(x, y, BodyDef.BodyType.DynamicBody, true);
         Body body = world.createBody(bodyDef);
 
         CircleShape circle = new CircleShape();

@@ -1,13 +1,8 @@
 package com.mygdx.game.net.server;
 
-import com.mygdx.game.gamestate.factories.ItemsFactory;
-import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.ServerZombieAIBehaviour;
+import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.Zombie;
-import com.mygdx.game.gamestate.player.AnotherPlayerConstructor;
-import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.net.GameServer;
-import com.mygdx.game.net.PlayerInfo;
-import com.mygdx.game.net.messages.EntityInfo;
 
 public class ServHandler {
     public ServGameState gameState;
@@ -55,28 +50,34 @@ public class ServHandler {
 //        }
     }
 
-    public void spawnEntity(EntityInfo inf){
-        Zombie zomb = (Zombie) gameState.mobsFactory.spawnEntity(inf.id, inf.type, inf.x, inf.y);
-//        zomb.zombieHandler.destroy();
-//        zomb.zombieHandler = new ServerZombieAIBehaviour(zomb.zombieObject);
-        gameState.entities.put(inf.id, zomb);
+//    public void spawnEntity(EntityInfo inf){
+//        Zombie zomb = (Zombie) gameState.mobsFactory.spawnEntity(inf.id, inf.type, inf.x, inf.y);
+//        gameState.entities.put(inf.id, zomb);
+//    }
+
+    public Zombie spawnZombie(long id, String name, float hp, float x, float y){
+        Zombie zomb = (Zombie) gameState.mobsFactory.spawnEntity(id, Entity.Kind.ZOMBIE, x, y);
+        zomb.setName(name);
+        zomb.setHp(hp);
+        gameState.entities.put(id, zomb);
+        return zomb;
     }
 
-    public void killEntity(long id){
-        gameState.entities.get(id).kill();
-    }
+//    public void killEntity(long id){
+//        gameState.entities.get(id).kill();
+//    }
 
-    public void playerJoined(PlayerInfo plInf){
-        Player anotherPlayer = AnotherPlayerConstructor.createPlayer(plInf.name);
-        anotherPlayer.setPosition(plInf.x, plInf.y);
-        if (plInf.equippedItemId != null)
-            anotherPlayer.equipItem(ItemsFactory.getItem(plInf.equippedItemId));
-        gameState.players.put(plInf.name, anotherPlayer);
-    }
-
-    public void playerExited(String playerName) {
-        Player p = gameState.players.get(playerName);
-        p.destroy();
-        gameState.players.remove(p.getName());
-    }
+//    public void playerJoined(PlayerInfo plInf){
+//        Player anotherPlayer = AnotherPlayerConstructor.createPlayer(plInf.name);
+//        anotherPlayer.setPosition(plInf.x, plInf.y);
+//        if (plInf.equippedItemId != null)
+//            anotherPlayer.equipItem(ItemsFactory.getItem(plInf.equippedItemId));
+//        gameState.players.put(plInf.id, anotherPlayer);
+//    }
+//
+//    public void playerExited(long id) {
+//        Player p = gameState.players.get(id);
+//        p.destroy();
+//        gameState.players.remove(p.getId());
+//    }
 }

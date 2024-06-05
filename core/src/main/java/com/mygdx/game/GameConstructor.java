@@ -7,10 +7,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.mygdx.game.gamestate.ClientHandler;
+import com.mygdx.game.gamestate.AcceptHandler;
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.factories.BodyResolver;
-import com.mygdx.game.gamestate.factories.MobsFactoryC;
+import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.tiledmap.tiled.TmxMapLoader;
 import com.mygdx.game.gamestate.GameStageInputListener;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.*;
@@ -48,7 +48,7 @@ public class GameConstructor {
         gameState.entities = new ObjectMap<>();
 
         gameState.client = SecondGDXGame.instance.client;
-        gameState.clientHandler = new ClientHandler(gameState.client);
+        gameState.acceptHandler = new AcceptHandler(gameState.client);
         SecondGDXGame.instance.client.handler = gameState.getServerHandler();
 
         gameState.debugRenderer = new ShapeRenderer();
@@ -56,7 +56,7 @@ public class GameConstructor {
         gameState.bodies = new Array<>();
         gameState.world = new World(new Vector2(0, 0), true);
         gameState.bodyResolver = new BodyResolver(gameState.world);
-        gameState.mobsFactory = new MobsFactoryC(gameState.world);
+        gameState.mobsFactory = new MobsFactory(gameState.world);
         gameState.unbox = new UnBox(gameState.world);
         gameState.unbox.getOptions().setTimeStep(gameState.physicsStep);
         gameState.unbox.getOptions().setInterpolateMovement(false);
@@ -89,8 +89,6 @@ public class GameConstructor {
         //gameState.console.setNoHoverAlpha(0.5f);
         gameState.console.setCommandExecutor(new ConsoleCommands(gameState));
         gameState.console.setMaxEntries(50);
-
-        gameState.tester();
 
         if (msg.playersInfo != null) {
             for (PlayerInfo plInf : msg.playersInfo) {

@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
-import com.mygdx.game.gamestate.factories.MobsFactoryC;
+import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 
 public class CustomCommandCompleter {
     private ObjectSet<String> possibleEntry;
@@ -15,7 +15,7 @@ public class CustomCommandCompleter {
     public CustomCommandCompleter () {
         possibleEntry = new ObjectSet<>();
         parameters = new Array<>();
-        for (MobsFactoryC.Type type : MobsFactoryC.Type.values()){
+        for (Entity.Kind type : Entity.Kind.values()){
             parameters.add(type.toString().toLowerCase());
         }
         setString = "";

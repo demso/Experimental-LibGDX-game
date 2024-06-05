@@ -2,12 +2,10 @@ package com.mygdx.game.gamestate.UI.console;
 
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.gamestate.GameState;
-import com.mygdx.game.gamestate.factories.MobsFactoryC;
 import com.mygdx.game.gamestate.UI.console.sjconsole.CommandExecutor;
 import com.mygdx.game.gamestate.UI.console.sjconsole.annotation.ConsoleDoc;
+import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.items.guns.GunSpriteBehaviour;
-
-import java.util.function.Consumer;
 
 public class ConsoleCommands extends CommandExecutor {
     GameState gameState;
@@ -25,12 +23,7 @@ public class ConsoleCommands extends CommandExecutor {
     public final void mobs() {
         StringBuilder logs = new StringBuilder();
 
-        new Array<MobsFactoryC.Type>(MobsFactoryC.Type.values()).forEach(new Consumer<MobsFactoryC.Type>() {
-            @Override
-            public void accept(MobsFactoryC.Type type) {
-                logs.append(type.toString().toLowerCase()).append("\n");
-            }
-        });
+        new Array<>(Entity.Kind.values()).forEach(type -> logs.append(type.toString().toLowerCase()).append("\n"));
 
         console.log(logs.toString());
     }

@@ -53,7 +53,7 @@ public class PistolAnimation {
     float recoilTime = 0.035f * coef;
     float returnTime = 0.06f * coef;
     float shakeTime = 0.025f * 20;
-    float rotationOffset = -32;
+    public float rotationOffset = -32;
 
     float lastValue;
     Vector2 distanceFromOrigin = new Vector2();

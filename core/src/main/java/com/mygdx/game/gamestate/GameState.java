@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.*;
 import com.mygdx.game.gamestate.factories.BodyResolver;
-import com.mygdx.game.gamestate.factories.MobsFactoryC;
+import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.player.ClientPlayer;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
@@ -55,12 +55,12 @@ public class GameState {
     public ShapeRenderer shapeRenderer;
     public UnBox unbox;
     public HUDInputListener HUDIL;
-    public ObjectMap<String, Player> players;
+    public ObjectMap<Long, Player> players;
     volatile public ObjectMap<Long, Entity> entities;
     volatile public GameClient client;
-    volatile public ClientHandler clientHandler;
+    volatile public AcceptHandler acceptHandler;
     public BodyResolver bodyResolver;
-    public MobsFactoryC mobsFactory;
+    public MobsFactory mobsFactory;
 
     public void tester(){
         player.takeItem(ItemsFactory.getItem("10mm_fmj"));
@@ -144,8 +144,8 @@ public class GameState {
         }
     }
 
-    public ClientHandler getServerHandler() {
-        return clientHandler;
+    public AcceptHandler getServerHandler() {
+        return acceptHandler;
     }
 }
 

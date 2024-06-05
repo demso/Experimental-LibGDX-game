@@ -1,10 +1,7 @@
 package com.mygdx.game.net.messages.client;
 
-import com.badlogic.gdx.math.Vector2;
-import com.mygdx.game.gamestate.player.Player;
-
 public class PlayerMove {
-    public String name;
+    public long playerId;
     public float x;
     public float y;
     public float xSpeed;
@@ -12,12 +9,12 @@ public class PlayerMove {
     public float rotation;
     public PlayerMove(){}
 
-    public PlayerMove set(String name, float x, float y, float xS, float yS, float rot){
+    public PlayerMove set(long id, float x, float y, float xS, float yS, float rot){
         this.x = x;
         this.y = y;
         xSpeed = xS;
         ySpeed = yS;
-        this.name = name;
+        this.playerId = id;
         rotation = rot;
         return this;
     }

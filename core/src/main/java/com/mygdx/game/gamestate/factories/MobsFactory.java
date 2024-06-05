@@ -14,26 +14,11 @@ import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
-public class MobsFactoryC {
-    public enum Type {
-        ZOMBIE("ZOMBIE");
-
-        String name;
-        Type(String name){
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-
-    }
-
-    World world;
+public class MobsFactory {
+    protected World world;
     private Vector2 tempPosition = new Vector2();
 
-    public MobsFactoryC(World w){
+    public MobsFactory(World w){
         world = w;
     }
 
@@ -50,7 +35,7 @@ public class MobsFactoryC {
         return zombie;
     }
 
-    public Entity spawnEntity(long id, Type type, float x, float y){
+    public Entity spawnEntity(long id, Entity.Kind type, float x, float y){
         Entity entity = null;
         switch (type){
             case ZOMBIE -> entity = spawnZombie(id, x, y);

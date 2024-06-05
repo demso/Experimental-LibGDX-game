@@ -14,16 +14,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.mygdx.game.SecondGDXGame;
-import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
 import com.mygdx.game.gamestate.UI.console.InGameConsole;
 import com.mygdx.game.gamestate.factories.BodyResolver;
-import com.mygdx.game.gamestate.factories.MobsFactoryC;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
-import com.mygdx.game.gamestate.tiledmap.tiled.TiledMap;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.mygdx.game.net.GameServer;
 import dev.lyze.gdxUnBox2d.UnBox;
@@ -54,12 +51,12 @@ public class ServGameState {
     public ShapeRenderer shapeRenderer;
     public UnBox unbox;
     public HUDInputListener HUDIL;
-    public ObjectMap<String, Player> players;
+    public ObjectMap<Long, Player> players;
     volatile public ObjectMap<Long, Entity> entities;
     volatile public ServHandler serverHandler;
     public GameServer gameServer;
     public BodyResolver bodyResolver;
-    public MobsFactoryS mobsFactory;
+    public ServerMobsFactory mobsFactory;
 
     public void tester(){
     }

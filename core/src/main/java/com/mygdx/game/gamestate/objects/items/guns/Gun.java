@@ -11,11 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 import com.mygdx.game.gamestate.Globals;
-import com.mygdx.game.gamestate.factories.BodyResolver;
-import com.mygdx.game.gamestate.objects.behaviours.SpriteBehaviour;
 import com.mygdx.game.gamestate.objects.bullet.Bullet;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.player.Player;
@@ -28,6 +25,7 @@ import static com.mygdx.game.gamestate.GameState.instance;
 
 public class Gun extends Item {
     GunSpriteBehaviour gunSpriteBehaviour;
+    Vector2 bulletTempRotationVec = new Vector2(1,1);
     public Gun(TiledMapTile tile, String itemName) {
         super(tile, itemName);
         spriteWidth = 0.4f;
@@ -41,10 +39,9 @@ public class Gun extends Item {
     }
 
     public void fireBullet(Player player){
-        (gunSpriteBehaviour).onFire();
-        Vector3 mousePos = gameState.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-        Vector2 vv = new Vector2(mousePos.x-player.getPosition().x, mousePos.y-player.getPosition().y);
-        new Bullet(TileResolver.getTile("bullet"), player.getPosition(), vv);
+        gunSpriteBehaviour.onFire();
+        bulletTempRotationVec.setAngleDeg(player.itemRotation);
+        new Bullet(TileResolver.getTile("bullet"), player.getPosition(), bulletTempRotationVec);
     }
 
     @Override
@@ -72,9 +69,8 @@ public class Gun extends Item {
         else
             gunSpriteBehaviour.setRenderOrder(Globals.DEFAULT_RENDER_ORDER);
 
-        if (isEquipped()) {
-        } else {
-
+        if (isEquipped()) {}
+        else {
             if (mouseHandler == null) {
                 mouseHandler = new Table();
                 mouseHandler.setSize(spriteWidth - 0.1f, spiteHeight - 0.1f);

@@ -89,7 +89,9 @@ public class SecondGDXGame extends Game {
             setScreen(menuScreen);
 
         gameScreen = new GameScreen();
-        gameScreen.gameState = new GameConstructor().createGameState(msg); //создаем клиент
+        gameScreen.gameState = new GameConstructor().createGameState(msg);
+        gameScreen.gameState.player.setId(msg.id);
+        gameScreen.gameState.tester();//создаем клиент
 
         ready();
 

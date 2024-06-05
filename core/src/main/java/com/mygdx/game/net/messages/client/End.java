@@ -1,9 +1,9 @@
 package com.mygdx.game.net.messages.client;
 
 public class End {
-    public String playerName;
-    public End set(String name) {
-        playerName = name;
+    public long playerId = -1;
+    public End set(long id) {
+        playerId = id;
         return this;
     }
 }

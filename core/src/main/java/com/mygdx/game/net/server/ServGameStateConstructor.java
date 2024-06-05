@@ -5,7 +5,6 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.mygdx.game.gamestate.factories.BodyResolver;
-import com.mygdx.game.gamestate.factories.MobsFactoryC;
 import com.mygdx.game.gamestate.tiledmap.tiled.TmxMapLoader;
 import com.mygdx.game.net.GameServer;
 import dev.lyze.gdxUnBox2d.UnBox;
@@ -32,7 +31,7 @@ public class ServGameStateConstructor {
         gameState.bodies = new Array<>();
         gameState.world = new World(new Vector2(0, 0), true);
         gameState.bodyResolver = new BodyResolver(gameState.world);
-        gameState.mobsFactory = new MobsFactoryS(gameState.world);
+        gameState.mobsFactory = new ServerMobsFactory(gameState.world);
         gameState.unbox = new UnBox(gameState.world);
         gameState.unbox.getOptions().setTimeStep(gameState.physicsStep);
         gameState.unbox.getOptions().setInterpolateMovement(false);

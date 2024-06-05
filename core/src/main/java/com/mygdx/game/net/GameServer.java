@@ -1,43 +1,39 @@
 package com.mygdx.game.net;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import com.esotericsoftware.minlog.Log;
 import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.HandyHelper;
-import com.mygdx.game.gamestate.factories.MobsFactoryC;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.Zombie;
-import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
 import com.mygdx.game.gamestate.tiledmap.tiled.TiledMapTileLayer;
 import com.mygdx.game.net.messages.*;
-import com.mygdx.game.net.messages.client.Begin;
-import com.mygdx.game.net.messages.client.End;
-import com.mygdx.game.net.messages.client.PlayerMove;
-import com.mygdx.game.net.messages.client.Ready;
+import com.mygdx.game.net.messages.client.*;
 import com.mygdx.game.net.messages.server.*;
+import com.mygdx.game.net.server.CustomKryoLogger;
 import com.mygdx.game.net.server.ServGameState;
 import com.mygdx.game.net.server.ServGameStateConstructor;
 import com.mygdx.game.net.server.ZombieHelper;
 
-import java.util.function.BiConsumer;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 public class GameServer {
     Server server;
     Listener.TypeListener listener;
-    public volatile ObjectMap<String, PlayerInfo> players;
-    public volatile ObjectMap<Long, ZombieInfo> entities;
-    long entitiesCounter  = 0;
+    public volatile ObjectMap<Long, PlayerInfo> players;
+    public volatile ObjectMap<Long, Entity> entities;//equals to gamestate.entities
+    volatile AtomicLong entitiesCounter = new AtomicLong(1);
     Vector2 spawnPoint = new Vector2(10,87);
     Thread endlessThread;
     long sleepTime = Math.round(Globals.SERVER_UPDATE_TIME * 1000);
     public ServGameState gameState;
     public ZombieHelper zhelper = new ZombieHelper(this);
+    ObjectMap.Values<Entity> entityMapVals;
 
     public final String mapToLoad = "tiled/firstmap/worldmap.tmx";
     public GameServer() {
@@ -46,6 +42,8 @@ public class GameServer {
 
             server = new Server();
             Registerer.register(server.getKryo());
+            Log.TRACE();
+            Log.setLogger(new CustomKryoLogger());
 
             listener = new Listener.TypeListener();
             listener.addTypeHandler(Message.class,
@@ -55,52 +53,54 @@ public class GameServer {
             listener.addTypeHandler(Begin.class,
                     (con, msg) -> {
                         PlayerInfo plInf = new PlayerInfo(msg.name, con).playerSet(spawnPoint.x, spawnPoint.y, 0, 0, 0);
-                        players.put(msg.name, plInf);
-                        con.sendTCP(new OnConnection(mapToLoad, plInf.x, plInf.y)
+                        plInf.id = entitiesCounter.get();
+                        entitiesCounter.incrementAndGet();
+                        players.put(plInf.id, plInf);
+                        con.sendTCP(new OnConnection(plInf.id, mapToLoad, plInf.x, plInf.y)
                                 .addPlayers(players.values().toArray().toArray(PlayerInfo.class))
-                                .addEntities(entities.values().toArray().toArray(EntityInfo.class)));
+                                .addEntities(entities.values().toArray().toArray(Entity.class)));
                         newPlayerJoined(plInf);
                     });
 
             listener.addTypeHandler(PlayerMove.class,
                     (con, msg) -> {
-                        players.get(msg.name).playerSet(msg.x, msg.y, msg.xSpeed, msg.ySpeed, msg.rotation);
-                        //sendToAllPlayersBut(new PlayerMove(msg.name, msg.x, msg.y, msg.xSpeed, msg.ySpeed), players.get(msg.name));
-                        //PlayerInfo pl = players.get(msg.name);
-                       // HandyHelper.instance.log(Math.round(pl.x * 10f)/10f + " " + Math.round(pl.y*10f)/10f + " " + Math.round(pl.xSpeed*10f)/10f + " " + Math.round(pl.ySpeed*10f)/10f);
-                    });
+                        players.get(msg.playerId).playerSet(msg.x, msg.y, msg.xSpeed, msg.ySpeed, msg.rotation);
+                      });
 
             listener.addTypeHandler(PlayerEquip.class,
                     (con, msg) -> {
-                            players.get(msg.playerName).equip(msg.itemId);
-                            sendToAllPlayersBut(msg, players.get(msg.playerName));
+                            players.get(msg.playerId).equip(msg.itemId);
+                            sendToAllPlayersBut(msg, players.get(msg.playerId));
                         });
             listener.addTypeHandler(End.class,
                     (con, msg) -> {
-                        PlayerInfo inf = players.remove(msg.playerName);
+                        PlayerInfo inf = players.remove(msg.playerId);
                         sendToAllPlayersBut(msg, inf);
                     });
             listener.addTypeHandler(Ready.class,
                     (con, msg) -> {
                         startWave();
-                        //con.sendTCP();
                     });
             listener.addTypeHandler(EntityShot.class,
                     (con, msg) -> {
-                        Entity zomb = gameState.entities.get(msg.id);
+                        Entity zomb = entities.get(msg.id);
                         if (zomb == null || !zomb.isAlive()){
                             HandyHelper.instance.log("[GameServer:93] Entity is unreachable on server, is null = " + (zomb == null)
                                     + ", hp = " + (zomb == null ? "" : zomb.getHp()));
                             return;
                         }
-                        gameState.entities.get(msg.id).hurt(msg.damage);
-                        ZombieInfo zInf = entities.get(msg.id);
-                        zInf.hp = entities.get(msg.id).hp = zomb.getHp();
-                        if (!gameState.entities.get(msg.id).isAlive()){
-                            killEntity(msg.id);
-                            sendToAllPlayers(new KillEntity().set(msg.id));
-                        } else
-                            server.sendToAllExceptTCP(players.get(msg.playerName).connection.getID(), msg);
+                        if (zomb instanceof Zombie zombie) {
+                            zombie.hurt(msg.damage);
+                            if (!zombie.isAlive()) {
+                                killEntity(msg.id);
+                                sendToAllPlayers(new KillEntity().set(msg.id));
+                            } else
+                                server.sendToAllExceptTCP(players.get(msg.playerId).connection.getID(), msg);
+                        }
+                    });
+            listener.addTypeHandler(GunFire.class,
+                    (con, msg) -> {
+                        sendToAllPlayersBut(msg, players.get(msg.playerID));
                     });
 
             server.addListener(listener);
@@ -135,6 +135,9 @@ public class GameServer {
 
     PlayerMove[] playerMoves = new PlayerMove[0];
     ZombieMove[] zombieMoves = new ZombieMove[0];
+    Array<Entity> tempEntityArray = new Array<>();
+    EntitiesMoves entityMoves = new EntitiesMoves();
+
     public void sendUpdatePlayersAndEntities(){
         if (playerMoves.length != players.size){
             playerMoves = new PlayerMove[players.size];
@@ -147,35 +150,30 @@ public class GameServer {
             int i = 0;
             @Override
             public void accept(PlayerInfo playerInfo) {
-                playerMoves[i].set(playerInfo.name, playerInfo.x, playerInfo.y, playerInfo.xSpeed, playerInfo.ySpeed, playerInfo.itemRotation);
+                playerMoves[i].set(playerInfo.id, playerInfo.x, playerInfo.y, playerInfo.xSpeed, playerInfo.ySpeed, playerInfo.itemRotation);
                 i++;
             }
         });
 
-        if (zombieMoves.length != entities.size){
-            zombieMoves = new ZombieMove[entities.size];
+        entityMapVals.reset();
+        tempEntityArray.clear();
+        entityMapVals.toArray(tempEntityArray);
+        if (zombieMoves.length != tempEntityArray.size){
+            zombieMoves = new ZombieMove[tempEntityArray.size];
             for (int i = 0; i < zombieMoves.length; i ++){
                 zombieMoves[i] = new ZombieMove();
             }
         }
 
-        int z = 0;
-        for (ZombieInfo zomb :  new Array.ArrayIterator<>(entities.values().toArray())){
-            Zombie zo = (Zombie) gameState.entities.get(zomb.id);
-            zomb.setInfoFromZombie((Zombie) gameState.entities.get(zomb.id));
-            zhelper.fillMove(zomb, zombieMoves[z]);
-            //HandyHelper.instance.periodicLog(zo.getPosition().x + " " + zo.getPosition().y + " " + zomb.xSpeed + " " + zomb.ySpeed);
-            z++;
+        for (int i = 0; i < tempEntityArray.size; i++){
+            Entity entity = tempEntityArray.get(i);
+            if (entity instanceof Zombie zombie) {
+                zombieMoves[i].set(zombie);
+            }
         }
 
-        sendToAllPlayers(new EntitiesMoves().setPlayersMoves(playerMoves).setZMoves(zombieMoves));
+        sendToAllPlayers(entityMoves.setPlayersMoves(playerMoves).setZMoves(zombieMoves));
     }
-
-//    public void sendUpdateEntities(){
-//        for (ZombieInfo zomb :  new Array.ArrayIterator<>(entities.values().toArray())){
-//            zomb.getMove();
-//        }
-//    }
 
     public void newPlayerJoined(PlayerInfo beg){
         sendToAllPlayersBut(new PlayerJoined(beg), beg);
@@ -187,9 +185,6 @@ public class GameServer {
             PlayerInfo plInf = pls.get(i);
             plInf.connection.sendTCP(obj);
         }
-//        for (PlayerInfo plInf : players.values()){
-//            plInf.connection.sendTCP(obj);
-//        }
     }
     public void sendToAllPlayersBut(Object obj, PlayerInfo... playerInfos){
         for (PlayerInfo plInf : players.values()){
@@ -200,13 +195,14 @@ public class GameServer {
     }
 
     void init(){
-        players = new ObjectMap<>();
-        entities = new ObjectMap<>();
         gameState = new ServGameStateConstructor().createGameState(this);
+        players = new ObjectMap<>();
+        entities = gameState.entities;
+        entityMapVals = new ObjectMap.Values<>(entities);
     }
 
     void startWave() {
-        wave = 1;
+        wave = 0;
     }
 
     Vector2 spawnCenter = new Vector2(10, 85);
@@ -231,18 +227,20 @@ public class GameServer {
     }
 
     void spawnZombie(float x, float y){
-        ZombieInfo zomInf = new ZombieInfo().set(entitiesCounter,  MobsFactoryC.Type.ZOMBIE,
-                "zombie" + entitiesCounter, 10, x, y, 0, 0);
-        gameState.getServerHandler().spawnEntity(zomInf);
-        entities.put(entitiesCounter, zomInf);
-        sendToAllPlayers(new SpawnEntity().set(zomInf));
-        entitiesCounter++;
+        Zombie zombie = gameState.getServerHandler().spawnZombie(entitiesCounter.get(),  "zombie" + entitiesCounter, 10, x, y);
+        entities.put(entitiesCounter.get(), zombie);
+        sendToAllPlayers(new SpawnEntity().set(new ZombieInfo().set(zombie)));
+        entitiesCounter.getAndIncrement();
     }
 
     public void killEntity(long id){
-        if (gameState.entities.get(id).isAlive())
-            gameState.entities.get(id).kill();
-        gameState.entities.remove(id);
+        Entity entity = entities.get(id);
+        if (entity == null) {
+            HandyHelper.instance.log("[GameServer:killentity:246] No entity with " + id + " id to kill.");
+            return;
+        }
+        if (entity.isAlive())
+            entity.kill();
         entities.remove(id);
     }
 

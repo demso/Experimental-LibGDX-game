@@ -24,6 +24,7 @@ public class HandyHelper {
             file.createNewFile();
 
             writer = new BufferedWriter(new FileWriter(file, true));
+            System.out.println(HandyHelper.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath() + "log.txt");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -78,7 +79,7 @@ public class HandyHelper {
         }
     }
 
-    public void saveLog(String toLog){
+    public synchronized void saveLog(String toLog){
         try {
             writer.write(toLog + "\n");
             writer.flush();
