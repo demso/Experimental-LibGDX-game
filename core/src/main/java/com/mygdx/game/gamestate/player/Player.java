@@ -66,7 +66,7 @@ public class Player extends Entity implements Storage {
     }
     @Override
     public void removeItem(Item item){
-        item.unequip();
+        item.onUnequip();
         if (equipedItem == item)
             equipedItem = null;
         inventoryItems.removeValue(item, true);
@@ -94,7 +94,7 @@ public class Player extends Entity implements Storage {
         if (!inventoryContains(item))
             takeItem(item);
         if (equipedItem != null)
-            equipedItem.unequip();
+            equipedItem.onUnequip();
         equipedItem = item;
         if (item instanceof Gun gun){
             gun.onEquip(this);
@@ -104,7 +104,7 @@ public class Player extends Entity implements Storage {
     public Item uneqipItem(){
         if (equipedItem == null)
             return null;
-        equipedItem.unequip();
+        equipedItem.onUnequip();
         Item tmpItem = equipedItem;
         equipedItem = null;
         return tmpItem;

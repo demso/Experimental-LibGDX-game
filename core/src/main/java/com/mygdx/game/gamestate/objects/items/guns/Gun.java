@@ -102,7 +102,7 @@ public class Gun extends Item {
     }
 
     @Override
-    public void unequip() {
+    public void onUnequip() {
         isEquipped = false;
         if (GO != null)
             GO.setEnabled(false);

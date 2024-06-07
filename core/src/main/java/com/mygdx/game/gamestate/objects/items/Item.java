@@ -136,7 +136,7 @@ public class Item implements BodyData, Interactable {
         removeFromWorld();
     }
     
-    public void unequip(){
+    public void onUnequip(){
         isEquipped = false;
     }
 
@@ -145,7 +145,7 @@ public class Item implements BodyData, Interactable {
     }
 
     public void dispose(){
-        unequip();
+        onUnequip();
         GO.destroy();
     }
 }
