@@ -21,4 +21,11 @@ public class ItemInfo {
         this.itemId = itemId;
         return this;
     }
+
+    public static ItemInfo createItemInfo(Item item) {
+        ItemInfo itemInfo = new ItemInfo();
+        itemInfo.itemId = item.itemId;
+        itemInfo.uid = item.uid;
+        return itemInfo;
+    }
 }

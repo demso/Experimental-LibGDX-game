@@ -66,7 +66,7 @@ public class Player extends Entity implements Storage {
     }
     @Override
     public void removeItem(Item item){
-        item.onUnequip();
+        item.onDrop();
         if (equipedItem == item)
             equipedItem = null;
         inventoryItems.removeValue(item, true);

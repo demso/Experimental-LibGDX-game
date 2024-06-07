@@ -73,6 +73,7 @@ public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
                 GameState.instance.clientPlayer.takeItem(contextMenu.itemEntry.item);
                 storage.removeItem(contextMenu.itemEntry.item);
                 Vector2 pos = storage.getPosition();
+                instance.hud.updateInvHUDContent();//todo update when items are taken or stored from server not on client
                 instance.client.tookItemFromStorage(contextMenu.itemEntry.item, (int)Math.floor(pos.x), (int)Math.floor(pos.y));
             }
             default -> handled = false;

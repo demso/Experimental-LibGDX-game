@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.mygdx.game.gamestate.AcceptHandler;
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.factories.BodyResolver;
+import com.mygdx.game.gamestate.factories.ItemsFactory;
 import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.tiledmap.tiled.TmxMapLoader;
 import com.mygdx.game.gamestate.GameStageInputListener;
@@ -46,6 +47,7 @@ public class GameConstructor {
         gameState.skin = SecondGDXGame.skin;
         gameState.players = new ObjectMap<>();
         gameState.entities = new ObjectMap<>();
+        gameState.items = new ObjectMap<>();
 
         gameState.client = SecondGDXGame.instance.client;
         gameState.acceptHandler = new AcceptHandler(gameState.client, gameState);
@@ -57,6 +59,7 @@ public class GameConstructor {
         gameState.world = new World(new Vector2(0, 0), true);
         gameState.bodyResolver = new BodyResolver(gameState.world);
         gameState.mobsFactory = new MobsFactory(gameState.world);
+        gameState.itemsFactory = new ItemsFactory(gameState.unbox, gameState.bodyResolver, gameState.hud, gameState.gameStage);
         gameState.unbox = new UnBox(gameState.world);
         gameState.unbox.getOptions().setTimeStep(gameState.physicsStep);
         gameState.unbox.getOptions().setInterpolateMovement(false);
@@ -125,9 +128,5 @@ public class GameConstructor {
         gameState.rayHandler.setAmbientLight(0f, 0f, 0f, 1f);
         gameState.rayHandler.setBlur(true);
         gameState.rayHandler.setBlurNum(2);
-
-        //game
-        Item it = new Item(TileResolver.getTile("10mm_fmj"), "10mm FMJ bullets");
-        it.allocate(new Vector2(3.5f,96.5f));
     }
 }

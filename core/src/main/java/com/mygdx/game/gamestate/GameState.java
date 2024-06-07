@@ -63,6 +63,7 @@ public class GameState implements AbstractGameState{
     volatile public AcceptHandler acceptHandler;
     public BodyResolver bodyResolver;
     public MobsFactory mobsFactory;
+    public ItemsFactory itemsFactory;
 
     public void tester(){
 //        clientPlayer.takeItem(ItemsFactory.getItem("10mm_fmj"));

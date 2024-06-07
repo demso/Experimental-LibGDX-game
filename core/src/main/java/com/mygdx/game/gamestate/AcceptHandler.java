@@ -2,7 +2,6 @@ package com.mygdx.game.gamestate;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongArray;
-import com.mygdx.game.gamestate.factories.ItemsFactory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.Zombie;
 import com.mygdx.game.gamestate.player.AnotherPlayerConstructor;
@@ -93,8 +92,8 @@ public class AcceptHandler {
     public void playerJoined(PlayerInfo plInf){
         Player anotherPlayer = AnotherPlayerConstructor.createPlayer(plInf.name);
         anotherPlayer.setPosition(plInf.x, plInf.y);
-        if (plInf.equippedItemId != null)
-            anotherPlayer.equipItem(ItemsFactory.getItem(plInf.equippedItemId));
+        if (plInf.equippedItem != null)
+            anotherPlayer.equipItem(gameState.itemsFactory.getItem(plInf.equippedItem));
         gameState.players.put(plInf.id, anotherPlayer);
     }
 

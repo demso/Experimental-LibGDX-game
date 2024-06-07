@@ -18,6 +18,7 @@ import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
 import com.mygdx.game.gamestate.UI.console.InGameConsole;
 import com.mygdx.game.gamestate.factories.BodyResolver;
+import com.mygdx.game.gamestate.factories.ItemsFactory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.player.Player;
@@ -60,6 +61,7 @@ public class ServGameState {
     public GameServer gameServer;
     public BodyResolver bodyResolver;
     public ServerMobsFactory mobsFactory;
+    public ItemsFactory itemsFactory;
     public TiledMapTileLayer obstaclesLayer;
 
     public void tester(){

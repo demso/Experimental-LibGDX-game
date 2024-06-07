@@ -1,5 +1,8 @@
 package com.mygdx.game.gamestate.objects.items;
 
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.mygdx.game.gamestate.UI.HUD;
+import com.mygdx.game.gamestate.factories.BodyResolver;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -18,9 +21,8 @@ import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
 import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
+import dev.lyze.gdxUnBox2d.UnBox;
 import lombok.Getter;
-
-import static com.mygdx.game.gamestate.GameState.instance;
 
 public class Item implements BodyData, Interactable {
     public TiledMapTile tile;
@@ -29,9 +31,13 @@ public class Item implements BodyData, Interactable {
     public Table mouseHandler;
     protected boolean isEquipped = false;
     @Getter Player owner;
+    @Getter public long ownerId;
 
-    public GameState gameState;
+    public UnBox unBox;
+    public BodyResolver bodyResolver;
+    public HUD hud;
     public long uid;
+    public Stage gameStage;
     public String itemId = "{No tile name}"; //string item identifier
     public String itemName = "{No name item}";
     public String description = "First you must develop a Skin that implements all the widgets you plan to use in your layout. You can't use a widget if it doesn't have a valid style. Do this how you would usually develop a Skin in Scene Composer.";
@@ -40,21 +46,28 @@ public class Item implements BodyData, Interactable {
     protected GameObject GO;
     protected @Getter SpriteBehaviour spriteBehaviour;
 
-    public Item(TiledMapTile tile, String itemName){
+    public Item(long uid, TiledMapTile tile, String itemName){
+        this.uid = uid;
         this.tile = tile;
         this.itemId = tile.getProperties().get("name", "no_name", String.class);
-        this.gameState = instance;
         this.itemName = itemName;
     }
 
-    public Item(String itemId, String itemName){
-        this(TileResolver.getTile(itemId), itemName);
+    public Item(long uid, String iId, String itemName){
+        this(uid, TileResolver.getTile(iId), itemName);
+    }
+    public void setData(UnBox box, BodyResolver resolver, HUD h, Stage st)
+    {
+        bodyResolver = resolver;
+        unBox = box;
+        gameStage = st;
+        hud = h;
     }
 
     public Body allocate(Vector2 position){
         prepareForRendering();
 
-        physicalBody = GameState.instance.bodyResolver.itemBody(position.x, position.y, this);
+        physicalBody = bodyResolver.itemBody(position.x, position.y, this);
         new Box2dBehaviour(physicalBody, GO);
         GO.setEnabled(true);
         mouseHandler.setPosition(getPosition().x - mouseHandler.getWidth()/2f, getPosition().y - mouseHandler.getHeight()/2f);
@@ -62,13 +75,13 @@ public class Item implements BodyData, Interactable {
     }
 
     protected void prepareForRendering(){
-        if (GO == null)
-            GO = new GameObject(itemName, false, instance.unbox);
+        if (unBox != null && GO == null)
+            GO = new GameObject(itemName, false, unBox);
 
-        if (spriteBehaviour == null)
+        if (hud != null && spriteBehaviour == null)
             spriteBehaviour = new SpriteBehaviour(GO, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
 
-        if (mouseHandler == null) {
+        if (hud != null && mouseHandler == null) {
             mouseHandler = new Table();
             mouseHandler.setSize(spriteWidth - 0.1f, spiteHeight - 0.1f);
             mouseHandler.setTouchable(Touchable.enabled);
@@ -76,25 +89,25 @@ public class Item implements BodyData, Interactable {
                 @Override
                 public void enter(InputEvent event, float x, float y, int pointer, @Null Actor fromActor) {
                     super.enter(event, x, y, pointer, fromActor);
-                    gameState.hud.debugEntries.put(itemId + "_ClickListener", "Pointing at " + itemId + " at " + getPosition());
-                    gameState.hud.showItemInfoWindow(Item.this);
+                    hud.debugEntries.put(itemId + "_ClickListener", "Pointing at " + itemId + " at " + getPosition());
+                    hud.showItemInfoWindow(Item.this);
                 }
 
                 @Override
                 public void exit(InputEvent event, float x, float y, int pointer, @Null Actor toActor) {
                     super.exit(event, x, y, pointer, toActor);
-                    gameState.hud.debugEntries.removeKey(itemId + "_ClickListener");
-                    gameState.hud.hideItemInfoWindow(Item.this);
+                    hud.debugEntries.removeKey(itemId + "_ClickListener");
+                    hud.hideItemInfoWindow(Item.this);
                 }
             });
         }
-
-        gameState.gameStage.addActor(mouseHandler);
+        if (hud != null)
+            gameStage.addActor(mouseHandler);
     }
 
     public void removeFromWorld(){
         if (mouseHandler != null){
-            gameState.gameStage.getActors().removeValue(mouseHandler, true);
+            gameStage.getActors().removeValue(mouseHandler, true);
         }
         if (physicalBody != null){
             clearPhysicalBody();
@@ -123,15 +136,23 @@ public class Item implements BodyData, Interactable {
 
     @Override
     public void interact(Player player) {
-        instance.clientPlayer.takeItem(this);
+        player.takeItem(this);
     }
 
     public void onTaking(Player player){
+        ownerId = player.getId();
         owner = player;
+    }
+
+    public void onDrop(){
+        onUnequip();
+        ownerId = -1;
+        owner = null;
     }
 
     public void onEquip(Player player){
         isEquipped = true;
+        ownerId = player.getId();
         owner = player;
         removeFromWorld();
     }

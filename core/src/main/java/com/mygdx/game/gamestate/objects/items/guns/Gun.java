@@ -24,14 +24,14 @@ import static com.mygdx.game.gamestate.GameState.instance;
 public class Gun extends Item {
     GunSpriteBehaviour gunSpriteBehaviour;
     Vector2 bulletTempRotationVec = new Vector2(1,1);
-    public Gun(TiledMapTile tile, String itemName) {
-        super(tile, itemName);
+    public Gun(long uid, TiledMapTile tile, String itemName) {
+        super(uid, tile, itemName);
         spriteWidth = 0.4f;
         spiteHeight = 0.4f;
     }
 
-    public Gun(String tileName, String itemName) {
-        super(tileName, itemName);
+    public Gun(long uid, String tileName, String itemName) {
+        super(uid, tileName, itemName);
         spriteWidth = 0.4f;
         spiteHeight = 0.4f;
     }
@@ -62,7 +62,7 @@ public class Gun extends Item {
         if (gunSpriteBehaviour == null || gunSpriteBehaviour.getState().equals(BehaviourState.DESTROYED))
                 gunSpriteBehaviour = new GunSpriteBehaviour(GO, this, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
 
-        if (getOwnerId() == instance.clientPlayer)
+        if (getOwner() == instance.clientPlayer)
             gunSpriteBehaviour.setRenderOrder(Globals.PLAYER_RENDER_ORDER);
         else
             gunSpriteBehaviour.setRenderOrder(Globals.DEFAULT_RENDER_ORDER);
@@ -77,20 +77,20 @@ public class Gun extends Item {
                     @Override
                     public void enter(InputEvent event, float x, float y, int pointer, @Null Actor fromActor) {
                         super.enter(event, x, y, pointer, fromActor);
-                        gameState.hud.debugEntries.put(itemId + "_ClickListener", "Pointing at " + itemId + " at " + getPosition());
-                        gameState.hud.showItemInfoWindow(Gun.this);
+                        hud.debugEntries.put(itemId + "_ClickListener", "Pointing at " + itemId + " at " + getPosition());
+                        hud.showItemInfoWindow(Gun.this);
                     }
 
                     @Override
                     public void exit(InputEvent event, float x, float y, int pointer, @Null Actor toActor) {
                         super.exit(event, x, y, pointer, toActor);
-                        gameState.hud.debugEntries.removeKey(itemId + "_ClickListener");
-                        gameState.hud.hideItemInfoWindow(Gun.this);
+                        hud.debugEntries.removeKey(itemId + "_ClickListener");
+                        hud.hideItemInfoWindow(Gun.this);
                     }
                 });
             }
 
-            gameState.gameStage.addActor(mouseHandler);
+            gameStage.addActor(mouseHandler);
         }
     }
 

@@ -191,21 +191,21 @@ public class ClientMapLoader extends TmxMapLoader {
                 }
             }
 
-        var objects = mlayers.get("chest_content").getObjects();
-
-        for (MapObject object : objects) {
-            TiledMapTileLayer.Cell curCell = obstaclesLayer.getCell(
-                    (int) Math.ceil(object.getProperties().get("x", float.class)/GameState.TILE_SIDE) - 1,
-                    (int) Math.ceil(object.getProperties().get("y", float.class)/GameState.TILE_SIDE) - 1);
-            String s = object.getProperties().get("items", String.class);
-            if (curCell.getData() != null && curCell.getData() instanceof Storage storage && s != null && !s.trim().isEmpty()){
-                String[] items = object.getProperties().get("items", String.class).split(",");
-                for (String item : items){
-                    storage.takeItem(ItemsFactory.getItem(item.trim().toLowerCase()));
-                }
-
-            }
-        }
+//        var objects = mlayers.get("chest_content").getObjects();
+//
+//        for (MapObject object : objects) {
+//            TiledMapTileLayer.Cell curCell = obstaclesLayer.getCell(
+//                    (int) Math.ceil(object.getProperties().get("x", float.class)/GameState.TILE_SIDE) - 1,
+//                    (int) Math.ceil(object.getProperties().get("y", float.class)/GameState.TILE_SIDE) - 1);
+//            String s = object.getProperties().get("items", String.class);
+//            if (curCell.getData() != null && curCell.getData() instanceof Storage storage && s != null && !s.trim().isEmpty()){
+//                String[] items = object.getProperties().get("items", String.class).split(",");
+//                for (String item : items){
+//                    storage.takeItem(ItemsFactory.getItem(item.trim().toLowerCase()));
+//                }
+//
+//            }
+//        }
 
         //world borders
         BodyDef borderBodyDef = new BodyDef();

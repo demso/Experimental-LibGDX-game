@@ -185,8 +185,7 @@ public class ServerMapLoader extends TmxMapLoader {
             if (curCell.getData() != null && curCell.getData() instanceof Storage storage && s != null && !s.trim().isEmpty()) {
                 String[] items = object.getProperties().get("items", String.class).split(",");
                 for (String item : items) {
-                    Item createdItem = ItemsFactory.getItem(item.trim().toLowerCase());
-                    createdItem.uid = gameState.gameServer.itemsCounter.getAndIncrement();
+                    Item createdItem = gameState.itemsFactory.getItem(gameState.gameServer.itemsCounter.getAndIncrement(), item.trim().toLowerCase());
                     gameState.items.put(createdItem.uid, createdItem);
                     storage.takeItem(createdItem);
                 }

@@ -67,7 +67,7 @@ public class GameServer {
                         players.get(msg.playerId).playerSet(msg.x, msg.y, msg.xSpeed, msg.ySpeed, msg.rotation);
                       });
             listener.addTypeHandler(PlayerEquip.class, (con, msg) -> {
-                            players.get(msg.playerId).equip(msg.itemId);
+                            players.get(msg.playerId).equip(msg.equippedItem);
                             sendToAllPlayersBut(msg, players.get(msg.playerId));
                         });
             listener.addTypeHandler(End.class, (con, msg) -> {
@@ -159,12 +159,12 @@ public class GameServer {
                     case 0:
                         TiledMapTileLayer.Cell sourceCell = gameState.obstaclesLayer.getCell(msg.sourceX, msg.sourceY);
                         if (sourceCell == null) {
-                            con.sendTCP(new Message().set("[MoveItemFromStorageToStorage] Nothing in source here! " + msg.sourceX + " " + msg.sourceY));
+                            con.sendTCP(new Message().set("[MoveItemFromStorageToStorage0] Nothing in source here! " + msg.sourceX + " " + msg.sourceY));
                             return;
                         }
                         TiledMapTileLayer.Cell targetCell = gameState.obstaclesLayer.getCell(msg.targetX, msg.targetY);
                         if (targetCell == null) {
-                            con.sendTCP(new Message().set("[MoveItemFromStorageToStorage] Nothing in target here! " + msg.targetX + " " + msg.targetY));
+                            con.sendTCP(new Message().set("[MoveItemFromStorageToStorage0] Nothing in target here! " + msg.targetX + " " + msg.targetY));
                             return;
                         }
                         removeItemFromStorage((Storage) sourceCell.getData(), msg.uid);
@@ -172,12 +172,25 @@ public class GameServer {
                         break;
                     case 1:
                         players.get(msg.sourceId).removeItem(items.get(msg.uid));
+                        targetCell = gameState.obstaclesLayer.getCell(msg.targetX, msg.targetY);
+                        if (targetCell == null) {
+                            con.sendTCP(new Message().set("[MoveItemFromStorageToStorage1] Nothing in target here! " + msg.targetX + " " + msg.targetY));
+                            return;
+                        }
+                        addItemToStorage((Storage) targetCell.getData(), msg.uid);
                         break;
                     case 2:
-                        server.sendToAllExceptTCP(con.getID(), msg);
+                        sourceCell = gameState.obstaclesLayer.getCell(msg.sourceX, msg.sourceY);
+                        if (sourceCell == null) {
+                            con.sendTCP(new Message().set("[MoveItemFromStorageToStorage0] Nothing in source here! " + msg.sourceX + " " + msg.sourceY));
+                            return;
+                        }
+                        removeItemFromStorage((Storage) sourceCell.getData(), msg.uid);
+                        players.get(msg.targetId).addItem(items.get(msg.uid));
                         break;
                     case 3:
-                        server.sendToAllExceptTCP(con.getID(), msg);
+                        players.get(msg.sourceId).removeItem(items.get(msg.uid));
+                        players.get(msg.targetId).addItem(items.get(msg.uid));
                         break;
                 }
                 server.sendToAllExceptTCP(con.getID(), msg);
@@ -288,10 +301,10 @@ public class GameServer {
         }
     }
     public void removeItemFromStorage(Storage storage, long uid){
-
+        storage.removeItem(items.get(uid));
     }
     public void addItemToStorage(Storage storage, long uid){
-
+        storage.takeItem(items.get(uid));
     }
 
     void init(){
@@ -299,6 +312,7 @@ public class GameServer {
         handler = gameState.serverHandler;
         players = new ObjectMap<>();
         entities = gameState.entities;
+        items = gameState.items;
         entityMapVals = new ObjectMap.Values<>(entities);
     }
 

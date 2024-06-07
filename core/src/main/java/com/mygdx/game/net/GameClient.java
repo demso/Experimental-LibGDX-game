@@ -7,7 +7,6 @@ import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.AcceptHandler;
-import com.mygdx.game.gamestate.factories.ItemsFactory;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.net.messages.client.*;
 import com.mygdx.game.net.messages.common.*;
@@ -53,7 +52,7 @@ public class GameClient {
                 });
         listener.addTypeHandler(PlayerEquip.class, (con, msg) -> {
                     if (!checkReady(msg)) return;
-                    if (msg.itemId == null || !msg.isEquipped)
+                    if (msg.equippedItem == null || !msg.isEquipped)
                         if (msg.playerId == (GameState.instance.clientPlayer.getId())) {
                             if (!Objects.equals(msg.senderName, SecondGDXGame.instance.name)) {
                                 GameState.instance.clientPlayer.uneqipItem();
@@ -64,10 +63,10 @@ public class GameClient {
                     else
                         if (msg.playerId == (GameState.instance.clientPlayer.getId())) {
                             if (!Objects.equals(msg.senderName, SecondGDXGame.instance.name)) {
-                                GameState.instance.clientPlayer.equipItem(ItemsFactory.getItem(msg.itemId));
+                                GameState.instance.clientPlayer.equipItem(gameState.itemsFactory.getItem(msg.equippedItem.uid, msg.equippedItem.itemId));
                             }
                         } else {
-                            GameState.instance.players.get(msg.playerId).equipItem(ItemsFactory.getItem(msg.itemId));
+                            GameState.instance.players.get(msg.playerId).equipItem(gameState.itemsFactory.getItem(msg.equippedItem.uid, msg.equippedItem.itemId));
                         }
                 });
         listener.addTypeHandler(End.class, (con, msg) -> {
@@ -112,8 +111,7 @@ public class GameClient {
 
             Item[] items = new Item[msg.items.length];
             for (int i = 0; i < msg.items.length; i++) {
-                items[i] = ItemsFactory.getItem(msg.items[i].itemId);
-                items[i].uid = msg.items[i].uid;
+                items[i] = gameState.itemsFactory.getItem(msg.items[i].uid, msg.items[i].itemId);
             }
 
             gameState.hud.onStoredItemsReceived(msg.x, msg.y, items);
@@ -134,7 +132,7 @@ public class GameClient {
 
     public void onItemEquipped(Item item, boolean isEquipped){
         if (item != null)
-            client.sendTCP(new PlayerEquip().set(item.itemId, GameState.instance.clientPlayer.getId(), SecondGDXGame.instance.name, isEquipped));
+            client.sendTCP(new PlayerEquip().set(ItemInfo.createItemInfo(item), GameState.instance.clientPlayer.getId(), SecondGDXGame.instance.name, isEquipped));
         else
             client.sendTCP(new PlayerEquip().set(null, GameState.instance.clientPlayer.getId(),  SecondGDXGame.instance.name, false));
     }
@@ -172,7 +170,7 @@ public class GameClient {
     }
 
     public void pickedUpItem(Item item){
-        client.sendTCP(new TookItem().set(gameState.clientPlayer.getId(), item.uid));
+        client.sendTCP(new PlayerTakeItems().set(gameState.clientPlayer.getId(), ItemInfo.createItemInfo(item)));
         client.sendTCP(new DisposeItem().set(item.uid));
     }
 

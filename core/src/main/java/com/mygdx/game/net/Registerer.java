@@ -4,10 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryo.Kryo;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.net.messages.client.*;
-import com.mygdx.game.net.messages.common.EntityInfo;
-import com.mygdx.game.net.messages.common.ItemInfo;
-import com.mygdx.game.net.messages.common.Message;
-import com.mygdx.game.net.messages.common.ZombieInfo;
+import com.mygdx.game.net.messages.common.*;
 import com.mygdx.game.net.messages.common.tileupdate.CloseTile;
 import com.mygdx.game.net.messages.common.tileupdate.OpenTile;
 import com.mygdx.game.net.messages.common.tileupdate.UpdateTile;
@@ -50,6 +47,10 @@ public class Registerer {
         kryo.register(ItemInfo[].class);
         kryo.register(NeedsStorageUpdate.class);
         kryo.register(StopStorageUpdate.class);
+        kryo.register(MoveItemFromStorageToStorage.class);
+        kryo.register(AllocateItem.class);
+        kryo.register(DisposeItem.class);
+        kryo.register(long[].class);
         //kryo.register();
     }
 }
