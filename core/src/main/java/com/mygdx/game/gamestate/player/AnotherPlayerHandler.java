@@ -43,7 +43,6 @@ public class AnotherPlayerHandler extends BehaviourAdapter implements PlayerMove
     public void update(float delta) {
         player.getBody().setLinearVelocity(velocity);
 
-
         if (needsUpdate && playerMove != null){
             Vector2 pos = player.getBody().getPosition();
             Vector2 speed = player.getBody().getLinearVelocity();
@@ -54,11 +53,12 @@ public class AnotherPlayerHandler extends BehaviourAdapter implements PlayerMove
             float offsetX = Math.abs(playerMove.x - pos.x), offsetY = Math.abs(playerMove.y - pos.y);
             if (offsetX > 0.5 || offsetY > 0.5)
                 player.setPosition(playerMove.x, playerMove.y);
-            else if (offsetX > 0.02f || offsetY > 0.02f) {
+            else if (offsetX >= 0.1f || offsetY >= 0.1f) {
                 tempVec.add(Math.signum(playerMove.x - pos.x), Math.signum(playerMove.y - pos.y));
                 //player.getBody().setTransform(playerMove.x, playerMove.y, player.getBody().getTransform().getRotation());
-            } else if ( offsetX >= 0.01 || offsetY >= 0.01f) {
-                tempVec.add(playerMove.x - pos.x, playerMove.y - pos.y);
+            }
+            else if ( offsetX >= 0.01 || offsetY >= 0.01f) {
+                tempVec.add((playerMove.x - pos.x)*2, (playerMove.y - pos.y)*2);
             }
 
             player.getBody().setLinearVelocity(tempVec);
@@ -104,13 +104,13 @@ public class AnotherPlayerHandler extends BehaviourAdapter implements PlayerMove
             float velX = Math.abs(vel.x);
             float velY = Math.abs(vel.y);
             player.state = Player.State.Walking;
-            if (velX >= velY)
-                if (vel.x > 0)
+            if (velX > velY && Math.abs(velX - velY) > 0.3f)
+                if (vel.x > 0.3f)
                     player.setFacing(Player.Facing.Right);
                 else
                     player.setFacing(Player.Facing.Left);
             else
-                if (vel.y > 0)
+                if (vel.y > 0.3f)
                     player.setFacing(Player.Facing.Up);
                 else
                     player.setFacing(Player.Facing.Down);

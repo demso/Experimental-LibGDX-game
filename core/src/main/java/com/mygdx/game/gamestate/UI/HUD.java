@@ -68,8 +68,10 @@ public class HUD extends Stage {
     }
 
     private void showStorageInventoryHUD(Storage storage) {
-        if (storageInventoryHUD.isVisible())
+        if (storageInventoryHUD.isVisible()){
+            storageInventoryHUD.refill();
             return;
+        }
         panels.addActor(storageInventoryHUD);
         storageInventoryHUD.onShow(storage);
         showPlayerInventoryHud();
@@ -266,6 +268,7 @@ public class HUD extends Stage {
 
         if (debug)
             SecondGDXGame.instance.helper.log("[HUD:250] " + esClosablePopups.toString());
+
 
         if (showRequestSatisfied){
             Vector2 vec = storageInventoryHUD.getStorage().getPosition();

@@ -11,6 +11,9 @@ import com.mygdx.game.gamestate.tiledmap.tiled.TmxMapLoader;
 import com.mygdx.game.net.GameServer;
 import dev.lyze.gdxUnBox2d.UnBox;
 
+import java.util.Collections;
+import java.util.HashMap;
+
 public class ServGameStateConstructor {
     ServGameState gameState;
     public ServGameState createGameState(GameServer serv){
@@ -19,9 +22,9 @@ public class ServGameStateConstructor {
 
         gameState.gameServer = serv;
 
-        gameState.players = new ObjectMap<>();
-        gameState.entities = new ObjectMap<>();
-        gameState.items = new ObjectMap<>();
+        gameState.players = Collections.synchronizedMap(new HashMap<>());
+        gameState.entities = Collections.synchronizedMap(new HashMap<>());
+        gameState.items = Collections.synchronizedMap(new HashMap<>());
 
         gameState.bodies = new Array<>();
         gameState.world = new World(new Vector2(0, 0), true);

@@ -5,7 +5,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
-import com.esotericsoftware.minlog.Log;
 import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
@@ -20,25 +19,27 @@ import com.mygdx.game.net.messages.common.tileupdate.OpenTile;
 import com.mygdx.game.net.messages.server.*;
 import com.mygdx.game.net.server.*;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 public class GameServer {
     Server server;
     Listener.TypeListener listener;
-    public volatile ObjectMap<Long, PlayerInfo> players;
-    public volatile ObjectMap<Long, Entity> entities;//equals to gamestate.entities
-    public volatile ObjectMap<Long, Item> items;
+    public volatile Map<Long, PlayerInfo> players;
+    public volatile Map<Long, Entity> entities;//equals to gamestate.entities
+    public volatile Map<Long, Item> items;
     public volatile AtomicLong entitiesCounter = new AtomicLong(1);
     public volatile AtomicLong itemsCounter = new AtomicLong(1);
-    Vector2 spawnPoint = new Vector2(10,87);
+    Vector2 spawnPoint = new Vector2(20,87);
     Thread endlessThread;
     long sleepTime = Math.round(Globals.SERVER_UPDATE_TIME * 1000);
     public ServGameState gameState;
     public ZombieHelper zhelper = new ZombieHelper(this);
-    ObjectMap.Values<Entity> entityMapVals;
     public ServHandler handler;
-    ObjectMap<Storage, Array<Long>> storageUpdateMap = new ObjectMap<>(); //player id -> storage
+    ObjectMap<Storage, Array<Long>> storageListeners = new ObjectMap<>(); //player id -> storage
 
     public final String mapToLoad = "tiled/firstmap/worldmap.tmx";
     public GameServer() {
@@ -59,8 +60,8 @@ public class GameServer {
                         entitiesCounter.incrementAndGet();
                         players.put(plInf.id, plInf);
                         con.sendTCP(new OnConnection(plInf.id, mapToLoad, plInf.x, plInf.y)
-                                .addPlayers(players.values().toArray().toArray(PlayerInfo.class))
-                                .addEntities(entities.values().toArray().toArray(Entity.class)));
+                                .addPlayers(players.values().toArray(new PlayerInfo[0]))
+                                .addEntities(entities.values().toArray(new Entity[0])));
                         newPlayerJoined(plInf);
                     });
             listener.addTypeHandler(PlayerMove.class, (con, msg) -> {
@@ -126,9 +127,9 @@ public class GameServer {
 
                 if (data instanceof Storage storage) {
                     con.sendTCP(new StoredItems().set(msg.x, msg.y, ItemInfo.createItemsInfo(storage.getInventoryItems().toArray(Item.class))));
-                    if (storageUpdateMap.get(storage) == null)
-                        storageUpdateMap.put(storage, new Array<>());
-                    storageUpdateMap.get(storage).add(msg.playerId);
+                    if (storageListeners.get(storage) == null)
+                        storageListeners.put(storage, new Array<>());
+                    storageListeners.get(storage).add(msg.playerId);
                 } else
                     con.sendTCP(new Message().set("[NeedsStorageUpdate] Not a storage! " + msg.x + " " + msg.y));
             });
@@ -141,16 +142,16 @@ public class GameServer {
                 Object data = cell.getData();
 
                 if (data instanceof Storage storage) {
-                    if (storageUpdateMap.get(storage) == null) {
+                    if (storageListeners.get(storage) == null) {
                         con.sendTCP(new Message().set("[StopStorageUpdate] You are not getting updates for this storage (no such storage on map)! " + storage.getName() + " " + msg.x + " " + msg.y));
                         return;
                     }
-                    if (!storageUpdateMap.get(storage).removeValue(msg.playerId, false)){
+                    if (!storageListeners.get(storage).removeValue(msg.playerId, false)){
                         con.sendTCP(new Message().set("[StopStorageUpdate] You are not getting updates for this storage (no such player id in array)! " + storage.getName() + " " + msg.x + " " + msg.y));
                         return;
                     }
-                    if (storageUpdateMap.get(storage).size == 0)
-                        storageUpdateMap.remove(storage);
+                    if (storageListeners.get(storage).size == 0)
+                        storageListeners.remove(storage);
                 } else
                     con.sendTCP(new Message().set("[StopStorageUpdate] Not a storage! " + msg.x + " " + msg.y));
             });
@@ -193,8 +194,6 @@ public class GameServer {
                         players.get(msg.targetId).addItem(items.get(msg.uid));
                         break;
                 }
-                server.sendToAllExceptTCP(con.getID(), msg);
-                //sendToAllPlayersBut(msg, players.get(msg.sourceId));
             });
             listener.addTypeHandler(AllocateItem.class, (con, msg) -> {
                 server.sendToAllExceptTCP(con.getID(), msg);
@@ -235,40 +234,43 @@ public class GameServer {
 
     PlayerMove[] playerMoves = new PlayerMove[0];
     ZombieMove[] zombieMoves = new ZombieMove[0];
-    Array<Entity> tempEntityArray = new Array<>();
+    Entity[] tempEntityArray = new Entity[0];
     EntitiesMoves entityMoves = new EntitiesMoves();
 
     public void sendUpdatePlayersAndEntities(){
-        if (playerMoves.length != players.size){
-            playerMoves = new PlayerMove[players.size];
-            for (int i = 0; i < playerMoves.length; i ++){
-                playerMoves[i] = new PlayerMove();
+        synchronized (players) {
+            if (playerMoves.length != players.size()) {
+                playerMoves = new PlayerMove[players.size()];
+                for (int i = 0; i < playerMoves.length; i++) {
+                    playerMoves[i] = new PlayerMove();
+                }
             }
+
+            players.values().forEach(new Consumer<>() {
+                int i = 0;
+
+                @Override
+                public void accept(PlayerInfo playerInfo) {
+                    playerMoves[i].set(playerInfo.id, playerInfo.x, playerInfo.y, playerInfo.xSpeed, playerInfo.ySpeed, playerInfo.itemRotation);
+                    i++;
+                }
+            });
         }
 
-        players.values().forEach(new Consumer<>() {
-            int i = 0;
-            @Override
-            public void accept(PlayerInfo playerInfo) {
-                playerMoves[i].set(playerInfo.id, playerInfo.x, playerInfo.y, playerInfo.xSpeed, playerInfo.ySpeed, playerInfo.itemRotation);
-                i++;
+        synchronized (entities) {
+            tempEntityArray = entities.values().toArray(tempEntityArray);
+            if (zombieMoves.length != entities.size()) {
+                zombieMoves = new ZombieMove[tempEntityArray.length];
+                for (int i = 0; i < zombieMoves.length; i++) {
+                    zombieMoves[i] = new ZombieMove();
+                }
             }
-        });
 
-        entityMapVals.reset();
-        tempEntityArray.clear();
-        entityMapVals.toArray(tempEntityArray);
-        if (zombieMoves.length != tempEntityArray.size){
-            zombieMoves = new ZombieMove[tempEntityArray.size];
-            for (int i = 0; i < zombieMoves.length; i ++){
-                zombieMoves[i] = new ZombieMove();
-            }
-        }
-
-        for (int i = 0; i < tempEntityArray.size; i++){
-            Entity entity = tempEntityArray.get(i);
-            if (entity instanceof Zombie zombie) {
-                zombieMoves[i].set(zombie);
+            for (int i = 0; i < tempEntityArray.length; i++) {
+                Entity entity = tempEntityArray[i];
+                if (entity instanceof Zombie zombie) {
+                    zombieMoves[i].set(zombie);
+                }
             }
         }
 
@@ -287,9 +289,10 @@ public class GameServer {
     }
 
     public void sendToAllPlayers(Object obj){
-        var pls = players.values().toArray();
-        for (int i = 0; i < players.size; i ++) {
-            PlayerInfo plInf = pls.get(i);
+
+        var pls = players.values().toArray(new PlayerInfo[0]);
+        for (int i = 0; i < players.size(); i ++) {
+            PlayerInfo plInf = pls[i];
             plInf.connection.sendTCP(obj);
         }
     }
@@ -302,18 +305,31 @@ public class GameServer {
     }
     public void removeItemFromStorage(Storage storage, long uid){
         storage.removeItem(items.get(uid));
+        sendStorageUpdateToListeners(storage);
     }
     public void addItemToStorage(Storage storage, long uid){
         storage.takeItem(items.get(uid));
+        sendStorageUpdateToListeners(storage);
+    }
+    public void sendStorageUpdateToListeners(Storage storage){
+        if (storageListeners.containsKey(storage)){
+            Array<Long> arr = storageListeners.get(storage);
+            arr.forEach(aLong -> {
+                server.sendToTCP(players.get(aLong).connection.getID(), new StoredItems().set((int)Math.floor(storage.getPosition().x),
+                        (int)Math.floor(storage.getPosition().y),
+                        ItemInfo.createItemsInfo(storage.getInventoryItems().toArray(Item.class))));
+            });
+        }
     }
 
     void init(){
         gameState = new ServGameStateConstructor().createGameState(this);
         handler = gameState.serverHandler;
-        players = new ObjectMap<>();
+
+
+        players = Collections.synchronizedMap(new HashMap<>());
         entities = gameState.entities;
         items = gameState.items;
-        entityMapVals = new ObjectMap.Values<>(entities);
     }
 
     void startWave() {

@@ -28,6 +28,9 @@ import com.mygdx.game.gamestate.tiledmap.tiled.renderers.OrthogonalTiledMapRende
 import com.mygdx.game.net.GameServer;
 import dev.lyze.gdxUnBox2d.UnBox;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ServGameState {
     public static ServGameState instance;
     public SecondGDXGame game;
@@ -54,9 +57,9 @@ public class ServGameState {
     public ShapeRenderer shapeRenderer;
     public UnBox unbox;
     public HUDInputListener HUDIL;
-    volatile public ObjectMap<Long, Player> players;
-    volatile public ObjectMap<Long, Entity> entities;
-    public volatile ObjectMap<Long, Item> items;
+    volatile public Map<Long, Player> players;
+    volatile public Map<Long, Entity> entities;
+    public volatile Map<Long, Item> items;
     volatile public ServHandler serverHandler;
     public GameServer gameServer;
     public BodyResolver bodyResolver;

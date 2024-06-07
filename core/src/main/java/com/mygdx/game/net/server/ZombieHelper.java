@@ -32,8 +32,8 @@ public class ZombieHelper {
         var players = SecondGDXGame.instance.server.players;
         Vector2 pos = zombie.getPosition();
         tempVec3.set(pos.x, pos.y);
-        PlayerInfo plinf =  new Array.ArrayIterator<>(players.values().toArray()).next();
-        for (PlayerInfo info :  new Array.ArrayIterator<>(players.values().toArray())) {
+        PlayerInfo plinf =  players.values().iterator().next();
+        for (PlayerInfo info : players.values()) {
             tempVec.set(plinf.x, plinf.y);
             tempVec2.set(info.x, info.y);
             if (tempVec2.sub(tempVec3).len2() < tempVec.sub(tempVec3).len2())

@@ -30,7 +30,7 @@ public class AnotherPlayerConstructor extends ClientPlayerConstructor {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
         fixtureDef.density = 1f;
-        fixtureDef.friction = 0.4f;
+        fixtureDef.friction = 0.0f;
         fixtureDef.restitution = 0.0f;
         fixtureDef.filter.categoryBits = Globals.PLAYER_CONTACT_FILTER;
         fixtureDef.filter.groupIndex = Globals.PLAYER_CONTACT_GROUP;
@@ -51,7 +51,7 @@ public class AnotherPlayerConstructor extends ClientPlayerConstructor {
 //        body.createFixture(sensorFixtureDef).setUserData(new SimpleUserData("playerInteractionBubble"));
 //        sensorCircle.dispose();
 
-        body.setLinearDamping(12);
+        body.setLinearDamping(0);
 
         player.setBody(body);
 
