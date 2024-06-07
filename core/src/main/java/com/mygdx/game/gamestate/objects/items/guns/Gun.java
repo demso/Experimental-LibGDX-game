@@ -62,7 +62,7 @@ public class Gun extends Item {
         if (gunSpriteBehaviour == null || gunSpriteBehaviour.getState().equals(BehaviourState.DESTROYED))
                 gunSpriteBehaviour = new GunSpriteBehaviour(GO, this, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
 
-        if (getOwner() == instance.clientPlayer)
+        if (getOwnerId() == instance.clientPlayer)
             gunSpriteBehaviour.setRenderOrder(Globals.PLAYER_RENDER_ORDER);
         else
             gunSpriteBehaviour.setRenderOrder(Globals.DEFAULT_RENDER_ORDER);
@@ -95,8 +95,8 @@ public class Gun extends Item {
     }
 
     @Override
-    public void equip(Player player){
-        super.equip(player);
+    public void onEquip(Player player){
+        super.onEquip(player);
         prepareForRendering();
         GO.setEnabled(true);
     }

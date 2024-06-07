@@ -61,15 +61,19 @@ public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
         switch (action){
             case Drop -> {
                 putItemFromInventory(contextMenu.itemEntry);
+                Vector2 pos = GameState.instance.clientPlayer.getPosition();
+                instance.client.droppedItem(contextMenu.itemEntry.item, (int)Math.floor(pos.x), (int)Math.floor(pos.y));
             }
             case Equip -> {
                 contextAction(ContextMenu.ConAction.Take, contextMenu);
-                GameState.instance.clientPlayer.equipItem(contextMenu.itemEntry.item);
+                instance.clientPlayer.equipItem(contextMenu.itemEntry.item);
             }
             case Description -> {}
             case Take -> {
                 GameState.instance.clientPlayer.takeItem(contextMenu.itemEntry.item);
-                storage.dropItem(contextMenu.itemEntry.item);
+                storage.removeItem(contextMenu.itemEntry.item);
+                Vector2 pos = storage.getPosition();
+                instance.client.tookItemFromStorage(contextMenu.itemEntry.item, (int)Math.floor(pos.x), (int)Math.floor(pos.y));
             }
             default -> handled = false;
         }
@@ -78,7 +82,7 @@ public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
     }
 
     public void putItemFromInventory(ItemEntry itemEntry){
-        storage.dropItem(itemEntry.item);
+        storage.removeItem(itemEntry.item);
         instance.hud.updateInvHUDContent();
         itemEntry.item.allocate(GameState.instance.clientPlayer.getPosition());
     }

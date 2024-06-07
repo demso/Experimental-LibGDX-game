@@ -58,16 +58,19 @@ public class Player extends Entity implements Storage {
 
     @Override
     public void takeItem(Item item){
+        item.onTaking(this);
         item.removeFromWorld();
         inventoryItems.add(item);
+        instance.items.put(item.uid, item);
         instance.hud.updateInvHUDContent();
     }
     @Override
-    public void dropItem(Item item){
+    public void removeItem(Item item){
         item.unequip();
         if (equipedItem == item)
             equipedItem = null;
         inventoryItems.removeValue(item, true);
+        instance.items.remove(item.uid);
         instance.hud.updateInvHUDContent();
     }
     @Override
@@ -94,7 +97,7 @@ public class Player extends Entity implements Storage {
             equipedItem.unequip();
         equipedItem = item;
         if (item instanceof Gun gun){
-            gun.equip(this);
+            gun.onEquip(this);
         }
     }
 
@@ -147,9 +150,11 @@ public class Player extends Entity implements Storage {
         return false;
     }
 
-    public void destroy() {
+    public void dispose() {
+
         if (equipedItem != null){
-            equipedItem.destroy();
+            uneqipItem();
+            equipedItem.dispose();
         }
         playerObject.destroy();
     }

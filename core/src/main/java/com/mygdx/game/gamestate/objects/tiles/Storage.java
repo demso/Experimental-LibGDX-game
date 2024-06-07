@@ -7,7 +7,7 @@ import com.mygdx.game.gamestate.objects.items.Item;
 public interface Storage {
     Array<Item> getInventoryItems();
     void setInventoryItems(Item... items);
-    void dropItem(Item item);
+    void removeItem(Item item);
     void takeItem(Item item);
     Vector2 getPosition();
     String getName();

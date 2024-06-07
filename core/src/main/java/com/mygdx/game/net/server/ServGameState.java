@@ -19,6 +19,7 @@ import com.mygdx.game.gamestate.UI.HUDInputListener;
 import com.mygdx.game.gamestate.UI.console.InGameConsole;
 import com.mygdx.game.gamestate.factories.BodyResolver;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
+import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
 import com.mygdx.game.gamestate.tiledmap.tiled.TiledMapTileLayer;
@@ -52,8 +53,9 @@ public class ServGameState {
     public ShapeRenderer shapeRenderer;
     public UnBox unbox;
     public HUDInputListener HUDIL;
-    public ObjectMap<Long, Player> players;
+    volatile public ObjectMap<Long, Player> players;
     volatile public ObjectMap<Long, Entity> entities;
+    public volatile ObjectMap<Long, Item> items;
     volatile public ServHandler serverHandler;
     public GameServer gameServer;
     public BodyResolver bodyResolver;
@@ -67,14 +69,5 @@ public class ServGameState {
         unbox.preRender(deltaTime);
         unbox.postRender();
         //getServerHandler().update();
-    }
-
-    public ServHandler getServerHandler() {
-        return serverHandler;
-    }
-
-
-    public BodyResolver getBodyResolver() {
-        return bodyResolver;
     }
 }

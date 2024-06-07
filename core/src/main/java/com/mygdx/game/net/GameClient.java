@@ -10,7 +10,7 @@ import com.mygdx.game.gamestate.AcceptHandler;
 import com.mygdx.game.gamestate.factories.ItemsFactory;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.net.messages.client.*;
-import com.mygdx.game.net.messages.common.Message;
+import com.mygdx.game.net.messages.common.*;
 import com.mygdx.game.net.messages.common.tileupdate.CloseTile;
 import com.mygdx.game.net.messages.common.tileupdate.OpenTile;
 import com.mygdx.game.net.messages.server.*;
@@ -113,6 +113,7 @@ public class GameClient {
             Item[] items = new Item[msg.items.length];
             for (int i = 0; i < msg.items.length; i++) {
                 items[i] = ItemsFactory.getItem(msg.items[i].itemId);
+                items[i].uid = msg.items[i].uid;
             }
 
             gameState.hud.onStoredItemsReceived(msg.x, msg.y, items);
@@ -156,6 +157,23 @@ public class GameClient {
 
     public void onTileClose(int x, int y){
         client.sendTCP(new CloseTile().set(gameState.clientPlayer.getId(), x, y));
+    }
+
+    public void tookItemFromStorage(Item item, int fromX, int fromY){
+        client.sendTCP(new MoveItemFromStorageToStorage().set(item.uid, fromX, fromY, GameState.instance.clientPlayer.getId()));
+    }
+
+    public void storedItem(Item item, int toX, int toY){
+        client.sendTCP(new MoveItemFromStorageToStorage().set(item.uid, GameState.instance.clientPlayer.getId(), toX, toY));
+    }
+
+    public void droppedItem(Item item, int toX, int toY){
+        client.sendTCP(new AllocateItem().set(new ItemInfo().set(item.uid, item.itemId), toX, toY));
+    }
+
+    public void pickedUpItem(Item item){
+        client.sendTCP(new TookItem().set(gameState.clientPlayer.getId(), item.uid));
+        client.sendTCP(new DisposeItem().set(item.uid));
     }
 
 //    public void getStoredItems(float x, float y){

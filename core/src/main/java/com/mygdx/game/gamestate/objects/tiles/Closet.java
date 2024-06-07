@@ -58,7 +58,7 @@ public class Closet implements BodyData, Interactable, Storage {
 
     }
     @Override
-    public void dropItem(Item item){
+    public void removeItem(Item item){
         inventoryItems.removeValue(item, true);
         //instance.hud.updateInvHUDContent();
     }

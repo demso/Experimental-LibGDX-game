@@ -14,9 +14,7 @@ import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
 import com.mygdx.game.gamestate.tiledmap.tiled.TiledMapTileLayer;
 import com.mygdx.game.net.messages.client.*;
-import com.mygdx.game.net.messages.common.ItemInfo;
-import com.mygdx.game.net.messages.common.Message;
-import com.mygdx.game.net.messages.common.ZombieInfo;
+import com.mygdx.game.net.messages.common.*;
 import com.mygdx.game.net.messages.common.tileupdate.CloseTile;
 import com.mygdx.game.net.messages.common.tileupdate.OpenTile;
 import com.mygdx.game.net.messages.server.*;
@@ -30,7 +28,9 @@ public class GameServer {
     Listener.TypeListener listener;
     public volatile ObjectMap<Long, PlayerInfo> players;
     public volatile ObjectMap<Long, Entity> entities;//equals to gamestate.entities
-    volatile AtomicLong entitiesCounter = new AtomicLong(1);
+    public volatile ObjectMap<Long, Item> items;
+    public volatile AtomicLong entitiesCounter = new AtomicLong(1);
+    public volatile AtomicLong itemsCounter = new AtomicLong(1);
     Vector2 spawnPoint = new Vector2(10,87);
     Thread endlessThread;
     long sleepTime = Math.round(Globals.SERVER_UPDATE_TIME * 1000);
@@ -154,6 +154,41 @@ public class GameServer {
                 } else
                     con.sendTCP(new Message().set("[StopStorageUpdate] Not a storage! " + msg.x + " " + msg.y));
             });
+            listener.addTypeHandler(MoveItemFromStorageToStorage.class, (con, msg) -> {
+                switch (msg.type) {
+                    case 0:
+                        TiledMapTileLayer.Cell sourceCell = gameState.obstaclesLayer.getCell(msg.sourceX, msg.sourceY);
+                        if (sourceCell == null) {
+                            con.sendTCP(new Message().set("[MoveItemFromStorageToStorage] Nothing in source here! " + msg.sourceX + " " + msg.sourceY));
+                            return;
+                        }
+                        TiledMapTileLayer.Cell targetCell = gameState.obstaclesLayer.getCell(msg.targetX, msg.targetY);
+                        if (targetCell == null) {
+                            con.sendTCP(new Message().set("[MoveItemFromStorageToStorage] Nothing in target here! " + msg.targetX + " " + msg.targetY));
+                            return;
+                        }
+                        removeItemFromStorage((Storage) sourceCell.getData(), msg.uid);
+                        addItemToStorage((Storage) targetCell.getData(), msg.uid);
+                        break;
+                    case 1:
+                        players.get(msg.sourceId).removeItem(items.get(msg.uid));
+                        break;
+                    case 2:
+                        server.sendToAllExceptTCP(con.getID(), msg);
+                        break;
+                    case 3:
+                        server.sendToAllExceptTCP(con.getID(), msg);
+                        break;
+                }
+                server.sendToAllExceptTCP(con.getID(), msg);
+                //sendToAllPlayersBut(msg, players.get(msg.sourceId));
+            });
+            listener.addTypeHandler(AllocateItem.class, (con, msg) -> {
+                server.sendToAllExceptTCP(con.getID(), msg);
+            });
+            listener.addTypeHandler(DisposeItem.class, (con, msg) -> {
+                server.sendToAllExceptTCP(con.getID(), msg);
+            });
 
             server.bind(54555,54777);
             server.start();
@@ -180,6 +215,7 @@ public class GameServer {
                 spawner();
                 tempTime = curTime;
                 sendUpdatePlayersAndEntities();
+                //sendStorageUpdates();
                 Thread.sleep(sleepTime);
         }
     }
@@ -250,6 +286,12 @@ public class GameServer {
                 if (plInf != plInf2)
                     plInf.connection.sendTCP(obj);
         }
+    }
+    public void removeItemFromStorage(Storage storage, long uid){
+
+    }
+    public void addItemToStorage(Storage storage, long uid){
+
     }
 
     void init(){

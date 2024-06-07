@@ -31,6 +31,7 @@ public class Item implements BodyData, Interactable {
     @Getter Player owner;
 
     public GameState gameState;
+    public long uid;
     public String itemId = "{No tile name}"; //string item identifier
     public String itemName = "{No name item}";
     public String description = "First you must develop a Skin that implements all the widgets you plan to use in your layout. You can't use a widget if it doesn't have a valid style. Do this how you would usually develop a Skin in Scene Composer.";
@@ -125,7 +126,11 @@ public class Item implements BodyData, Interactable {
         instance.clientPlayer.takeItem(this);
     }
 
-    public void equip(Player player){
+    public void onTaking(Player player){
+        owner = player;
+    }
+
+    public void onEquip(Player player){
         isEquipped = true;
         owner = player;
         removeFromWorld();
@@ -139,7 +144,7 @@ public class Item implements BodyData, Interactable {
         return isEquipped;
     }
 
-    public void destroy(){
+    public void dispose(){
         unequip();
         GO.destroy();
     }

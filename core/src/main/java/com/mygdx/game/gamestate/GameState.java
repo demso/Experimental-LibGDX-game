@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.*;
 import com.mygdx.game.gamestate.factories.BodyResolver;
 import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
+import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.player.ClientPlayer;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.*;
@@ -28,7 +29,7 @@ import com.mygdx.game.gamestate.player.Player;
 import dev.lyze.gdxUnBox2d.UnBox;
 import net.dermetfan.gdx.physics.box2d.Box2DUtils;
 
-public class GameState {
+public class GameState implements AbstractGameState{
     public static GameState instance;
     public SecondGDXGame game;
     public GameScreen gameScreen;
@@ -58,17 +59,18 @@ public class GameState {
     public ObjectMap<Long, Player> players;
     volatile public ObjectMap<Long, Entity> entities;
     volatile public GameClient client;
+    public volatile ObjectMap<Long, Item> items;//items on floor and in player inventory
     volatile public AcceptHandler acceptHandler;
     public BodyResolver bodyResolver;
     public MobsFactory mobsFactory;
 
     public void tester(){
-        clientPlayer.takeItem(ItemsFactory.getItem("10mm_fmj"));
-        clientPlayer.takeItem(ItemsFactory.getItem("beef"));
-        clientPlayer.takeItem(ItemsFactory.getItem("watches"));
-        clientPlayer.takeItem(ItemsFactory.getItem("shotgun_ammo"));
-        clientPlayer.takeItem(ItemsFactory.getItem("deagle_44"));
-        clientPlayer.equipItem(ItemsFactory.getItem("deagle_44"));
+//        clientPlayer.takeItem(ItemsFactory.getItem("10mm_fmj"));
+//        clientPlayer.takeItem(ItemsFactory.getItem("beef"));
+//        clientPlayer.takeItem(ItemsFactory.getItem("watches"));
+//        clientPlayer.takeItem(ItemsFactory.getItem("shotgun_ammo"));
+//        clientPlayer.takeItem(ItemsFactory.getItem("deagle_44"));
+//        clientPlayer.equipItem(ItemsFactory.getItem("deagle_44"));
     }
 
     private void update(float deltaTime) {
@@ -146,6 +148,11 @@ public class GameState {
 
     public AcceptHandler getServerHandler() {
         return acceptHandler;
+    }
+
+    @Override
+    public ObjectMap<Long, Player> getPlayers() {
+        return players;
     }
 }
 

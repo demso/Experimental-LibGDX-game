@@ -32,7 +32,7 @@ public abstract class Entity implements BodyData {
     @Getter int maxHp = 1;
     protected boolean isAlive = true;
 
-    @Setter @Getter Body body;
+    transient @Setter @Getter Body body;
     @Setter @Getter Friendliness friendliness = Friendliness.NEUTRAL;
     @Getter @Setter Kind kind;
     @Setter String name;

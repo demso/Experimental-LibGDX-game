@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.factories.ItemsFactory;
+import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
 import com.mygdx.game.gamestate.objects.tiles.TileInitializer;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
@@ -50,25 +51,6 @@ public class ServerMapLoader extends TmxMapLoader {
 
         return map;
     }
-
-//    public MyTiledMap loadFromString(String xml, TmxMapLoader.Parameters parameter) {
-//
-//        this.root = this.xml.parse(xml);
-//
-//        ObjectMap<String, Texture> textures = new ObjectMap<String, Texture>();
-//
-//        final Array<FileHandle> textureFiles = getDependencyFileHandles(tmxFile);
-//        for (FileHandle textureFile : textureFiles) {
-//            Texture texture = new Texture(textureFile, parameter.generateMipMaps);
-//            texture.setFilter(parameter.textureMinFilter, parameter.textureMagFilter);
-//            textures.put(textureFile.path(), texture);
-//        }
-//
-//        MyTiledMap map = loadTiledMap(tmxFile, parameter, new ImageResolver.DirectImageResolver(textures));
-//        map.setOwnedResources(textures.values().toArray());
-//
-//        return map;
-//    }
 
     @Override
     protected MyTiledMap loadTiledMap(FileHandle tmxFile, TmxMapLoader.Parameters parameter, ImageResolver imageResolver) {
@@ -203,7 +185,10 @@ public class ServerMapLoader extends TmxMapLoader {
             if (curCell.getData() != null && curCell.getData() instanceof Storage storage && s != null && !s.trim().isEmpty()) {
                 String[] items = object.getProperties().get("items", String.class).split(",");
                 for (String item : items) {
-                    storage.takeItem(ItemsFactory.getItem(item.trim().toLowerCase()));
+                    Item createdItem = ItemsFactory.getItem(item.trim().toLowerCase());
+                    createdItem.uid = gameState.gameServer.itemsCounter.getAndIncrement();
+                    gameState.items.put(createdItem.uid, createdItem);
+                    storage.takeItem(createdItem);
                 }
             }
         }

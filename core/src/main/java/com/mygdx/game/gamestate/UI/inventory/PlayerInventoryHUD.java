@@ -1,5 +1,6 @@
 package com.mygdx.game.gamestate.UI.inventory;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.UI.HUD;
@@ -20,8 +21,10 @@ public class PlayerInventoryHUD extends StorageInventoryHUD{
         boolean handled = true;
         switch (action) {
             case Store -> {
-                GameState.instance.clientPlayer.dropItem(contextMenu.itemEntry.item);
+                GameState.instance.clientPlayer.removeItem(contextMenu.itemEntry.item);
                 hud.storageInventoryHUD.getStorage().takeItem(contextMenu.itemEntry.item);
+                Vector2 pos = hud.storageInventoryHUD.getStorage().getPosition();
+                instance.client.storedItem(contextMenu.itemEntry.item,(int)Math.floor(pos.x), (int)Math.floor(pos.y));
                 instance.hud.updateInvHUDContent();
             }
             case Equip -> {

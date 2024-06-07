@@ -57,7 +57,7 @@ public class AcceptHandler {
 
         if (playersToKill.size != 0) {
             for (Player p :  new Array.ArrayIterator<>(playersToKill)){
-                p.destroy();
+                p.dispose();
                 gameState.players.remove(p.getId());
             }
         }

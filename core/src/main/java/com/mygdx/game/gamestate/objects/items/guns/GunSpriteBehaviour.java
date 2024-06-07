@@ -11,7 +11,6 @@ import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.behaviours.SpriteBehaviour;
 import com.mygdx.game.gamestate.objects.items.PistolAnimation;
 import com.mygdx.game.gamestate.player.Player;
-import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
@@ -62,7 +61,7 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
     @Override
     public void update(float delta) {
         if (gun.isEquipped()) {
-            Player player = gun.getOwner();
+            Player player = gun.getOwnerId();
             float rotation = 0;
             if (!player.getName().equals(SecondGDXGame.instance.name))
                 rotation = player.itemRotation;
@@ -80,7 +79,7 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
     @Override
     public void fixedUpdate() {
         if (gun.isEquipped()) {
-            sprite.setPosition(gun.getOwner().getPosition().x + (sprite.getWidth() / 2f), gun.getOwner().getPosition().y + sprite.getHeight() / 2f);
+            sprite.setPosition(gun.getOwnerId().getPosition().x + (sprite.getWidth() / 2f), gun.getOwnerId().getPosition().y + sprite.getHeight() / 2f);
         } else {
             super.fixedUpdate();
         }

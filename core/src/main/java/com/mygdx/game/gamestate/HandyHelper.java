@@ -43,9 +43,19 @@ public class HandyHelper {
 
     public void log(String toLog){
         if (noSpam) {
-            noSpamLog(toLog);
+            noSpamLog(toLog, LogLevel.DEFAULT);
         } else {
             logInConsole(toLog, LogLevel.DEFAULT);
+            saveLog(toLog);
+            System.out.println(toLog);
+        }
+    }
+
+    public void log(String toLog, LogLevel level){
+        if (noSpam) {
+            noSpamLog(toLog, level);
+        } else {
+            logInConsole(toLog, level);
             saveLog(toLog);
             System.out.println(toLog);
         }
@@ -56,10 +66,10 @@ public class HandyHelper {
     long timeOfLastLog;
     long logPeriod = 2000;
 
-    public void noSpamLog(String toLog) {
+    public void noSpamLog(String toLog, LogLevel level) {
         var curTime = System.currentTimeMillis();
         if (!lastString.equals(toLog) || curTime - timeOfLastLog > logPeriod){
-            logInConsole(toLog, LogLevel.DEFAULT);
+            logInConsole(toLog, level);
             System.out.println(toLog);
 
             lastString = toLog;
