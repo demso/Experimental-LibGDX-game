@@ -1,6 +1,6 @@
 package com.mygdx.game.net.messages.server;
 
-import com.mygdx.game.net.messages.EntityInfo;
+import com.mygdx.game.net.messages.common.EntityInfo;
 
 public class SpawnEntity {
     public EntityInfo entity;

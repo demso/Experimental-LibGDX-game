@@ -1,19 +1,17 @@
 package com.mygdx.game.gamestate;
 
-import com.badlogic.gdx.Gdx;
-import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.UI.console.sjconsole.LogLevel;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 public class HandyHelper {
     public  static HandyHelper instance;
     boolean noSpam = true;
     BufferedWriter writer;
+    boolean consoleNeedsRefresh = false;
 
     public HandyHelper(){
         try {
@@ -30,38 +28,42 @@ public class HandyHelper {
         }
     }
 
+    float refreshLogTime = 0;
+    float logRefreshPeriod = 0.2f;
+
+    public void refreshLogsInConsole(float delta) {
+        if (consoleNeedsRefresh) {
+            refreshLogTime += delta;
+            if (refreshLogTime > logRefreshPeriod) {
+                refreshLogTime = 0f;
+                GameState.instance.console.refreshLogs();
+            }
+        }
+    }
+
     public void log(String toLog){
         if (noSpam) {
             noSpamLog(toLog);
         } else {
-            System.out.println(toLog);
+            logInConsole(toLog, LogLevel.DEFAULT);
             saveLog(toLog);
+            System.out.println(toLog);
         }
-    }
 
-    public void log(String toLog, boolean noSpam){
-        if (noSpam)
-            noSpamLog(toLog);
-        else {
-            if (GameState.instance != null && GameState.instance.console != null)
-                GameState.instance.console.log(toLog, LogLevel.DEFAULT);
-            saveLog(toLog);
-            System.out.println(toLog);
-        }
     }
 
     String lastString = "";
     long timeOfLastLog;
-    long logPeriod = 1000;
+    long logPeriod = 2000;
 
     public void noSpamLog(String toLog) {
-        if (!lastString.equals(toLog) || System.currentTimeMillis() - timeOfLastLog > logPeriod){
+        var curTime = System.currentTimeMillis();
+        if (!lastString.equals(toLog) || curTime - timeOfLastLog > logPeriod){
+            logInConsole(toLog, LogLevel.DEFAULT);
             System.out.println(toLog);
-            if (GameState.instance != null && GameState.instance.console != null)
-                GameState.instance.console.log(toLog, LogLevel.DEFAULT);
+
             lastString = toLog;
-            saveLog(toLog);
-            timeOfLastLog = System.currentTimeMillis();
+            timeOfLastLog = curTime;
         }
     }
 
@@ -72,8 +74,7 @@ public class HandyHelper {
 
         if (System.currentTimeMillis() - timeOfPeriodicLog > periodicLogTime){
             System.out.println(toLog);
-            if (GameState.instance != null && GameState.instance.console != null)
-                GameState.instance.console.log(toLog, LogLevel.DEFAULT);
+            logInConsole(toLog, LogLevel.DEFAULT);
             saveLog(toLog);
             timeOfPeriodicLog = System.currentTimeMillis();
         }
@@ -86,6 +87,13 @@ public class HandyHelper {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private void logInConsole(String toLog, LogLevel lev){
+        if (GameState.instance == null || GameState.instance.console == null)
+            return;
+        GameState.instance.console.logWithoutRefresh(toLog, lev);
+        consoleNeedsRefresh = true;
     }
 
     public void dispose() {

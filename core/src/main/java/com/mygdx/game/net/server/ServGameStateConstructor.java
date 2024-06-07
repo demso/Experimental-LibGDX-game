@@ -5,6 +5,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.mygdx.game.gamestate.factories.BodyResolver;
+import com.mygdx.game.gamestate.tiledmap.tiled.TiledMapTileLayer;
 import com.mygdx.game.gamestate.tiledmap.tiled.TmxMapLoader;
 import com.mygdx.game.net.GameServer;
 import dev.lyze.gdxUnBox2d.UnBox;
@@ -42,7 +43,8 @@ public class ServGameStateConstructor {
 
         //gameState.camera.setToOrtho(false, 30, 20);
 
-        gameState.map = new ServMapLoader(gameState).load(serv.mapToLoad, new TmxMapLoader.Parameters());
+        gameState.map = new ServerMapLoader(gameState).load(serv.mapToLoad, new TmxMapLoader.Parameters());
+        gameState.obstaclesLayer = ((TiledMapTileLayer)gameState.map.getLayers().get("obstacles"));
 
         gameState.serverHandler = new ServHandler(gameState, serv);
 

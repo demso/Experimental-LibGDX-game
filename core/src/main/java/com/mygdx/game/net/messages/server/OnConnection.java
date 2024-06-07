@@ -3,8 +3,8 @@ package com.mygdx.game.net.messages.server;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.Zombie;
 import com.mygdx.game.net.PlayerInfo;
-import com.mygdx.game.net.messages.EntityInfo;
-import com.mygdx.game.net.messages.ZombieInfo;
+import com.mygdx.game.net.messages.common.EntityInfo;
+import com.mygdx.game.net.messages.common.ZombieInfo;
 
 public class OnConnection {
    public String map;//локальный путь до карты .tmx

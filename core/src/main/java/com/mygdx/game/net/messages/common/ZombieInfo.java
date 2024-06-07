@@ -1,4 +1,4 @@
-package com.mygdx.game.net.messages;
+package com.mygdx.game.net.messages.common;
 
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.Zombie;

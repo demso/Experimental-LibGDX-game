@@ -11,7 +11,7 @@ import com.mygdx.game.gamestate.factories.BodyResolver;
 import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.player.ClientPlayer;
-import com.mygdx.game.gamestate.tiledmap.tiled.*;
+import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -32,11 +32,11 @@ public class GameState {
     public static GameState instance;
     public SecondGDXGame game;
     public GameScreen gameScreen;
-    public ClientPlayer player;
+    public ClientPlayer clientPlayer;
     public Skin skin;
     public BitmapFont  font;
     public Batch batch;
-    public TiledMap map;
+    public MyTiledMap map;
     public OrthogonalTiledMapRenderer renderer;
     public OrthographicCamera camera;
     public boolean debug = false;
@@ -63,19 +63,19 @@ public class GameState {
     public MobsFactory mobsFactory;
 
     public void tester(){
-        player.takeItem(ItemsFactory.getItem("10mm_fmj"));
-        player.takeItem(ItemsFactory.getItem("beef"));
-        player.takeItem(ItemsFactory.getItem("watches"));
-        player.takeItem(ItemsFactory.getItem("shotgun_ammo"));
-        player.takeItem(ItemsFactory.getItem("deagle_44"));
-        player.equipItem(ItemsFactory.getItem("deagle_44"));
+        clientPlayer.takeItem(ItemsFactory.getItem("10mm_fmj"));
+        clientPlayer.takeItem(ItemsFactory.getItem("beef"));
+        clientPlayer.takeItem(ItemsFactory.getItem("watches"));
+        clientPlayer.takeItem(ItemsFactory.getItem("shotgun_ammo"));
+        clientPlayer.takeItem(ItemsFactory.getItem("deagle_44"));
+        clientPlayer.equipItem(ItemsFactory.getItem("deagle_44"));
     }
 
     private void update(float deltaTime) {
         //Input Listener Update
         HUDIL.update();
         //CAMERA UPDATE
-        camera.position.set(player.getPosition(), 0);
+        camera.position.set(clientPlayer.getPosition(), 0);
         camera.update();
 
         getServerHandler().update(deltaTime);
@@ -104,11 +104,11 @@ public class GameState {
         rayHandler.setCombinedMatrix(camera);
         rayHandler.updateAndRender();
 
-        if (player.closestObject != null) {
-            float w = Box2DUtils.width(player.closestObject);
-            float h = Box2DUtils.height(player.closestObject);
+        if (clientPlayer.getClosestObject() != null) {
+            float w = Box2DUtils.width(clientPlayer.getClosestObject());
+            float h = Box2DUtils.height(clientPlayer.getClosestObject());
             batch.begin();
-            batch.draw(userSelection, player.closestObject.getPosition().x-w/2f, player.closestObject.getPosition().y-h/2f, w,h);
+            batch.draw(userSelection, clientPlayer.getClosestObject().getPosition().x-w/2f, clientPlayer.getClosestObject().getPosition().y-h/2f, w,h);
             batch.end();
         }
 

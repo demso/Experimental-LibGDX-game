@@ -21,6 +21,7 @@ import com.mygdx.game.gamestate.factories.BodyResolver;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
+import com.mygdx.game.gamestate.tiledmap.tiled.TiledMapTileLayer;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.mygdx.game.net.GameServer;
 import dev.lyze.gdxUnBox2d.UnBox;
@@ -57,6 +58,7 @@ public class ServGameState {
     public GameServer gameServer;
     public BodyResolver bodyResolver;
     public ServerMobsFactory mobsFactory;
+    public TiledMapTileLayer obstaclesLayer;
 
     public void tester(){
     }

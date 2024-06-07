@@ -10,14 +10,17 @@ import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.Zombie;
+import com.mygdx.game.gamestate.objects.items.Item;
+import com.mygdx.game.gamestate.objects.tiles.Storage;
 import com.mygdx.game.gamestate.tiledmap.tiled.TiledMapTileLayer;
-import com.mygdx.game.net.messages.*;
 import com.mygdx.game.net.messages.client.*;
+import com.mygdx.game.net.messages.common.ItemInfo;
+import com.mygdx.game.net.messages.common.Message;
+import com.mygdx.game.net.messages.common.ZombieInfo;
+import com.mygdx.game.net.messages.common.tileupdate.CloseTile;
+import com.mygdx.game.net.messages.common.tileupdate.OpenTile;
 import com.mygdx.game.net.messages.server.*;
-import com.mygdx.game.net.server.CustomKryoLogger;
-import com.mygdx.game.net.server.ServGameState;
-import com.mygdx.game.net.server.ServGameStateConstructor;
-import com.mygdx.game.net.server.ZombieHelper;
+import com.mygdx.game.net.server.*;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
@@ -34,24 +37,23 @@ public class GameServer {
     public ServGameState gameState;
     public ZombieHelper zhelper = new ZombieHelper(this);
     ObjectMap.Values<Entity> entityMapVals;
+    public ServHandler handler;
+    ObjectMap<Storage, Array<Long>> storageUpdateMap = new ObjectMap<>(); //player id -> storage
 
     public final String mapToLoad = "tiled/firstmap/worldmap.tmx";
     public GameServer() {
         try {
             init();
-
             server = new Server();
             Registerer.register(server.getKryo());
-            Log.TRACE();
-            Log.setLogger(new CustomKryoLogger());
-
             listener = new Listener.TypeListener();
-            listener.addTypeHandler(Message.class,
-                    (connection, message) -> {
+            server.addListener(listener);
+            //Log.TRACE();
+//            Log.setLogger(new CustomKryoLogger());
+            listener.addTypeHandler(Message.class, (connection, message) -> {
                         System.out.println("Recived on server!");
                     });
-            listener.addTypeHandler(Begin.class,
-                    (con, msg) -> {
+            listener.addTypeHandler(Begin.class, (con, msg) -> {
                         PlayerInfo plInf = new PlayerInfo(msg.name, con).playerSet(spawnPoint.x, spawnPoint.y, 0, 0, 0);
                         plInf.id = entitiesCounter.get();
                         entitiesCounter.incrementAndGet();
@@ -61,28 +63,21 @@ public class GameServer {
                                 .addEntities(entities.values().toArray().toArray(Entity.class)));
                         newPlayerJoined(plInf);
                     });
-
-            listener.addTypeHandler(PlayerMove.class,
-                    (con, msg) -> {
+            listener.addTypeHandler(PlayerMove.class, (con, msg) -> {
                         players.get(msg.playerId).playerSet(msg.x, msg.y, msg.xSpeed, msg.ySpeed, msg.rotation);
                       });
-
-            listener.addTypeHandler(PlayerEquip.class,
-                    (con, msg) -> {
+            listener.addTypeHandler(PlayerEquip.class, (con, msg) -> {
                             players.get(msg.playerId).equip(msg.itemId);
                             sendToAllPlayersBut(msg, players.get(msg.playerId));
                         });
-            listener.addTypeHandler(End.class,
-                    (con, msg) -> {
+            listener.addTypeHandler(End.class, (con, msg) -> {
                         PlayerInfo inf = players.remove(msg.playerId);
                         sendToAllPlayersBut(msg, inf);
                     });
-            listener.addTypeHandler(Ready.class,
-                    (con, msg) -> {
+            listener.addTypeHandler(Ready.class, (con, msg) -> {
                         startWave();
                     });
-            listener.addTypeHandler(EntityShot.class,
-                    (con, msg) -> {
+            listener.addTypeHandler(EntityShot.class, (con, msg) -> {
                         Entity zomb = entities.get(msg.id);
                         if (zomb == null || !zomb.isAlive()){
                             HandyHelper.instance.log("[GameServer:93] Entity is unreachable on server, is null = " + (zomb == null)
@@ -98,12 +93,68 @@ public class GameServer {
                                 server.sendToAllExceptTCP(players.get(msg.playerId).connection.getID(), msg);
                         }
                     });
-            listener.addTypeHandler(GunFire.class,
-                    (con, msg) -> {
+            listener.addTypeHandler(GunFire.class, (con, msg) -> {
                         sendToAllPlayersBut(msg, players.get(msg.playerID));
                     });
+            listener.addTypeHandler(OpenTile.class, (con, msg) -> {
+                        handler.updateTile(msg);
+                        sendToAllPlayersBut(msg, players.get(msg.sourceId));
+                    });
+            listener.addTypeHandler(CloseTile.class, (con, msg) -> {
+                        handler.updateTile(msg);
+                        sendToAllPlayersBut(msg, players.get(msg.sourceId));
+                    });
+            listener.addTypeHandler(GetStoredItems.class, (con, msg) -> {
+                TiledMapTileLayer.Cell cell = gameState.obstaclesLayer.getCell(msg.x, msg.y);
+                if (cell == null) {
+                    con.sendTCP(new Message().set("[GetStoredItems] Nothing here! " + msg.x + " " + msg.y));
+                    return;
+                }
+                Object data = cell.getData();
+                if (data instanceof Storage storage) {
+                    con.sendTCP(new StoredItems().set(msg.x, msg.y, ItemInfo.createItemsInfo(storage.getInventoryItems().toArray(Item.class))));
+                } else
+                    con.sendTCP(new Message().set("[GetStoredItems] Not a storage! " + msg.x + " " + msg.y));
+            });
+            listener.addTypeHandler(NeedsStorageUpdate.class, (con, msg) -> {
+                TiledMapTileLayer.Cell cell = gameState.obstaclesLayer.getCell(msg.x, msg.y);
+                if (cell == null) {
+                    con.sendTCP(new Message().set("[NeedsStorageUpdate] Nothing here! " + msg.x + " " + msg.y));
+                    return;
+                }
+                Object data = cell.getData();
 
-            server.addListener(listener);
+                if (data instanceof Storage storage) {
+                    con.sendTCP(new StoredItems().set(msg.x, msg.y, ItemInfo.createItemsInfo(storage.getInventoryItems().toArray(Item.class))));
+                    if (storageUpdateMap.get(storage) == null)
+                        storageUpdateMap.put(storage, new Array<>());
+                    storageUpdateMap.get(storage).add(msg.playerId);
+                } else
+                    con.sendTCP(new Message().set("[NeedsStorageUpdate] Not a storage! " + msg.x + " " + msg.y));
+            });
+            listener.addTypeHandler(StopStorageUpdate.class, (con, msg) -> {
+                TiledMapTileLayer.Cell cell = gameState.obstaclesLayer.getCell(msg.x, msg.y);
+                if (cell == null) {
+                    con.sendTCP(new Message().set("[StopStorageUpdate] Nothing here! " + msg.x + " " + msg.y));
+                    return;
+                }
+                Object data = cell.getData();
+
+                if (data instanceof Storage storage) {
+                    if (storageUpdateMap.get(storage) == null) {
+                        con.sendTCP(new Message().set("[StopStorageUpdate] You are not getting updates for this storage (no such storage on map)! " + storage.getName() + " " + msg.x + " " + msg.y));
+                        return;
+                    }
+                    if (!storageUpdateMap.get(storage).removeValue(msg.playerId, false)){
+                        con.sendTCP(new Message().set("[StopStorageUpdate] You are not getting updates for this storage (no such player id in array)! " + storage.getName() + " " + msg.x + " " + msg.y));
+                        return;
+                    }
+                    if (storageUpdateMap.get(storage).size == 0)
+                        storageUpdateMap.remove(storage);
+                } else
+                    con.sendTCP(new Message().set("[StopStorageUpdate] Not a storage! " + msg.x + " " + msg.y));
+            });
+
             server.bind(54555,54777);
             server.start();
 
@@ -175,6 +226,13 @@ public class GameServer {
         sendToAllPlayers(entityMoves.setPlayersMoves(playerMoves).setZMoves(zombieMoves));
     }
 
+//    public void sendStorageUpdates(){
+//        for (Storage storage : storageUpdateMap.keys()) {
+//            Vector2 pos = storage.getPosition();
+//            sendToAllPlayers(new StoredItems().set((int)Math.floor(pos.x), (int)Math.floor(pos.y), ItemInfo.createItemsInfo(storage.getInventoryItems().toArray(Item.class))));
+//        }
+//    }
+
     public void newPlayerJoined(PlayerInfo beg){
         sendToAllPlayersBut(new PlayerJoined(beg), beg);
     }
@@ -196,6 +254,7 @@ public class GameServer {
 
     void init(){
         gameState = new ServGameStateConstructor().createGameState(this);
+        handler = gameState.serverHandler;
         players = new ObjectMap<>();
         entities = gameState.entities;
         entityMapVals = new ObjectMap.Values<>(entities);
@@ -227,10 +286,8 @@ public class GameServer {
     }
 
     void spawnZombie(float x, float y){
-        Zombie zombie = gameState.getServerHandler().spawnZombie(entitiesCounter.get(),  "zombie" + entitiesCounter, 10, x, y);
-        entities.put(entitiesCounter.get(), zombie);
+        Zombie zombie = handler.spawnZombie(entitiesCounter.getAndIncrement(),  "zombie" + entitiesCounter, 10, x, y);
         sendToAllPlayers(new SpawnEntity().set(new ZombieInfo().set(zombie)));
-        entitiesCounter.getAndIncrement();
     }
 
     public void killEntity(long id){

@@ -17,9 +17,9 @@ import com.mygdx.game.gamestate.objects.tiles.TileInitializer;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
-public class MyTmxMapLoader extends TmxMapLoader {
+public class ClientMapLoader extends TmxMapLoader {
     World world;
-    public MyTmxMapLoader(World world){
+    public ClientMapLoader(World world){
         super();
         this.world = world;
     }

@@ -49,7 +49,7 @@ public class PlayerCollisionBehaviour extends CollisionBehaviour<Player> {
             updatePlayerClosestObject();
             if (otherUserData instanceof Storage storage
                     && GameState.instance.hud.storageInventoryHUD.isVisible()
-                    && GameState.instance.hud.storageInventoryHUD.storage == storage){
+                    && GameState.instance.hud.storageInventoryHUD.getStorage() == storage){
                 GameState.instance.hud.closeStorageInventoryHUD(false);
             }
         }
@@ -72,8 +72,8 @@ public class PlayerCollisionBehaviour extends CollisionBehaviour<Player> {
             }
         }
 
-        if (formelyClosest != null && formelyClosest.getUserData() != GameState.instance.hud.storageInventoryHUD.storage && GameState.instance.hud.playerInventoryHud.isVisible() && GameState.instance.player.getClosestObject() != null && GameState.instance.player.getClosestObject().getUserData() instanceof Storage storage)
-            GameState.instance.hud.showStorageInventoryHUD(storage);
+        if (formelyClosest != null && formelyClosest.getUserData() != GameState.instance.hud.storageInventoryHUD.getStorage() && GameState.instance.hud.playerInventoryHud.isVisible() && GameState.instance.clientPlayer.getClosestObject() != null && GameState.instance.clientPlayer.getClosestObject().getUserData() instanceof Storage storage)
+            GameState.instance.hud.showRequestStorageInventoryHUD(storage);
 
         if (data.getClosestObject() != null && data.getClosestObject().getUserData() instanceof Storage && (formelyClosest == null || !(formelyClosest.getUserData() instanceof Storage)))
             GameState.instance.hud.playerInventoryHud.storageInventoryNear();

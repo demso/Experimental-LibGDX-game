@@ -54,14 +54,14 @@ public class InGameConsole extends CustomConsole {
                     }
 
                     if (parts[i+1].length() > 1){
-                        tempArgs.add(String.valueOf(GameState.instance.player.getPosition().x + Float.parseFloat(parts[i+1].substring(1))));
+                        tempArgs.add(String.valueOf(GameState.instance.clientPlayer.getPosition().x + Float.parseFloat(parts[i+1].substring(1))));
                     } else
-                        tempArgs.add(String.valueOf(GameState.instance.player.getPosition().x));
+                        tempArgs.add(String.valueOf(GameState.instance.clientPlayer.getPosition().x));
 
                     if (parts[i+2].length() > 1){
-                        tempArgs.add(String.valueOf(GameState.instance.player.getPosition().y + Float.parseFloat(parts[i+2].substring(1))));
+                        tempArgs.add(String.valueOf(GameState.instance.clientPlayer.getPosition().y + Float.parseFloat(parts[i+2].substring(1))));
                     } else
-                        tempArgs.add(String.valueOf(GameState.instance.player.getPosition().y));
+                        tempArgs.add(String.valueOf(GameState.instance.clientPlayer.getPosition().y));
 
                     i += 3;
                 } else

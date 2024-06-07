@@ -26,12 +26,12 @@ import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 import com.mygdx.game.gamestate.UI.console.ConsoleCommands;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
 import com.mygdx.game.net.PlayerInfo;
-import com.mygdx.game.net.messages.EntityInfo;
+import com.mygdx.game.net.messages.common.EntityInfo;
 import com.mygdx.game.net.messages.server.OnConnection;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.player.ClientPlayerConstructor;
-import com.mygdx.game.gamestate.tiledmap.loader.MyTmxMapLoader;
+import com.mygdx.game.gamestate.tiledmap.loader.ClientMapLoader;
 import dev.lyze.gdxUnBox2d.UnBox;
 
 public class GameConstructor {
@@ -48,7 +48,7 @@ public class GameConstructor {
         gameState.entities = new ObjectMap<>();
 
         gameState.client = SecondGDXGame.instance.client;
-        gameState.acceptHandler = new AcceptHandler(gameState.client);
+        gameState.acceptHandler = new AcceptHandler(gameState.client, gameState);
         SecondGDXGame.instance.client.handler = gameState.getServerHandler();
 
         gameState.debugRenderer = new ShapeRenderer();
@@ -67,7 +67,7 @@ public class GameConstructor {
 
         gameState.camera.setToOrtho(false, 30, 20);
 
-        gameState.map = new MyTmxMapLoader(gameState.world).load(msg.map, new TmxMapLoader.Parameters());
+        gameState.map = new ClientMapLoader(gameState.world).load(msg.map, new TmxMapLoader.Parameters());
 
         gameState.shapeRenderer.setProjectionMatrix(gameState.camera.combined);
         gameState.renderer = new OrthogonalTiledMapRenderer(gameState.map, 1f / (float) GameState.TILE_SIDE);
@@ -80,9 +80,9 @@ public class GameConstructor {
         initScene2D();
         initPhysics();
 
-        gameState.player = new ClientPlayerConstructor().createPlayer(gameState);
-        gameState.player.setPosition(msg.spawnX, msg.spawnY);
-        gameState.player.setName(SecondGDXGame.instance.name);
+        gameState.clientPlayer = new ClientPlayerConstructor().createPlayer(gameState);
+        gameState.clientPlayer.setPosition(msg.spawnX, msg.spawnY);
+        gameState.clientPlayer.setName(SecondGDXGame.instance.name);
 
         gameState.console = new InGameConsole(SecondGDXGame.instance.skin1x,true);
         gameState.console.setDisplayKeyID(Input.Keys.GRAVE);

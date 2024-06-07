@@ -13,7 +13,6 @@ import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.objects.Interactable;
 import com.mygdx.game.gamestate.objects.behaviours.SpriteBehaviour;
-import com.mygdx.game.gamestate.factories.BodyResolver;
 import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
 import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
@@ -32,7 +31,7 @@ public class Item implements BodyData, Interactable {
     @Getter Player owner;
 
     public GameState gameState;
-    public String tileName = "{No tile name}";
+    public String itemId = "{No tile name}"; //string item identifier
     public String itemName = "{No name item}";
     public String description = "First you must develop a Skin that implements all the widgets you plan to use in your layout. You can't use a widget if it doesn't have a valid style. Do this how you would usually develop a Skin in Scene Composer.";
     public float spriteWidth = 0.7f;
@@ -42,13 +41,13 @@ public class Item implements BodyData, Interactable {
 
     public Item(TiledMapTile tile, String itemName){
         this.tile = tile;
-        this.tileName = tile.getProperties().get("name", "no_name", String.class);
+        this.itemId = tile.getProperties().get("name", "no_name", String.class);
         this.gameState = instance;
         this.itemName = itemName;
     }
 
-    public Item(String tileName, String itemName){
-        this(TileResolver.getTile(tileName), itemName);
+    public Item(String itemId, String itemName){
+        this(TileResolver.getTile(itemId), itemName);
     }
 
     public Body allocate(Vector2 position){
@@ -76,14 +75,14 @@ public class Item implements BodyData, Interactable {
                 @Override
                 public void enter(InputEvent event, float x, float y, int pointer, @Null Actor fromActor) {
                     super.enter(event, x, y, pointer, fromActor);
-                    gameState.hud.debugEntries.put(tileName + "_ClickListener", "Pointing at " + tileName + " at " + getPosition());
+                    gameState.hud.debugEntries.put(itemId + "_ClickListener", "Pointing at " + itemId + " at " + getPosition());
                     gameState.hud.showItemInfoWindow(Item.this);
                 }
 
                 @Override
                 public void exit(InputEvent event, float x, float y, int pointer, @Null Actor toActor) {
                     super.exit(event, x, y, pointer, toActor);
-                    gameState.hud.debugEntries.removeKey(tileName + "_ClickListener");
+                    gameState.hud.debugEntries.removeKey(itemId + "_ClickListener");
                     gameState.hud.hideItemInfoWindow(Item.this);
                 }
             });
@@ -123,7 +122,7 @@ public class Item implements BodyData, Interactable {
 
     @Override
     public void interact(Player player) {
-        instance.player.takeItem(this);
+        instance.clientPlayer.takeItem(this);
     }
 
     public void equip(Player player){

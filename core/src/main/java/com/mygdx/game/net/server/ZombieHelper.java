@@ -6,8 +6,6 @@ import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.Zombie;
 import com.mygdx.game.net.GameServer;
 import com.mygdx.game.net.PlayerInfo;
-import com.mygdx.game.net.messages.ZombieInfo;
-import com.mygdx.game.net.messages.server.ZombieMove;
 
 public class ZombieHelper {
     GameServer server;

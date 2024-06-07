@@ -10,8 +10,8 @@ public class GameStageInputListener extends InputListener {
     @Override
     public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
         if (button == Input.Buttons.LEFT)
-            if (instance.player.equipedItem != null &&  instance.player.equipedItem.getName().equals("Deagle .44"))
-                instance.player.fire();
+            if (instance.clientPlayer.equipedItem != null &&  instance.clientPlayer.equipedItem.getName().equals("Deagle .44"))
+                instance.clientPlayer.fire();
         return false;
     }
 }

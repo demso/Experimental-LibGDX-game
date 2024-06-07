@@ -1,5 +1,7 @@
 package com.mygdx.game.gamestate.objects.tiles;
 
+import com.mygdx.game.gamestate.objects.tiles.interfaces.Closeable;
+import com.mygdx.game.gamestate.objects.tiles.interfaces.Openable;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -12,7 +14,7 @@ import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
 import lombok.Getter;
 
-public class Door implements Interactable, BodyData {
+public class Door implements Interactable, BodyData, Closeable, Openable {
     TiledMapTileLayer.Cell cell;
     TiledMapTile closedTile;
     TiledMapTile openTile;
@@ -64,6 +66,12 @@ public class Door implements Interactable, BodyData {
     public void interact(Player player) {
         toggle();
         player.getBody().getFixtureList().get(0).refilter();
+        if (player.getId() == gameState.clientPlayer.getId()){
+            if (isOpen)
+                gameState.client.onTileOpen((int)Math.floor(physicalBody.getPosition().x + 0.05f), (int)Math.floor(physicalBody.getPosition().y + 0.05f));
+            else
+                gameState.client.onTileClose((int)Math.floor(physicalBody.getPosition().x + 0.05f), (int)Math.floor(physicalBody.getPosition().y + 0.05f));
+        }
     }
 
     public TiledMapTile getTile(){

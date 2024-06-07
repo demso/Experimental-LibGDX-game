@@ -1,4 +1,4 @@
-package com.mygdx.game.net.messages;
+package com.mygdx.game.net.messages.common;
 
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;

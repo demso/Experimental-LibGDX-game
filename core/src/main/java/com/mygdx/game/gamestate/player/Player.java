@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.SecondGDXGame;
+import com.mygdx.game.gamestate.objects.Interactable;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
@@ -34,7 +35,7 @@ public class Player extends Entity implements Storage {
     public float WIDTH = 0.8f;
     public float HEIGHT = 0.8f;
     public float normalSpeed = 3f;
-    public Body closestObject;
+    Body closestObject;
 
     Array<Item> inventoryItems = new Array<>();
 
@@ -72,6 +73,12 @@ public class Player extends Entity implements Storage {
     @Override
     public Array<Item> getInventoryItems(){
         return inventoryItems;
+    }
+
+    @Override
+    public void setInventoryItems(Item... items) {
+        inventoryItems.clear();
+        inventoryItems.addAll(items);
     }
 
     public boolean inventoryContains(Item item){
@@ -131,10 +138,24 @@ public class Player extends Entity implements Storage {
         return getBody().getLinearVelocity();
     }
 
+    public boolean interact(){
+        if (closestObject != null) {
+            var obj = (Interactable) closestObject.getUserData();
+            obj.interact(this);
+            return true;
+        }
+        return false;
+    }
+
     public void destroy() {
         if (equipedItem != null){
             equipedItem.destroy();
         }
         playerObject.destroy();
+    }
+
+
+    public Vector2 getPosition() {
+        return super.getPosition();
     }
 }

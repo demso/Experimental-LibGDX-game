@@ -46,6 +46,12 @@ public class Closet implements BodyData, Interactable, Storage {
     }
 
     @Override
+    public void setInventoryItems(Item... items) {
+        inventoryItems.clear();
+        inventoryItems.addAll(items);
+    }
+
+    @Override
     public void takeItem(Item item){
         item.removeFromWorld();
         inventoryItems.add(item);

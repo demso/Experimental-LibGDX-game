@@ -294,6 +294,14 @@ public class CustomConsole extends AbstractConsole {
         display.refresh();
     }
 
+    public void logWithoutRefresh (String msg, LogLevel level) {
+        super.log(msg, level);
+    }
+
+    public void refreshLogs(){
+        display.refresh();
+    }
+
     @Override public void setDisabled (boolean disabled) {
         if (disabled) {
             display.setHidden(true);
@@ -505,7 +513,11 @@ public class CustomConsole extends AbstractConsole {
                 l.setColor(le.getColor());
                 logEntries.add(l).expandX().fillX().top().left().row();
             }
-            scroll.validate();
+            try {
+                scroll.validate();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             scroll.setScrollPercentY(1);
         }
 

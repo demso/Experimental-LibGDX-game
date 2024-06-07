@@ -2,7 +2,9 @@ package com.mygdx.game.net.server;
 
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.Zombie;
+import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.net.GameServer;
+import com.mygdx.game.net.messages.common.tileupdate.UpdateTile;
 
 public class ServHandler {
     public ServGameState gameState;
@@ -61,6 +63,10 @@ public class ServHandler {
         zomb.setHp(hp);
         gameState.entities.put(id, zomb);
         return zomb;
+    }
+
+    public void updateTile(UpdateTile updater){
+        updater.updateTile(gameState.map);
     }
 
 //    public void killEntity(long id){

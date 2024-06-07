@@ -1,10 +1,8 @@
 package com.mygdx.game.gamestate.objects.items.guns;
 
-import com.badlogic.gdx.Gdx;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -64,7 +62,7 @@ public class Gun extends Item {
         if (gunSpriteBehaviour == null || gunSpriteBehaviour.getState().equals(BehaviourState.DESTROYED))
                 gunSpriteBehaviour = new GunSpriteBehaviour(GO, this, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
 
-        if (getOwner() == instance.player)
+        if (getOwner() == instance.clientPlayer)
             gunSpriteBehaviour.setRenderOrder(Globals.PLAYER_RENDER_ORDER);
         else
             gunSpriteBehaviour.setRenderOrder(Globals.DEFAULT_RENDER_ORDER);
@@ -79,14 +77,14 @@ public class Gun extends Item {
                     @Override
                     public void enter(InputEvent event, float x, float y, int pointer, @Null Actor fromActor) {
                         super.enter(event, x, y, pointer, fromActor);
-                        gameState.hud.debugEntries.put(tileName + "_ClickListener", "Pointing at " + tileName + " at " + getPosition());
+                        gameState.hud.debugEntries.put(itemId + "_ClickListener", "Pointing at " + itemId + " at " + getPosition());
                         gameState.hud.showItemInfoWindow(Gun.this);
                     }
 
                     @Override
                     public void exit(InputEvent event, float x, float y, int pointer, @Null Actor toActor) {
                         super.exit(event, x, y, pointer, toActor);
-                        gameState.hud.debugEntries.removeKey(tileName + "_ClickListener");
+                        gameState.hud.debugEntries.removeKey(itemId + "_ClickListener");
                         gameState.hud.hideItemInfoWindow(Gun.this);
                     }
                 });

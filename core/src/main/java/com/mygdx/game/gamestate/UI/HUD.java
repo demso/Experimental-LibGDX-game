@@ -3,6 +3,7 @@ package com.mygdx.game.gamestate.UI;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayer;
+import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -25,6 +26,7 @@ import com.mygdx.game.gamestate.objects.bodies.userdata.SimpleUserData;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
+import dev.lyze.gdxUnBox2d.GameObject;
 
 public class HUD extends Stage {
     boolean debug = false;
@@ -37,6 +39,10 @@ public class HUD extends Stage {
     public ArrayMap<String, String> debugEntries = new ArrayMap<>();
     Label label;
     Skin skin;
+    GameObject gameObject;
+    volatile boolean showRequestSatisfied;
+    volatile int showRequestX, showRequestY;
+    Item[] showRequestItems;
 
     public void showItemInfoWindow(Item item){
         getActors().removeValue(itemPopups.get(item), true);
@@ -50,18 +56,24 @@ public class HUD extends Stage {
         closePopup(itemPopups.get(item));
     }
 
-    public void showStorageInventoryHUD(Storage storage){
-        if (storageInventoryHUD.isVisible()) {
-            if (storageInventoryHUD.storage != storage){
-                storageInventoryHUD.storage = storage;
-                storageInventoryHUD.refill();
-            }
+    public void showRequestStorageInventoryHUD(Storage storage){
+        storageInventoryHUD.requestShowOnStorage(storage);
+    }
+
+    public void onStoredItemsReceived(int recX, int recY, Item[] items){
+        showRequestX = recX;
+        showRequestY = recY;
+        showRequestItems = items;
+        showRequestSatisfied = true;
+    }
+
+    private void showStorageInventoryHUD(Storage storage) {
+        if (storageInventoryHUD.isVisible())
             return;
-        }
         panels.addActor(storageInventoryHUD);
         storageInventoryHUD.onShow(storage);
         showPlayerInventoryHud();
-        if (GameState.instance.player.getClosestObject() == null || GameState.instance.player.getClosestObject().getUserData() != storage)
+        if (GameState.instance.clientPlayer.getClosestObject() == null || GameState.instance.clientPlayer.getClosestObject().getUserData() != storage)
             playerInventoryHud.storageInventoryNear();
         storageInventoryHUD.setVisible(true);
         setScrollFocus(storageInventoryHUD);
@@ -78,7 +90,7 @@ public class HUD extends Stage {
         storageInventoryHUD.setVisible(false);
         storageInventoryHUD.onClose();
         esClosablePopups.removeValue(storageInventoryHUD, true);
-        if (GameState.instance.player.getClosestObject() == null || GameState.instance.player.getClosestObject().getUserData() != storageInventoryHUD.storage)
+        if (GameState.instance.clientPlayer.getClosestObject() == null || GameState.instance.clientPlayer.getClosestObject().getUserData() != storageInventoryHUD.getStorage())
             playerInventoryHud.storageInventoryFar();
         updatePanels();
     }
@@ -87,14 +99,14 @@ public class HUD extends Stage {
         if (storageInventoryHUD.isVisible())
             closeStorageInventoryHUD(offPlayersInv);
         else
-            showStorageInventoryHUD(storage);
+            showRequestStorageInventoryHUD(storage);
     }
 
     public void showPlayerInventoryHud(){
         if (playerInventoryHud.isVisible())
             return;
         panels.addActorAt(0, playerInventoryHud);
-        playerInventoryHud.onShow(GameState.instance.player);
+        playerInventoryHud.onShow(GameState.instance.clientPlayer);
 
         playerInventoryHud.setVisible(true);
         setScrollFocus(playerInventoryHud);
@@ -203,8 +215,8 @@ public class HUD extends Stage {
     StringBuilder labelText = new StringBuilder();
     public void drawTileDebugInfo() {
         labelText = new StringBuilder();
-        labelText.append("Player velocity : ").append(gameState.player.getBody().getLinearVelocity()).append("\n");
-        clObj = gameState.player.closestObject;
+        labelText.append("Player velocity : ").append(gameState.clientPlayer.getBody().getLinearVelocity()).append("\n");
+        clObj = gameState.clientPlayer.getClosestObject();
         labelText.append("Closest object : ").append(clObj == null ? null : clObj.getUserData() instanceof SimpleUserData ? ((SimpleUserData) clObj.getUserData()).bodyName + " " + clObj.getPosition() : clObj.getUserData()).append("\n\n");
         if (debugEntries.size > 0)
             debugEntries.values().forEach((kall) -> labelText.append(kall).append("\n\n"));
@@ -214,7 +226,7 @@ public class HUD extends Stage {
         int tileY = (int)Math.floor(tilePosition.y);
         for (var x = 0; x < gameState.map.getLayers().size(); x++){
             MapLayer currentLayer = gameState.map.getLayers().get(x);
-            if (! (currentLayer instanceof TiledMapTile))
+            if (! (currentLayer instanceof TiledMapTileLayer))
                 continue;
             TiledMapTileLayer.Cell mcell = ((TiledMapTileLayer)currentLayer).getCell(tileX, tileY);
 
@@ -237,6 +249,9 @@ public class HUD extends Stage {
         esClosablePopups.add(actor);
     }
 
+    float storageUpdateAccumulator;
+    float storageUpdatePeriod = Globals.CLIENT_STORAGE_UPDATE_PERIOD;
+
     @Override
     public void act(float delta) {
         super.act(delta);
@@ -251,11 +266,39 @@ public class HUD extends Stage {
 
         if (debug)
             SecondGDXGame.instance.helper.log("[HUD:250] " + esClosablePopups.toString());
+
+        if (showRequestSatisfied){
+            Vector2 vec = storageInventoryHUD.getStorage().getPosition();
+            if (showRequestX == (int)Math.floor(vec.x) && showRequestY == (int)Math.floor(vec.y)) {
+                storageInventoryHUD.getStorage().setInventoryItems(showRequestItems);
+                showStorageInventoryHUD(storageInventoryHUD.getStorage());
+            }
+            showRequestSatisfied = false;
+        }
+
+//        if (playerInventoryHud.isVisible()) {
+//            storageUpdateAccumulator += delta;
+//            if (storageUpdateAccumulator > storageUpdatePeriod) {
+//                storageUpdateAccumulator = 0;
+//                gameState.client.getInventoryItemsForPlayer();
+//            }
+//        }
+//        if (storageInventoryHUD.isVisible()) {
+//            storageUpdateAccumulator += delta;
+//            if (storageUpdateAccumulator > storageUpdatePeriod) {
+//                storageUpdateAccumulator = 0;
+//                Vector2 pos = storageInventoryHUD.storage.getPosition();
+//                gameState.client.getStoredItems(pos.x, pos.y);
+//                storageInventoryHUD.refill();
+//            }
+//        }
+
     }
 
     public HUD(GameState gi, ScreenViewport screenViewport, SpriteBatch batch) {
         super(screenViewport, batch);
         gameState = gi;
+        gameObject = new GameObject("HUD", gameState.unbox);
         skin = gameState.skin;
 
         panels = new HorizontalGroup();

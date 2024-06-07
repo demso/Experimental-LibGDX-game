@@ -6,7 +6,8 @@ public class Globals {
         PLAYER_RENDER_ORDER = 1,
         ANOTHER_PLAYER_RENDER_ORDER = DEFAULT_RENDER_ORDER;
 
-    public static float SERVER_UPDATE_TIME = 1/75f;//17
+    public static float SERVER_UPDATE_TIME = 1/30f,
+            CLIENT_STORAGE_UPDATE_PERIOD =      0.5f;
 
     public final static short
             DEFAULT_CONTACT_FILTER =            0x0001,                 //00000000 00000001
@@ -20,5 +21,4 @@ public class Globals {
 
             PLAYER_CONTACT_GROUP =              -42,
             LIGHT_CONTACT_GROUP =               -10;
-
 }

@@ -1,7 +1,7 @@
 package com.mygdx.game.net;
 
 import com.esotericsoftware.kryonet.Connection;
-import com.mygdx.game.net.messages.EntityInfo;
+import com.mygdx.game.net.messages.common.EntityInfo;
 import lombok.Getter;
 import lombok.Setter;
 

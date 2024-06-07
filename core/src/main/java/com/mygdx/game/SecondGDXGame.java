@@ -90,7 +90,7 @@ public class SecondGDXGame extends Game {
 
         gameScreen = new GameScreen();
         gameScreen.gameState = new GameConstructor().createGameState(msg);
-        gameScreen.gameState.player.setId(msg.id);
+        gameScreen.gameState.clientPlayer.setId(msg.id);
         gameScreen.gameState.tester();//создаем клиент
 
         ready();
@@ -112,7 +112,7 @@ public class SecondGDXGame extends Game {
     }
 
     public void ready(){
-        client.ready();
+        client.ready(gameScreen.gameState);
         gameIsReady = true;
     }
 
@@ -155,6 +155,7 @@ public class SecondGDXGame extends Game {
             client.startMessage = null;
             readyToInit = false;
         }
+        helper.refreshLogsInConsole(Gdx.graphics.getDeltaTime());
     }
 
     @Override

@@ -24,7 +24,7 @@ public class BulletCollisionBehaviour extends CollisionBehaviour<Bullet> {
             case "zombie" -> {
                 if (otherUserData instanceof Zombie zombie){
                     //zombie.hurt(data.getDamage());
-                    GameState.instance.client.hit(zombie.getId(), data.getDamage());
+                    GameState.instance.client.onHit(zombie.getId(), data.getDamage());
                 }
             }
         }

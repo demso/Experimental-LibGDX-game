@@ -4,9 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.HandyHelper;
-import com.mygdx.game.gamestate.objects.Interactable;
 import com.mygdx.game.gamestate.player.PlayerHandler;
 
 import static com.mygdx.game.gamestate.GameState.instance;
@@ -43,35 +41,32 @@ public class HUDInputListener extends InputListener {
         if (keycode == Input.Keys.R){
             RLongPressed = false;
             if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-                instance.player.revive();
+                instance.clientPlayer.revive();
                 return false;
             }
         }
         if (keycode == Input.Keys.E){
-            if (instance.player.closestObject != null) {
-                var obj = (Interactable) instance.player.closestObject.getUserData();
-                obj.interact(instance.player);
-            }
+            instance.clientPlayer.interact();
         }
         if (keycode == Input.Keys.I){
             instance.hud.togglePlayerInventoryHUD();
         }
         if (keycode == Input.Keys.T){
-            if (instance.player.equipedItem != null && instance.player.equipedItem.itemName.equals("Deagle .44"))
-                instance.player.fire();
+            if (instance.clientPlayer.equipedItem != null && instance.clientPlayer.equipedItem.itemName.equals("Deagle .44"))
+                instance.clientPlayer.fire();
                 //instance.fireBullet(instance.player);
         }
         if (keycode == Input.Keys.W || keycode == Input.Keys.UP){
-            instance.player.playerObject.getBehaviour(PlayerHandler.class).moveUp = false;
+            instance.clientPlayer.playerObject.getBehaviour(PlayerHandler.class).moveUp = false;
         }
         if (keycode == Input.Keys.S || keycode == Input.Keys.DOWN){
-            instance.player.playerObject.getBehaviour(PlayerHandler.class).moveDown = false;
+            instance.clientPlayer.playerObject.getBehaviour(PlayerHandler.class).moveDown = false;
         }
         if (keycode == Input.Keys.A || keycode == Input.Keys.LEFT){
-            instance.player.playerObject.getBehaviour(PlayerHandler.class).moveToTheLeft = false;
+            instance.clientPlayer.playerObject.getBehaviour(PlayerHandler.class).moveToTheLeft = false;
         }
         if (keycode == Input.Keys.D || keycode == Input.Keys.RIGHT){
-            instance.player.playerObject.getBehaviour(PlayerHandler.class).moveToTheRight = false;
+            instance.clientPlayer.playerObject.getBehaviour(PlayerHandler.class).moveToTheRight = false;
         }
         return false;
     }
@@ -80,16 +75,16 @@ public class HUDInputListener extends InputListener {
     @Override
     public boolean keyDown(InputEvent event, int keycode) {
         if (keycode == Input.Keys.W || keycode == Input.Keys.UP){
-            instance.player.playerObject.getBehaviour(PlayerHandler.class).moveUp = true;
+            instance.clientPlayer.playerObject.getBehaviour(PlayerHandler.class).moveUp = true;
         }
         if (keycode == Input.Keys.S || keycode == Input.Keys.DOWN){
-            instance.player.playerObject.getBehaviour(PlayerHandler.class).moveDown = true;
+            instance.clientPlayer.playerObject.getBehaviour(PlayerHandler.class).moveDown = true;
         }
         if (keycode == Input.Keys.A || keycode == Input.Keys.LEFT){
-            instance.player.playerObject.getBehaviour(PlayerHandler.class).moveToTheLeft = true;
+            instance.clientPlayer.playerObject.getBehaviour(PlayerHandler.class).moveToTheLeft = true;
         }
         if (keycode == Input.Keys.D || keycode == Input.Keys.RIGHT){
-            instance.player.playerObject.getBehaviour(PlayerHandler.class).moveToTheRight = true;
+            instance.clientPlayer.playerObject.getBehaviour(PlayerHandler.class).moveToTheRight = true;
         }
 
         if (keycode == Input.Keys.R){
@@ -104,9 +99,8 @@ public class HUDInputListener extends InputListener {
 
     public void update(){
         if (Gdx.input.isKeyPressed(Input.Keys.R) && (System.nanoTime() - RPressedTime > 400000000L) && !RLongPressed) {
-            HandyHelper.instance.log("R long pressed", false);
-            if (instance.player.equipedItem != null)
-                instance.player.uneqipItem();
+            if (instance.clientPlayer.equipedItem != null)
+                instance.clientPlayer.uneqipItem();
             RLongPressed = true;
         }
         //HandyHelper.instance.log(System.nanoTime() + " " + RPressedTime + " " + (System.nanoTime() - RPressedTime), false);

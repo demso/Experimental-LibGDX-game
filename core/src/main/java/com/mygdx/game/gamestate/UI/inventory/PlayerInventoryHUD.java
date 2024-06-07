@@ -1,7 +1,9 @@
 package com.mygdx.game.gamestate.UI.inventory;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.UI.HUD;
+import com.mygdx.game.gamestate.objects.tiles.Storage;
 
 import static com.mygdx.game.gamestate.GameState.instance;
 
@@ -18,12 +20,12 @@ public class PlayerInventoryHUD extends StorageInventoryHUD{
         boolean handled = true;
         switch (action) {
             case Store -> {
-                GameState.instance.player.dropItem(contextMenu.itemEntry.item);
-                hud.storageInventoryHUD.storage.takeItem(contextMenu.itemEntry.item);
+                GameState.instance.clientPlayer.dropItem(contextMenu.itemEntry.item);
+                hud.storageInventoryHUD.getStorage().takeItem(contextMenu.itemEntry.item);
                 instance.hud.updateInvHUDContent();
             }
             case Equip -> {
-                GameState.instance.player.equipItem(contextMenu.itemEntry.item);
+                GameState.instance.clientPlayer.equipItem(contextMenu.itemEntry.item);
             }
             default -> handled = false;
         }
@@ -38,6 +40,26 @@ public class PlayerInventoryHUD extends StorageInventoryHUD{
         contextMenu.disableActions(ContextMenu.ConAction.Store);
         if (contextMenu.isVisible())
             contextMenu.update();
+    }
+
+    @Override
+    public void onShow(Storage storage) {
+        requestShowOnStorage(storage);
+        refill();
+    }
+
+    @Override
+    public void requestShowOnStorage(Storage storage) {
+        this.storage = storage;
+    }
+
+    @Override
+    public void onClose() {
+        for (Actor ac: popups){
+            if (ac instanceof ContextMenu){
+                closeItemContextMenu( (ContextMenu) ac);
+            }
+        }
     }
 
     public PlayerInventoryHUD(HUD hud) {
