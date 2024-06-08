@@ -20,6 +20,7 @@ public class ZombieAIBehaviour extends BehaviourAdapter {
         super(gameObject);
         body = getGameObject().getBox2dBehaviour().getBody();
         zombie = (Zombie) body.getUserData();
+        zombie.getBody().setLinearDamping(0);
     }
 
     @Override
@@ -46,7 +47,7 @@ public class ZombieAIBehaviour extends BehaviourAdapter {
             zombie.getBody().setLinearVelocity(tempVec);
 
 //            zombie.getBody().setLinearVelocity(0, -1.5f);
-            zombie.getBody().setLinearDamping(0);
+
 
             needsUpdate = false;
             //playerMove = null;
