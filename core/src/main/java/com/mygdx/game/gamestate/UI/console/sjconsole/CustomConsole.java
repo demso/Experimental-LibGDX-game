@@ -513,11 +513,7 @@ public class CustomConsole extends AbstractConsole {
                 l.setColor(le.getColor());
                 logEntries.add(l).expandX().fillX().top().left().row();
             }
-            try {
-                scroll.validate();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            scroll.validate();
             scroll.setScrollPercentY(1);
         }
 

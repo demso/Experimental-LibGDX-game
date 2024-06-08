@@ -51,7 +51,7 @@ public class AnotherPlayerConstructor extends ClientPlayerConstructor {
 //        body.createFixture(sensorFixtureDef).setUserData(new SimpleUserData("playerInteractionBubble"));
 //        sensorCircle.dispose();
 
-        body.setLinearDamping(0);
+        //body.setLinearDamping(0);
 
         player.setBody(body);
 
@@ -100,7 +100,7 @@ public class AnotherPlayerConstructor extends ClientPlayerConstructor {
 //        light.setContactFilter(f);
 
         MassData massData = new MassData();
-        massData.mass = 60f;
+        massData.mass = 0.05f;
         massData.center.set(new Vector2(0f,0f));
         body.setMassData(massData);
 

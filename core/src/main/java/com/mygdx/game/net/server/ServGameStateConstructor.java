@@ -30,10 +30,11 @@ public class ServGameStateConstructor {
         gameState.world = new World(new Vector2(0, 0), true);
         gameState.bodyResolver = new BodyResolver(gameState.world);
         gameState.mobsFactory = new ServerMobsFactory(gameState.world);
-        gameState.itemsFactory = new ItemsFactory(gameState.unbox, gameState.bodyResolver, gameState.hud, gameState.gameStage);
         gameState.unbox = new UnBox(gameState.world);
         gameState.unbox.getOptions().setTimeStep(gameState.physicsStep);
         gameState.unbox.getOptions().setInterpolateMovement(false);
+
+        gameState.itemsFactory = new ItemsFactory(gameState.unbox, gameState.bodyResolver, null, null);
 
         gameState.map = new ServerMapLoader(gameState).load(serv.mapToLoad, new TmxMapLoader.Parameters());
         gameState.obstaclesLayer = ((TiledMapTileLayer)gameState.map.getLayers().get("obstacles"));

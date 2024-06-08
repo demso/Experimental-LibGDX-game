@@ -29,7 +29,7 @@ public class SpriteBehaviour extends BehaviourAdapter {
 
     public SpriteBehaviour(GameObject gameObject, float width, float height, TextureRegion textureRegion, float renderOrder) {
         super(gameObject);
-        setRenderOrder(renderOrder);
+        setRenderOrder(-2);
         sprite = new Sprite(textureRegion);
         sprite.setSize(width, height);
         sprite.setOriginCenter();

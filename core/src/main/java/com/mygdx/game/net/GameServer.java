@@ -187,18 +187,20 @@ public class GameServer {
                             return;
                         }
                         removeItemFromStorage((Storage) sourceCell.getData(), msg.uid);
-                        players.get(msg.targetId).addItem(items.get(msg.uid));
+                        players.get(msg.targetId).takeItem(items.get(msg.uid));
                         break;
                     case 3:
                         players.get(msg.sourceId).removeItem(items.get(msg.uid));
-                        players.get(msg.targetId).addItem(items.get(msg.uid));
+                        players.get(msg.targetId).takeItem(items.get(msg.uid));
                         break;
                 }
             });
             listener.addTypeHandler(AllocateItem.class, (con, msg) -> {
-                server.sendToAllExceptTCP(con.getID(), msg);
+                Item item = handler.allocateItem(items.get(msg.itemInfo.uid), msg.x, msg.y);
+                server.sendToAllExceptTCP(con.getID(), new AllocateItem().set(new ItemInfo().set(msg.itemInfo.uid, msg.itemInfo.itemId), item.getPosition().x, item.getPosition().y));
             });
-            listener.addTypeHandler(DisposeItem.class, (con, msg) -> {
+            listener.addTypeHandler(RemoveItemFromWorld.class, (con, msg) -> {
+                handler.removeFromWorld(items.get(msg.uid));
                 server.sendToAllExceptTCP(con.getID(), msg);
             });
 
@@ -248,7 +250,6 @@ public class GameServer {
 
             players.values().forEach(new Consumer<>() {
                 int i = 0;
-
                 @Override
                 public void accept(PlayerInfo playerInfo) {
                     playerMoves[i].set(playerInfo.id, playerInfo.x, playerInfo.y, playerInfo.xSpeed, playerInfo.ySpeed, playerInfo.itemRotation);

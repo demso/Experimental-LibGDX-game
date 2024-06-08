@@ -1,6 +1,7 @@
 package com.mygdx.game.gamestate.objects.items.guns;
 
 import com.mygdx.game.gamestate.GameState;
+import com.mygdx.game.gamestate.player.ClientPlayer;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -49,7 +50,8 @@ public class Gun extends Item {
         physicalBody = GameState.instance.bodyResolver.itemBody(position.x, position.y, this);
         new Box2dBehaviour(physicalBody, GO);
         GO.setEnabled(true);
-        mouseHandler.setPosition(getPosition().x - mouseHandler.getWidth()/2f, getPosition().y - mouseHandler.getHeight()/2f);
+        if (mouseHandler != null)
+            mouseHandler.setPosition(getPosition().x - mouseHandler.getWidth()/2f, getPosition().y - mouseHandler.getHeight()/2f);
         
         return physicalBody;
     }
@@ -59,17 +61,19 @@ public class Gun extends Item {
         if (GO == null)
             GO = new GameObject(itemName, false, instance.unbox);
 
+        if (hud == null)
+            return;
         if (gunSpriteBehaviour == null || gunSpriteBehaviour.getState().equals(BehaviourState.DESTROYED))
                 gunSpriteBehaviour = new GunSpriteBehaviour(GO, this, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
 
-        if (getOwner() == instance.clientPlayer)
+        if (getOwner() instanceof ClientPlayer)
             gunSpriteBehaviour.setRenderOrder(Globals.PLAYER_RENDER_ORDER);
         else
             gunSpriteBehaviour.setRenderOrder(Globals.DEFAULT_RENDER_ORDER);
 
         if (isEquipped()) {}
         else {
-            if (mouseHandler == null) {
+            if (hud != null && mouseHandler == null) {
                 mouseHandler = new Table();
                 mouseHandler.setSize(spriteWidth - 0.1f, spiteHeight - 0.1f);
                 mouseHandler.setTouchable(Touchable.enabled);
@@ -89,8 +93,8 @@ public class Gun extends Item {
                     }
                 });
             }
-
-            gameStage.addActor(mouseHandler);
+            if (hud != null)
+                gameStage.addActor(mouseHandler);
         }
     }
 

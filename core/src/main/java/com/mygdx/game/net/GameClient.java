@@ -115,9 +115,19 @@ public class GameClient {
             }
 
             gameState.hud.onStoredItemsReceived(msg.x, msg.y, items);
-
-//            gameState.hud.storageInventoryHUD.getStorage().setInventoryItems(items);
-//            gameState.hud.storageInventoryHUD.refill();
+        });
+        listener.addTypeHandler(AllocateItem.class, (con, msg) -> {
+            Item item = gameState.items.get(msg.itemInfo.uid);
+            if (item == null){
+                item = gameState.itemsFactory.getItem(msg.itemInfo.uid, msg.itemInfo.itemId);
+                gameState.items.put(msg.itemInfo.uid, item);
+            }
+            item.allocate(new Vector2(msg.x, msg.y));
+        });
+        listener.addTypeHandler(RemoveItemFromWorld.class, (con, msg) -> {
+            Item item = gameState.items.get(msg.uid);
+            if (item != null)
+                item.removeFromWorld();
         });
     }
 
@@ -165,13 +175,13 @@ public class GameClient {
         client.sendTCP(new MoveItemFromStorageToStorage().set(item.uid, GameState.instance.clientPlayer.getId(), toX, toY));
     }
 
-    public void droppedItem(Item item, int toX, int toY){
-        client.sendTCP(new AllocateItem().set(new ItemInfo().set(item.uid, item.itemId), toX, toY));
+    public void droppedItem(Item item, Vector2 pos){
+        client.sendTCP(new AllocateItem().set(new ItemInfo().set(item.uid, item.itemId), pos.x, pos.y));
     }
 
     public void pickedUpItem(Item item){
         client.sendTCP(new PlayerTakeItems().set(gameState.clientPlayer.getId(), ItemInfo.createItemInfo(item)));
-        client.sendTCP(new DisposeItem().set(item.uid));
+        client.sendTCP(new RemoveItemFromWorld().set(item.uid));
     }
 
 //    public void getStoredItems(float x, float y){

@@ -33,8 +33,8 @@ public class Zombie extends Entity {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
         fixtureDef.density = 1f;
-        fixtureDef.friction = 0.01f;
-        fixtureDef.restitution = 0.01f;
+        fixtureDef.friction = 0f;
+        fixtureDef.restitution = 0f;
         fixtureDef.filter.categoryBits = Globals.ZOMBIE_CONTACT_FILTER;
         fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits & ~Globals.LIGHT_CONTACT_FILTER);
 
@@ -43,7 +43,7 @@ public class Zombie extends Entity {
         getBody().setFixedRotation(true);
 
         MassData massData = new MassData();
-        massData.mass = 60f;
+        massData.mass = 0.05f;
         massData.center.set(new Vector2(0f,0f));
 
         getBody().setMassData(massData);

@@ -61,7 +61,7 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
     @Override
     public void update(float delta) {
         if (gun.isEquipped()) {
-            Player player = gun.getOwner();
+            Player player = (Player) gun.getOwner();
             float rotation = 0;
             if (!player.getName().equals(SecondGDXGame.instance.name))
                 rotation = player.itemRotation;

@@ -1,61 +1,24 @@
 package com.mygdx.game.net.server;
 
+import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.Zombie;
 import com.mygdx.game.gamestate.objects.items.Item;
+import com.mygdx.game.gamestate.objects.tiles.Storage;
 import com.mygdx.game.net.GameServer;
+import com.mygdx.game.net.messages.common.AllocateItem;
 import com.mygdx.game.net.messages.common.tileupdate.UpdateTile;
 
 public class ServHandler {
     public ServGameState gameState;
     public GameServer server;
-//    public PlayerJoined playerJoined;
-//    public boolean entitiesNeedUpdate;
-//    public EntitiesMoves moves;
-//    volatile public Array<Player> playersToKill = new Array<>();
-//    volatile public Array<EntityInfo> entitiesToSpawn = new Array<>();
-//    volatile public LongArray entitiesToKill = new LongArray();
 
     public ServHandler(ServGameState state, GameServer serv) {
         gameState = state;
         server = serv;
     }
 
-    public void update(){
-//        if (entitiesToKill.size != 0) {
-//            for (long id : entitiesToKill.items)
-//                gameState.entities.get(id).kill();
-//            entitiesToKill.clear();
-//        }
-
-//        if (entitiesToSpawn.size != 0) {
-//            for (EntityInfo inf :  new Array.ArrayIterator<>(entitiesToSpawn)) {
-//                Zombie zomb = (Zombie) MobsFactory.spawnEntity(inf.id, inf.type, inf.x, inf.y);
-//                zomb.zombieHandler.destroy();
-//                zomb.zombieHandler = new ServerZombieAIBehaviour(zomb.zombieObject);
-//                gameState.entities.put(inf.id, zomb);
-//            }
-//            entitiesToSpawn.clear();
-//        }
-
-//        if (playersToKill.size != 0) {
-//            for (Player p :  new Array.ArrayIterator<>(playersToKill)){
-//                p.destroy();
-//                gameState.players.remove(p.getName());
-//            }
-//        }
-
-
-//        if (playerJoined != null){
-//            playerJoined(playerJoined.playerInfo);
-//            playerJoined = null;
-//        }
-    }
-
-//    public void spawnEntity(EntityInfo inf){
-//        Zombie zomb = (Zombie) gameState.mobsFactory.spawnEntity(inf.id, inf.type, inf.x, inf.y);
-//        gameState.entities.put(inf.id, zomb);
-//    }
+    public void update(){}
 
     public Zombie spawnZombie(long id, String name, float hp, float x, float y){
         Zombie zomb = (Zombie) gameState.mobsFactory.spawnEntity(id, Entity.Kind.ZOMBIE, x, y);
@@ -69,21 +32,15 @@ public class ServHandler {
         updater.updateTile(gameState.map);
     }
 
-//    public void killEntity(long id){
-//        gameState.entities.get(id).kill();
-//    }
+    public Item allocateItem(Item item, float toX, float toY){
+        Storage owner = item.getOwner();
+        if (owner != null)
+            owner.removeItem(item);
+        item.allocate(new Vector2(toX, toY));
+        return item;
+    }
 
-//    public void playerJoined(PlayerInfo plInf){
-//        Player anotherPlayer = AnotherPlayerConstructor.createPlayer(plInf.name);
-//        anotherPlayer.setPosition(plInf.x, plInf.y);
-//        if (plInf.equippedItemId != null)
-//            anotherPlayer.equipItem(ItemsFactory.getItem(plInf.equippedItemId));
-//        gameState.players.put(plInf.id, anotherPlayer);
-//    }
-//
-//    public void playerExited(long id) {
-//        Player p = gameState.players.get(id);
-//        p.destroy();
-//        gameState.players.remove(p.getId());
-//    }
+    public void removeFromWorld(Item item){
+        item.removeFromWorld();
+    }
 }

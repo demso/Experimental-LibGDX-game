@@ -71,7 +71,7 @@ public class HandyHelper {
         if (!lastString.equals(toLog) || curTime - timeOfLastLog > logPeriod){
             logInConsole(toLog, level);
             System.out.println(toLog);
-
+            saveLog(toLog);
             lastString = toLog;
             timeOfLastLog = curTime;
         }

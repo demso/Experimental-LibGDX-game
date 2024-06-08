@@ -59,7 +59,6 @@ public class GameConstructor {
         gameState.world = new World(new Vector2(0, 0), true);
         gameState.bodyResolver = new BodyResolver(gameState.world);
         gameState.mobsFactory = new MobsFactory(gameState.world);
-        gameState.itemsFactory = new ItemsFactory(gameState.unbox, gameState.bodyResolver, gameState.hud, gameState.gameStage);
         gameState.unbox = new UnBox(gameState.world);
         gameState.unbox.getOptions().setTimeStep(gameState.physicsStep);
         gameState.unbox.getOptions().setInterpolateMovement(false);
@@ -67,6 +66,8 @@ public class GameConstructor {
         gameState.camera = new OrthographicCamera();
         gameState.gameStage = new Stage(new ScreenViewport(gameState.camera));
         gameState.gameStage.addListener(new GameStageInputListener());
+
+        gameState.itemsFactory = new ItemsFactory(gameState.unbox, gameState.bodyResolver, gameState.hud, gameState.gameStage);
 
         gameState.camera.setToOrtho(false, 30, 20);
 

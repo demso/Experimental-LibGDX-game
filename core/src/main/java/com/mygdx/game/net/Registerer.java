@@ -49,8 +49,8 @@ public class Registerer {
         kryo.register(StopStorageUpdate.class);
         kryo.register(MoveItemFromStorageToStorage.class);
         kryo.register(AllocateItem.class);
-        kryo.register(DisposeItem.class);
-        kryo.register(long[].class);
+        kryo.register(RemoveItemFromWorld.class);
+        kryo.register(PlayerTakeItems.class);
         //kryo.register();
     }
 }

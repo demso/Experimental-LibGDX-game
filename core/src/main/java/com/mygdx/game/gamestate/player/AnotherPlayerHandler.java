@@ -41,31 +41,24 @@ public class AnotherPlayerHandler extends BehaviourAdapter implements PlayerMove
 
     @Override
     public void update(float delta) {
-        player.getBody().setLinearVelocity(velocity);
-
-        if (needsUpdate && playerMove != null){
-            Vector2 pos = player.getBody().getPosition();
-            Vector2 speed = player.getBody().getLinearVelocity();
-
-            tempVec.set(playerMove.xSpeed, playerMove.ySpeed);
-            velocity.set(tempVec);
-
+        Vector2 pos = player.getBody().getPosition();
+        if (playerMove != null) {
             float offsetX = Math.abs(playerMove.x - pos.x), offsetY = Math.abs(playerMove.y - pos.y);
-            if (offsetX > 0.5 || offsetY > 0.5)
-                player.setPosition(playerMove.x, playerMove.y);
-            else if (offsetX >= 0.1f || offsetY >= 0.1f) {
-                tempVec.add(Math.signum(playerMove.x - pos.x), Math.signum(playerMove.y - pos.y));
-                //player.getBody().setTransform(playerMove.x, playerMove.y, player.getBody().getTransform().getRotation());
+            if (needsUpdate) {
+                tempVec.set(playerMove.xSpeed, playerMove.ySpeed);
+                velocity.set(tempVec);
+
+                player.itemRotation = playerMove.rotation;
+
+                needsUpdate = false;
             }
-            else if ( offsetX >= 0.01 || offsetY >= 0.01f) {
-                tempVec.add((playerMove.x - pos.x)*2, (playerMove.y - pos.y)*2);
-            }
+
+            if (offsetX > 0.5 || offsetY > 0.5) player.setPosition(playerMove.x, playerMove.y);
+            else if (offsetX >= 0.035f || offsetY >= 0.035f)
+                tempVec.add(Math.signum(playerMove.x - pos.x) / 2, Math.signum(playerMove.y - pos.y) / 2);
+            else if (offsetX >= 0.01f || offsetY >= 0.01f) tempVec.add((playerMove.x - pos.x), (playerMove.y - pos.y));
 
             player.getBody().setLinearVelocity(tempVec);
-            player.itemRotation = playerMove.rotation;
-
-            needsUpdate = false;
-            //playerMove = null;
         }
 
         if (delta > 0.1f) delta = 0.1f;

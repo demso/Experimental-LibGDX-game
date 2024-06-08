@@ -66,6 +66,7 @@ public class SecondGDXGame extends Game {
         server = new GameServer();
 
         connectToServer("127.0.0.1", name);
+        Gdx.graphics.setTitle(" SERVER");
 
         //setScreen(gameScreen);
     }

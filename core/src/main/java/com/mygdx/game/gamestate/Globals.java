@@ -3,8 +3,9 @@ package com.mygdx.game.gamestate;
 public class Globals {
     public static final int DEFAULT_RENDER_ORDER = 0,
         ZOMBIE_RENDER_ORDER = DEFAULT_RENDER_ORDER,
-        PLAYER_RENDER_ORDER = 1,
-        ANOTHER_PLAYER_RENDER_ORDER = DEFAULT_RENDER_ORDER;
+        PLAYER_RENDER_ORDER = 2,
+        ANOTHER_PLAYER_RENDER_ORDER = 1,
+        ITEMS_RENDER_ORDER = DEFAULT_RENDER_ORDER;
 
     public static float SERVER_UPDATE_TIME = 1/30f,
             CLIENT_STORAGE_UPDATE_PERIOD =      0.5f;

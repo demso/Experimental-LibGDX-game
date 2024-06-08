@@ -3,6 +3,7 @@ package com.mygdx.game.gamestate.objects.items;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.factories.BodyResolver;
+import com.mygdx.game.gamestate.objects.tiles.Storage;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -30,7 +31,8 @@ public class Item implements BodyData, Interactable {
     public Body physicalBody;
     public Table mouseHandler;
     protected boolean isEquipped = false;
-    @Getter Player owner;
+    @Getter
+    Storage owner;
     @Getter public long ownerId;
 
     public UnBox unBox;
@@ -45,6 +47,7 @@ public class Item implements BodyData, Interactable {
     public float spiteHeight = 0.7f;
     protected GameObject GO;
     protected @Getter SpriteBehaviour spriteBehaviour;
+
 
     public Item(long uid, TiledMapTile tile, String itemName){
         this.uid = uid;
@@ -65,12 +68,14 @@ public class Item implements BodyData, Interactable {
     }
 
     public Body allocate(Vector2 position){
+        onDrop();
         prepareForRendering();
 
         physicalBody = bodyResolver.itemBody(position.x, position.y, this);
         new Box2dBehaviour(physicalBody, GO);
         GO.setEnabled(true);
-        mouseHandler.setPosition(getPosition().x - mouseHandler.getWidth()/2f, getPosition().y - mouseHandler.getHeight()/2f);
+        if (mouseHandler != null)
+            mouseHandler.setPosition(getPosition().x - mouseHandler.getWidth()/2f, getPosition().y - mouseHandler.getHeight()/2f);
         return physicalBody;
     }
 
@@ -79,7 +84,7 @@ public class Item implements BodyData, Interactable {
             GO = new GameObject(itemName, false, unBox);
 
         if (hud != null && spriteBehaviour == null)
-            spriteBehaviour = new SpriteBehaviour(GO, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
+            spriteBehaviour = new SpriteBehaviour(GO, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.ITEMS_RENDER_ORDER);
 
         if (hud != null && mouseHandler == null) {
             mouseHandler = new Table();
@@ -139,9 +144,10 @@ public class Item implements BodyData, Interactable {
         player.takeItem(this);
     }
 
-    public void onTaking(Player player){
-        ownerId = player.getId();
-        owner = player;
+    public void onTaking(Storage storage){
+        if (storage instanceof Player player)
+            ownerId = player.getId();
+        owner = storage;
     }
 
     public void onDrop(){
@@ -167,6 +173,7 @@ public class Item implements BodyData, Interactable {
 
     public void dispose(){
         onUnequip();
+        onDrop();
         GO.destroy();
     }
 }
