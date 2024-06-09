@@ -42,6 +42,7 @@ public class GameState implements AbstractGameState{
     public OrthographicCamera camera;
     public boolean debug = false;
     public Texture userSelection;
+    public Texture bulletTracer;
     public ShapeRenderer debugRenderer;
     public RayHandler rayHandler;
     public World world;

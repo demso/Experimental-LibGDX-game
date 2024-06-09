@@ -114,6 +114,9 @@ public class GameConstructor {
     }
     private void initTextures(){
         gameState.userSelection = new Texture(Gdx.files.internal("selection.png"));
+        gameState.bulletTracer = new Texture(Gdx.files.internal("visual/textures/bullet_tracer_yellow.png"));
+        //Texture tex = new Texture(Gdx.files.internal("visual/textures/bullet_tracer_red.png"));
+
     }
 
     private void initScene2D(){
@@ -125,7 +128,7 @@ public class GameConstructor {
         //light
         gameState.rayHandler = new RayHandler(gameState.world);
         gameState.rayHandler.setCombinedMatrix(gameState.camera);
-        RayHandler.useDiffuseLight(true );
+        RayHandler.useDiffuseLight(true);
         gameState.rayHandler.setAmbientLight(0f, 0f, 0f, 1f);
         gameState.rayHandler.setBlur(true);
         gameState.rayHandler.setBlurNum(2);

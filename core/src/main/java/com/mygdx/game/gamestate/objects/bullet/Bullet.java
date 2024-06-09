@@ -1,5 +1,6 @@
 package com.mygdx.game.gamestate.objects.bullet;
 
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -24,14 +25,20 @@ public class Bullet implements BodyData {
         bulletObject = new GameObject(getName(), GameState.instance.unbox);
 
         new Box2dBehaviour(body, bulletObject);
-        new SpriteBehaviour(bulletObject, 0.5f, 0.5f, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
+
+        Sprite tracer = new Sprite(GameState.instance.bulletTracer);
+        tracer.setRotation(target.angleDeg()+90);
+
+        new BulletTracer(bulletObject, tracer, Globals.DEFAULT_RENDER_ORDER);
+
         new BulletCollisionBehaviour(bulletObject);
-        //new SoutBehaviour("bulletLog", false, bulletObject);
+
+
+        //new SpriteBehaviour(bulletObject, 0.5f, 0.5f, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
 
         moveVec = target.nor().scl(bulletSpeed);
 
-        //body.applyForceToCenter(vv, true);
-        //body.applyLinearImpulse(vv, body.getPosition(), true);
+        body.setLinearDamping(1);
         body.setLinearVelocity(moveVec);
     }
 

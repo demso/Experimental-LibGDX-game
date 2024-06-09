@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.10.2" name="normal_furniture" tilewidth="32" tileheight="32" tilecount="512" columns="16">
- <image source="../atlases/normal_furniture.png" width="512" height="1024"/>
+<tileset version="1.10" tiledversion="1.10.2" name="normal_furniture" tilewidth="32" tileheight="32" tilecount="256" columns="16" spacing="2" margin="1">
+ <image source="../atlases/normal_furniture.png" width="544" height="544"/>
  <tile id="0">
   <properties>
    <property name="body type" value="METAL_CLOSET_BODY"/>

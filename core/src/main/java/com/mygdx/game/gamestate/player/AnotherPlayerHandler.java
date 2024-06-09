@@ -41,6 +41,25 @@ public class AnotherPlayerHandler extends BehaviourAdapter implements PlayerMove
 
     @Override
     public void update(float delta) {
+        if (Math.abs(player.getVelocity().len2()) < 0.5f) {
+            player.state = Player.State.Standing;
+        } else {
+            Vector2 vel = player.getVelocity();
+            float velX = Math.abs(vel.x);
+            float velY = Math.abs(vel.y);
+            player.state = Player.State.Walking;
+            if (velX > velY && Math.abs(velX - velY) > 0.3f)
+                if (vel.x > 0.3f)
+                    player.setFacing(Player.Facing.Right);
+                else
+                    player.setFacing(Player.Facing.Left);
+            else
+            if (vel.y > 0.3f)
+                player.setFacing(Player.Facing.Up);
+            else
+                player.setFacing(Player.Facing.Down);
+        }
+
         Vector2 pos = player.getBody().getPosition();
         if (playerMove != null) {
             float offsetX = Math.abs(playerMove.x - pos.x), offsetY = Math.abs(playerMove.y - pos.y);
@@ -54,8 +73,8 @@ public class AnotherPlayerHandler extends BehaviourAdapter implements PlayerMove
             }
 
             if (offsetX > 0.5 || offsetY > 0.5) player.setPosition(playerMove.x, playerMove.y);
-            else if (offsetX >= 0.035f || offsetY >= 0.035f)
-                tempVec.add(Math.signum(playerMove.x - pos.x) / 2, Math.signum(playerMove.y - pos.y) / 2);
+//            else if (offsetX >= 0.035f || offsetY >= 0.035f)
+//                tempVec.add(Math.signum(playerMove.x - pos.x) / 2, Math.signum(playerMove.y - pos.y) / 2);
             else if (offsetX >= 0.01f || offsetY >= 0.01f) tempVec.add((playerMove.x - pos.x), (playerMove.y - pos.y));
 
             player.getBody().setLinearVelocity(tempVec);
@@ -90,25 +109,6 @@ public class AnotherPlayerHandler extends BehaviourAdapter implements PlayerMove
 
     @Override
     public void render(Batch batch) {
-        if (Math.abs(player.getVelocity().len2()) < 0.5f) {
-            player.state = Player.State.Standing;
-        } else {
-            Vector2 vel = player.getVelocity();
-            float velX = Math.abs(vel.x);
-            float velY = Math.abs(vel.y);
-            player.state = Player.State.Walking;
-            if (velX > velY && Math.abs(velX - velY) > 0.3f)
-                if (vel.x > 0.3f)
-                    player.setFacing(Player.Facing.Right);
-                else
-                    player.setFacing(Player.Facing.Left);
-            else
-                if (vel.y > 0.3f)
-                    player.setFacing(Player.Facing.Up);
-                else
-                    player.setFacing(Player.Facing.Down);
-        }
-
         if (player.facing == Player.Facing.Right)
             batch.draw(currentFrame, player.getPosition().x - player.WIDTH/2 + player.WIDTH, player.getPosition().y - player.WIDTH * 1/4, -player.WIDTH, player.HEIGHT);
         else

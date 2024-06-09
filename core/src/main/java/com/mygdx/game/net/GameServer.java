@@ -33,7 +33,7 @@ public class GameServer {
     public volatile Map<Long, Item> items;
     public volatile AtomicLong entitiesCounter = new AtomicLong(1);
     public volatile AtomicLong itemsCounter = new AtomicLong(1);
-    Vector2 spawnPoint = new Vector2(20,87);
+    Vector2 spawnPoint = new Vector2(25,87);
     Thread endlessThread;
     long sleepTime = Math.round(Globals.SERVER_UPDATE_TIME * 1000);
     public ServGameState gameState;
@@ -77,6 +77,7 @@ public class GameServer {
                     });
             listener.addTypeHandler(Ready.class, (con, msg) -> {
                         startWave();
+                        //server.sendToTCP(con.getID(), new PlayerEquip().set(ItemInfo.createItemInfo(gameState.itemsFactory.getItem(itemsCounter.incrementAndGet(), "deagle_44"), msg.playerId, null, true)));
                     });
             listener.addTypeHandler(EntityShot.class, (con, msg) -> {
                         Entity zomb = entities.get(msg.id);
