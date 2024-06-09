@@ -18,8 +18,10 @@ package com.mygdx.game.gamestate.tiledmap.tiled;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.maps.Map;
+import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 
 /** @brief Represents a tiled map, adds the concept of tiles and tilesets.
  * 
@@ -36,6 +38,18 @@ public class TiledMap extends Map {
 	/** Creates an empty TiledMap. */
 	public TiledMap () {
 		tilesets = new TiledMapTileSets();
+	}
+
+	public TiledMapTileLayer getTileLayer(String name){
+		for (MapLayer layer : getLayers()) {
+			if(layer.getName().equals(name)){
+				if (layer instanceof TiledMapTileLayer tiledLayer)
+					return tiledLayer;
+				else
+					throw new GdxRuntimeException("Layer " + name + " is not a TiledMapTileLayer");
+			}
+		}
+		return null;
 	}
 
 	/** Used by loaders to set resources when loading the map directly, without {@link AssetManager}. To be disposed in

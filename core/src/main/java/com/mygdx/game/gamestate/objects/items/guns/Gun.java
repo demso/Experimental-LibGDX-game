@@ -38,8 +38,8 @@ public class Gun extends Item {
     }
 
     public void fireBullet(Player player){
-        gunSpriteBehaviour.onFire();
         bulletTempRotationVec.setAngleDeg(player.itemRotation);
+        gunSpriteBehaviour.onFire();
         new Bullet(TileResolver.getTile("bullet"), player.getPosition(), bulletTempRotationVec);
     }
 

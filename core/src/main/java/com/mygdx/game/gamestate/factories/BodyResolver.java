@@ -168,6 +168,8 @@ public class BodyResolver {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
         fixtureDef.density = 1f;
+        fixtureDef.friction = 100f;
+
         fixtureDef.filter.categoryBits = Globals.BULLET_CONTACT_FILTER;
         fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits & ~Globals.LIGHT_CONTACT_FILTER & ~Globals.PLAYER_CONTACT_FILTER & ~Globals.PLAYER_INTERACT_CONTACT_FILTER);
         circle.dispose();
