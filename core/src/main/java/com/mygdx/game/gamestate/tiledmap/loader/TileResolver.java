@@ -7,7 +7,7 @@ import com.mygdx.game.SecondGDXGame;
 public class TileResolver {
     public static ObjectIntMap<String> tilemapa = new ObjectIntMap<>();
     public static TiledMapTileSets tilesets;
-    public final static int NO_TILE_ID = 1035;
+    public final static int NO_TILE_ID = 523;
 
     public static TiledMapTile getTile(String id){
         var tile = tilesets.getTile(tilemapa.get(id, NO_TILE_ID));

@@ -29,6 +29,8 @@ import com.mygdx.game.gamestate.player.Player;
 import dev.lyze.gdxUnBox2d.UnBox;
 import net.dermetfan.gdx.physics.box2d.Box2DUtils;
 
+import java.lang.StringBuilder;
+
 public class GameState extends AbstractGameState {
     public static GameState instance;
     public SecondGDXGame game;
@@ -81,6 +83,12 @@ public class GameState extends AbstractGameState {
         //CAMERA UPDATE
         camera.position.set(clientPlayer.getPosition(), 0);
         camera.update();
+
+//        StringBuilder itemsString = new StringBuilder();
+//        for (Item i : items.values()) {
+//            itemsString.append(i.toString()).append("\n");
+//        }
+        HandyHelper.instance.periodicLog(items.toString());
 
         getServerHandler().update(deltaTime);
     }

@@ -185,7 +185,6 @@ public class ServerMapLoader extends TmxMapLoader {
                 String[] items = object.getProperties().get("items", String.class).split(",");
                 for (String item : items) {
                     Item createdItem = gameState.itemsFactory.getItem(gameState.gameServer.itemsCounter.getAndIncrement(), item.trim().toLowerCase());
-                    gameState.items.put(createdItem.uid, createdItem);
                     storage.takeItem(createdItem);
                 }
             }

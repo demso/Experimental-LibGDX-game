@@ -1,6 +1,6 @@
 package com.mygdx.game.gamestate.objects.items.guns;
+import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.player.ClientPlayer;
-import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -21,11 +21,7 @@ import dev.lyze.gdxUnBox2d.GameObject;
 public class Gun extends Item {
     GunSpriteBehaviour gunSpriteBehaviour;
     Vector2 bulletTempRotationVec = new Vector2(1,1);
-    public Gun(long uid, TiledMapTile tile, String itemName) {
-        super(uid, tile, itemName);
-        spriteWidth = 0.4f;
-        spiteHeight = 0.4f;
-    }
+    GunMagazine insertedMagazine;
 
     public Gun(long uid, String tileName, String itemName) {
         super(uid, tileName, itemName);
@@ -33,7 +29,19 @@ public class Gun extends Item {
         spiteHeight = 0.4f;
     }
 
+    public void reload(GunMagazine mag){
+        if (insertedMagazine != null)
+            insertedMagazine.onUnInsert();
+        mag.onInsert(this);
+        insertedMagazine = mag;
+    }
+
     public void fireBullet(Player player){
+        if (insertedMagazine == null || insertedMagazine.getCurrentAmount() == 0){
+            HandyHelper.instance.log("[Player("+ owner.getName()+"):fire] Not enough ammo (" + ((insertedMagazine == null) ? "no magazine in gun" : insertedMagazine.getCurrentAmount()) + ")");
+            return;
+        }
+        insertedMagazine.onFire();
         bulletTempRotationVec.setAngleDeg(player.itemRotation);
         gunSpriteBehaviour.onFire();
         new Bullet(TileResolver.getTile("bullet"), player.getPosition(), bulletTempRotationVec);
@@ -80,14 +88,14 @@ public class Gun extends Item {
                     @Override
                     public void enter(InputEvent event, float x, float y, int pointer, @Null Actor fromActor) {
                         super.enter(event, x, y, pointer, fromActor);
-                        hud.debugEntries.put(itemId + "_ClickListener", "Pointing at " + itemId + " at " + getPosition());
+                        hud.debugEntries.put(stringID + "_ClickListener", "Pointing at " + stringID + " at " + getPosition());
                         hud.showItemInfoWindow(Gun.this);
                     }
 
                     @Override
                     public void exit(InputEvent event, float x, float y, int pointer, @Null Actor toActor) {
                         super.exit(event, x, y, pointer, toActor);
-                        hud.debugEntries.removeKey(itemId + "_ClickListener");
+                        hud.debugEntries.removeKey(stringID + "_ClickListener");
                         hud.hideItemInfoWindow(Gun.this);
                     }
                 });

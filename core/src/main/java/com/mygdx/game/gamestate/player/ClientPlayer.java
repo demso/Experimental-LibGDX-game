@@ -2,14 +2,21 @@ package com.mygdx.game.gamestate.player;
 
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
+import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.objects.Interactable;
 import com.mygdx.game.gamestate.objects.items.Item;
+import com.mygdx.game.gamestate.objects.items.guns.Gun;
+import com.mygdx.game.gamestate.objects.items.guns.GunMagazine;
 
 public class ClientPlayer extends Player {
     @Override
-    public void fire() {
-        super.fire();
-        SecondGDXGame.instance.client.onGunFire();
+    public boolean fire() {
+        if(super.fire()){
+            SecondGDXGame.instance.client.onGunFire();
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -29,6 +36,23 @@ public class ClientPlayer extends Player {
         Item tmpItem = super.uneqipItem();
         SecondGDXGame.instance.client.onItemEquipped(tmpItem, false);
         return tmpItem;
+    }
+
+    public void reload(){
+        if (equipedItem instanceof Gun gun) {
+            GunMagazine magaz = (GunMagazine) getItemOfType(GunMagazine.class);
+            if (magaz != null) {
+                gun.reload(magaz);
+            }
+        }
+    }
+
+    public Item getItemOfType(Class<? extends Item> itemClass){
+        for (Item item : getInventoryItems()){
+            if (item.getClass().isInstance(itemClass) || item.getClass().equals(itemClass))
+                return item;
+        }
+        return null;
     }
 
 

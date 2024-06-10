@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.player.PlayerHandler;
 
@@ -39,6 +40,9 @@ public class HUDInputListener extends InputListener {
                     Gdx.graphics.getHeight() * (1f/ instance.TILE_SIDE) * (1/ instance.zoom));
         }
         if (keycode == Input.Keys.R){
+            if (!RLongPressed){
+                instance.clientPlayer.reload();
+            }
             RLongPressed = false;
             if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
                 instance.clientPlayer.revive();

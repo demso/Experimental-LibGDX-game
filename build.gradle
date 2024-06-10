@@ -21,6 +21,7 @@ allprojects {
     shapedrawerVersion = '2.6.0'
   }
   repositories {
+    mavenLocal()
     maven { url 'https://jitpack.io' }
   }
 

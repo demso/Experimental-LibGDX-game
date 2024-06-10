@@ -10,6 +10,7 @@ import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
+import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.net.PlayerInfo;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
@@ -107,8 +108,10 @@ public class AnotherPlayerConstructor {
         body.setMassData(massData);
 
         player.setPosition(info.x, info.y);
-        if (info.equippedItem != null)
-            player.equipItem(gameState.itemsFactory.getItem(info.equippedItem));
+        if (info.equippedItem != null) {
+            Item it = gameState.items.get(info.equippedItem.uid);
+            player.equipItem(it == null ? gameState.itemsFactory.getItem(info.equippedItem) : it);
+        }
 
         return player;
     }

@@ -204,7 +204,7 @@ public class GameServer {
             });
             listener.addTypeHandler(AllocateItem.class, (con, msg) -> {
                 Item item = handler.allocateItem(items.get(msg.itemInfo.uid), msg.x, msg.y);
-                server.sendToAllExceptTCP(con.getID(),new AllocateItem().set(new ItemInfo().set(item.uid, item.itemId), item.getPosition().x, item.getPosition().y));
+                server.sendToAllExceptTCP(con.getID(),new AllocateItem().set(new ItemInfo().set(item.uid, item.stringID), item.getPosition().x, item.getPosition().y));
             });
             listener.addTypeHandler(RemoveItemFromWorld.class, (con, msg) -> {
                 handler.removeFromWorld(items.get(msg.uid));
@@ -213,7 +213,7 @@ public class GameServer {
             listener.addTypeHandler(DropItems.class, (con, msg) -> {
                 Item item = handler.allocateItem(items.get(msg.itemUid), msg.x, msg.y);
                 players.get(msg.playerId).removeItem(items.get(msg.itemUid));
-                server.sendToAllExceptTCP(con.getID(),new AllocateItem().set(new ItemInfo().set(item.uid, item.itemId), item.getPosition().x, item.getPosition().y));
+                server.sendToAllExceptTCP(con.getID(),new AllocateItem().set(new ItemInfo().set(item.uid, item.stringID), item.getPosition().x, item.getPosition().y));
             });
 
             server.bind(54555,54777);

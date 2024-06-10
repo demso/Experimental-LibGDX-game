@@ -95,9 +95,13 @@ public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
                 closeItemContextMenu( (ContextMenu) ac);
             }
         }
+        for (Item item : storage.getInventoryItems()){
+            item.dispose();
+        }
+        storage.getInventoryItems().clear();
+        storage.setInventoryItems((Item[]) null);
         hud.gameState.client.stopStorageUpdate(storage.getPosition().x, storage.getPosition().y);
     }
-
     public void onPositionChanged(Vector2 offset){
         for (Actor invPopup : popups){
             invPopup.setPosition(invPopup.getX() + offset.x, invPopup.getY() + offset.y);

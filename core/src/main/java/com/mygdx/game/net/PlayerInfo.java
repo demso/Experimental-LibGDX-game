@@ -46,8 +46,7 @@ public class PlayerInfo extends EntityInfo implements Storage {
             inventoryItems = new ItemInfo[1];
         else
             inventoryItems = Arrays.copyOf(inventoryItems, inventoryItems.length + 1);
-        inventoryItems[inventoryItems.length - 1] = new ItemInfo().set(item.uid, item.itemId);
-        item.ownerId = id;
+        inventoryItems[inventoryItems.length - 1] = new ItemInfo().set(item.uid, item.stringID);
     }
 
     @Override @Deprecated
@@ -67,7 +66,7 @@ public class PlayerInfo extends EntityInfo implements Storage {
             return;
 
         for (int i = 0; i < inventoryItems.length; i++){
-            if (inventoryItems[i].itemId == item.itemId){
+            if (inventoryItems[i].itemId == item.stringID){
                 inventoryItems[i] = null;
 
                 ItemInfo[] newInventoryItems = new ItemInfo[inventoryItems.length - 1];

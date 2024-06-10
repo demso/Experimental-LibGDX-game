@@ -60,15 +60,13 @@ public class Player extends Entity implements Storage {
         item.onTaking(this);
         item.removeFromWorld();
         inventoryItems.add(item);
-        //instance.items.put(item.uid, item);
     }
     @Override
     public void removeItem(Item item){
         item.onDrop();
         if (equipedItem == item)
-            equipedItem = null;
+            uneqipItem();
         inventoryItems.removeValue(item, true);
-        //instance.items.remove(item.uid);
     }
     @Override
     public Array<Item> getInventoryItems(){
@@ -78,7 +76,8 @@ public class Player extends Entity implements Storage {
     @Override
     public void setInventoryItems(Item... items) {
         inventoryItems.clear();
-        inventoryItems.addAll(items);
+        if (items != null && items.length > 0)
+            inventoryItems.addAll(items);
     }
 
     public boolean inventoryContains(Item item){
@@ -131,9 +130,12 @@ public class Player extends Entity implements Storage {
         HandyHelper.instance.log("Player revived");
     }
 
-    public void fire(){
-        if (equipedItem != null && equipedItem instanceof Gun gun)
+    public boolean fire(){
+        if (equipedItem != null && equipedItem instanceof Gun gun) {
             gun.fireBullet(this);
+            return true;
+        }
+        return false;
     }
 
     public Vector2 getVelocity(){
@@ -150,10 +152,12 @@ public class Player extends Entity implements Storage {
     }
 
     public void dispose() {
+        for (Item item : inventoryItems) {
+            item.dispose();
+        }
 
         if (equipedItem != null){
             uneqipItem();
-            equipedItem.dispose();
         }
         playerObject.destroy();
     }

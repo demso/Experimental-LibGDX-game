@@ -2,18 +2,15 @@ package com.mygdx.game.gamestate.factories;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
-import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
+import com.mygdx.game.gamestate.objects.items.guns.GunMagazine;
 import com.mygdx.game.net.messages.common.ItemInfo;
 import dev.lyze.gdxUnBox2d.UnBox;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.Map;
 
 public class ItemsFactory {
     static ObjectMap<String, String> itemNames = new ObjectMap<>();
@@ -23,6 +20,7 @@ public class ItemsFactory {
     Stage gameStage;
     Object container;
     Method addMethod;
+    Method removeMehod;
 
     public ItemsFactory(Object container, UnBox box, BodyResolver resolver, HUD h, Stage st) {
         unBox = box;
@@ -32,6 +30,9 @@ public class ItemsFactory {
         this.container = container;
         try {
             addMethod = container.getClass().getMethod("put", Object.class, Object.class);
+            addMethod.setAccessible(true);
+            removeMehod = container.getClass().getMethod("remove", Object.class);
+            removeMehod.setAccessible(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -46,12 +47,17 @@ public class ItemsFactory {
         switch (itemId) {
             case "deagle_44" -> {
                 Gun gun = new Gun(uid, itemId, getNameForID(itemId));
-                gun.setData(unBox, bodyResolver, hud, gameStage);
+                gun.setData(unBox, bodyResolver, hud, gameStage, this);
                 createdItem = gun;
+            }
+            case "pistol_magazine" -> {
+                GunMagazine magaz = new GunMagazine(uid, itemId, getNameForID(itemId));
+                magaz.setData(unBox, bodyResolver, hud, gameStage, this);
+                createdItem = magaz;
             }
             default -> {
                 Item item = new Item(uid, itemId, getNameForID(itemId));
-                item.setData(unBox, bodyResolver, hud, gameStage);
+                item.setData(unBox, bodyResolver, hud, gameStage, this);
                 createdItem = item;
             }
         }
@@ -61,6 +67,14 @@ public class ItemsFactory {
 
     public Item getItem(ItemInfo info) {
         return getItem(info.uid, info.itemId);
+    }
+
+    public void onItemDispose(Item item){
+        try {
+            removeMehod.invoke(container, item.uid);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static String getNameForID(String id){
@@ -77,7 +91,6 @@ public class ItemsFactory {
 
     private void addToContainer(Item item) {
         try {
-            addMethod.setAccessible(true);
             addMethod.invoke(container, item.uid, item);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);

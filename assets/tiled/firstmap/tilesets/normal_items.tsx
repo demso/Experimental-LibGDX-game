@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.10.2" name="normal_items" tilewidth="32" tileheight="32" tilecount="256" columns="16" spacing="2" margin="1">
+<tileset version="1.10" tiledversion="1.10.2" name="normal_items" tilewidth="32" tileheight="32" spacing="2" margin="1" tilecount="256" columns="16">
  <image source="../atlases/normal_items.png" width="544" height="544"/>
  <tile id="0">
   <properties>
@@ -54,6 +54,11 @@
  <tile id="10">
   <properties>
    <property name="name" value="unknown"/>
+  </properties>
+ </tile>
+ <tile id="11">
+  <properties>
+   <property name="name" value="pistol_magazine"/>
   </properties>
  </tile>
 </tileset>

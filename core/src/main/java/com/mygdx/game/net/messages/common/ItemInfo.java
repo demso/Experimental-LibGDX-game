@@ -10,7 +10,7 @@ public class ItemInfo {
         ItemInfo[] itemInfos = new ItemInfo[items.length];
         for (int i = 0; i < items.length; i++) {
             itemInfos[i] = new ItemInfo();
-            itemInfos[i].itemId = items[i].itemId;
+            itemInfos[i].itemId = items[i].stringID;
             itemInfos[i].uid = items[i].uid;
         }
         return itemInfos;
@@ -24,7 +24,7 @@ public class ItemInfo {
 
     public static ItemInfo createItemInfo(Item item) {
         ItemInfo itemInfo = new ItemInfo();
-        itemInfo.itemId = item.itemId;
+        itemInfo.itemId = item.stringID;
         itemInfo.uid = item.uid;
         return itemInfo;
     }

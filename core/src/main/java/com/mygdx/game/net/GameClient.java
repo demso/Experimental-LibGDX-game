@@ -53,7 +53,7 @@ public class GameClient {
                     if (!checkReady(msg)) return;
                     if (msg.equippedItem == null || !msg.isEquipped)
                         if (msg.playerId == (gameState.clientPlayer.getId())) {
-                            gameState.clientPlayer.uneqipItem();
+                            gameState.clientPlayer.uneqipItem().dispose();
                         } else {
                             gameState.players.get(msg.playerId).uneqipItem();
                         }
@@ -61,7 +61,6 @@ public class GameClient {
                         Item item = gameState.items.get(msg.equippedItem.uid);
                         if (item == null) {
                             item = gameState.itemsFactory.getItem(msg.equippedItem.uid, msg.equippedItem.itemId);
-                            gameState.items.put(item.uid, item);
                         }
 
                         if (msg.playerId == (gameState.clientPlayer.getId())) {
@@ -114,7 +113,6 @@ public class GameClient {
             Item[] items = new Item[msg.items.length];
             for (int i = 0; i < msg.items.length; i++) {
                 items[i] = gameState.itemsFactory.getItem(msg.items[i].uid, msg.items[i].itemId);
-                gameState.items.put(items[i].uid, items[i]);
             }
 
             gameState.hud.onStoredItemsReceived(msg.x, msg.y, items);
@@ -123,14 +121,13 @@ public class GameClient {
             Item item = gameState.items.get(msg.itemInfo.uid);
             if (item == null){
                 item = gameState.itemsFactory.getItem(msg.itemInfo);
-                gameState.items.put(msg.itemInfo.uid, item);
             }
             item.allocate(new Vector2(msg.x, msg.y));
         });
         listener.addTypeHandler(RemoveItemFromWorld.class, (con, msg) -> {
             Item item = gameState.items.get(msg.uid);
             if (item != null)
-                item.removeFromWorld();
+                item.dispose();
         });
     }
 

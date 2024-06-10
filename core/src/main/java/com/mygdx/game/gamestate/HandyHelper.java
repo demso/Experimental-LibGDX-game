@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class HandyHelper {
     public  static HandyHelper instance;
-    boolean noSpam = false;
+    boolean noSpam = true;
     BufferedWriter writer;
     boolean consoleNeedsRefresh = false;
 
@@ -78,10 +78,9 @@ public class HandyHelper {
     }
 
     long timeOfPeriodicLog;
-    long periodicLogTime = 1000;
+    long periodicLogTime = 4000;
 
     public void periodicLog(String toLog){
-
         if (System.currentTimeMillis() - timeOfPeriodicLog > periodicLogTime){
             System.out.println(toLog);
             logInConsole(toLog, LogLevel.DEFAULT);

@@ -14,12 +14,13 @@ import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.bodies.userdata.SimpleUserData;
+import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.net.PlayerInfo;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
 public class ClientPlayerConstructor {
-    public ClientPlayer createPlayer(GameState gg, PlayerInfo info){
+    public ClientPlayer createPlayer(GameState gameState, PlayerInfo info){
         ClientPlayer player = new ClientPlayer();
 
         player.setName(SecondGDXGame.instance.name);
@@ -94,7 +95,7 @@ public class ClientPlayerConstructor {
         ph.walkUp = new Animation<TextureRegion>(ph.frameDuration, walkFrames);
         //Player handler construction end
 
-        PointLight light = new PointLight(gg.rayHandler, 1300, Color.WHITE, 50, 0, 0);
+        PointLight light = new PointLight(gameState.rayHandler, 1300, Color.WHITE, 50, 0, 0);
         light.setSoft(true);
         light.setSoftnessLength(2f);
         light.attachToBody(body, 0, 0);
@@ -113,8 +114,10 @@ public class ClientPlayerConstructor {
         player.setPosition(info.x, info.y);
         player.setId(info.id);
         player.setName(SecondGDXGame.instance.name);
-        if (info.equippedItem != null)
-            player.equipItem(gg.itemsFactory.getItem(info.equippedItem));
+        if (info.equippedItem != null) {
+            Item it = gameState.items.get(info.equippedItem.uid);
+            player.equipItem(it == null ? gameState.itemsFactory.getItem(info.equippedItem) : it);
+        }
 
         return player;
     }
