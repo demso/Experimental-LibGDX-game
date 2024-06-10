@@ -9,7 +9,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
-import com.mygdx.game.net.PlayerInfo;
 import com.mygdx.game.net.messages.client.PlayerMove;
 import dev.lyze.gdxUnBox2d.behaviours.BehaviourAdapter;
 

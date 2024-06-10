@@ -6,14 +6,13 @@ import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.Zombie;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
 import com.mygdx.game.net.GameServer;
-import com.mygdx.game.net.messages.common.AllocateItem;
 import com.mygdx.game.net.messages.common.tileupdate.UpdateTile;
 
 public class ServHandler {
-    public ServGameState gameState;
+    public ServerGameState gameState;
     public GameServer server;
 
-    public ServHandler(ServGameState state, GameServer serv) {
+    public ServHandler(ServerGameState state, GameServer serv) {
         gameState = state;
         server = serv;
     }

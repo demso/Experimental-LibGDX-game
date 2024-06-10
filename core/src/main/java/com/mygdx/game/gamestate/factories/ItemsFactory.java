@@ -2,6 +2,7 @@ package com.mygdx.game.gamestate.factories;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
@@ -9,18 +10,31 @@ import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 import com.mygdx.game.net.messages.common.ItemInfo;
 import dev.lyze.gdxUnBox2d.UnBox;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.Map;
+
 public class ItemsFactory {
     static ObjectMap<String, String> itemNames = new ObjectMap<>();
     UnBox unBox;
     BodyResolver bodyResolver;
     HUD hud;
     Stage gameStage;
+    Object container;
+    Method addMethod;
 
-    public ItemsFactory(UnBox box, BodyResolver resolver, HUD h, Stage st) {
+    public ItemsFactory(Object container, UnBox box, BodyResolver resolver, HUD h, Stage st) {
         unBox = box;
         bodyResolver = resolver;
         hud = h;
         gameStage = st;
+        this.container = container;
+        try {
+            addMethod = container.getClass().getMethod("put", Object.class, Object.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public Item getItem(long uid, String itemId) {
@@ -28,18 +42,21 @@ public class ItemsFactory {
             init();
         if (itemId == null)
             return null;
+        Item createdItem;
         switch (itemId) {
             case "deagle_44" -> {
                 Gun gun = new Gun(uid, itemId, getNameForID(itemId));
                 gun.setData(unBox, bodyResolver, hud, gameStage);
-                return gun;
+                createdItem = gun;
             }
             default -> {
                 Item item = new Item(uid, itemId, getNameForID(itemId));
                 item.setData(unBox, bodyResolver, hud, gameStage);
-                return item;
+                createdItem = item;
             }
         }
+        addToContainer(createdItem);
+        return createdItem;
     }
 
     public Item getItem(ItemInfo info) {
@@ -56,5 +73,14 @@ public class ItemsFactory {
         itemNames.put("beef", "Beef");
         itemNames.put("watches", "Watches");
         itemNames.put("shotgun_ammo", "Shotgun ammo");
+    }
+
+    private void addToContainer(Item item) {
+        try {
+            addMethod.setAccessible(true);
+            addMethod.invoke(container, item.uid, item);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

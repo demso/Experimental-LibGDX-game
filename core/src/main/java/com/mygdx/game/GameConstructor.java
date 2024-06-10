@@ -67,7 +67,7 @@ public class GameConstructor {
         gameState.gameStage = new Stage(new ScreenViewport(gameState.camera));
         gameState.gameStage.addListener(new GameStageInputListener());
 
-        gameState.itemsFactory = new ItemsFactory(gameState.unbox, gameState.bodyResolver, gameState.hud, gameState.gameStage);
+        gameState.itemsFactory = new ItemsFactory(gameState.items, gameState.unbox, gameState.bodyResolver, gameState.hud, gameState.gameStage);
 
         gameState.camera.setToOrtho(false, 30, 20);
 
@@ -84,9 +84,8 @@ public class GameConstructor {
         initScene2D();
         initPhysics();
 
-        gameState.clientPlayer = new ClientPlayerConstructor().createPlayer(gameState);
-        gameState.clientPlayer.setPosition(msg.spawnX, msg.spawnY);
-        gameState.clientPlayer.setName(SecondGDXGame.instance.name);
+        gameState.clientPlayer = new ClientPlayerConstructor().createPlayer(gameState, msg.yourPlayerInfo);
+
 
         gameState.console = new InGameConsole(SecondGDXGame.instance.skin1x,true);
         gameState.console.setDisplayKeyID(Input.Keys.GRAVE);

@@ -9,16 +9,14 @@ import com.mygdx.game.net.messages.common.ZombieInfo;
 public class OnConnection {
    public String map;//локальный путь до карты .tmx
    public float spawnX, spawnY;
-   public long id;
+   public PlayerInfo yourPlayerInfo;
    public PlayerInfo[] playersInfo;
    public EntityInfo[] entitiesInfo;
 
    public OnConnection(){}
 
-   public OnConnection(long i, String m,float x, float y){
-      id = i;
-      spawnX = x;
-      spawnY = y;
+   public OnConnection(PlayerInfo yourPlayer, String m){
+      yourPlayerInfo = yourPlayer;
       map = m;
    }
 

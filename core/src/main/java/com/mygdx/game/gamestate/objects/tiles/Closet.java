@@ -12,8 +12,6 @@ import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 
-import static com.mygdx.game.gamestate.GameState.instance;
-
 public class Closet implements BodyData, Interactable, Storage {
     com.mygdx.game.gamestate.tiledmap.tiled.TiledMapTileLayer.Cell cell;
     Array<Item> inventoryItems = new Array<>();

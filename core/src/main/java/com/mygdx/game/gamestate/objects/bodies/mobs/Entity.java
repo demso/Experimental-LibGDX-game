@@ -29,7 +29,7 @@ public abstract class Entity implements BodyData {
     }
     @Getter @Setter long id;
     @Getter float hp = 1;
-    @Getter int maxHp = 1;
+    @Getter float maxHp = 1;
     protected boolean isAlive = true;
 
     transient @Setter @Getter Body body;
@@ -51,7 +51,7 @@ public abstract class Entity implements BodyData {
             isAlive = false;
     }
 
-    public void setMaxHp(int maxHp) {
+    public void setMaxHp(float maxHp) {
         this.maxHp = Math.max(0, maxHp);
         if (this.hp == 0)
             isAlive = false;

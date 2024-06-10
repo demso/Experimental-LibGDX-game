@@ -3,7 +3,7 @@ package com.mygdx.game.gamestate.player;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.game.SecondGDXGame;
+import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.objects.Interactable;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.items.Item;
@@ -14,7 +14,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
-import static com.mygdx.game.gamestate.GameState.instance;
 
 public class Player extends Entity implements Storage {
 
@@ -61,8 +60,7 @@ public class Player extends Entity implements Storage {
         item.onTaking(this);
         item.removeFromWorld();
         inventoryItems.add(item);
-        instance.items.put(item.uid, item);
-        instance.hud.updateInvHUDContent();
+        //instance.items.put(item.uid, item);
     }
     @Override
     public void removeItem(Item item){
@@ -70,8 +68,7 @@ public class Player extends Entity implements Storage {
         if (equipedItem == item)
             equipedItem = null;
         inventoryItems.removeValue(item, true);
-        instance.items.remove(item.uid);
-        instance.hud.updateInvHUDContent();
+        //instance.items.remove(item.uid);
     }
     @Override
     public Array<Item> getInventoryItems(){
@@ -96,9 +93,11 @@ public class Player extends Entity implements Storage {
         if (equipedItem != null)
             equipedItem.onUnequip();
         equipedItem = item;
-        if (item instanceof Gun gun){
-            gun.onEquip(this);
-        }
+//        if (item instanceof Gun gun){
+//            gun.onEquip(this);
+//        }
+        item.onEquip(this);
+        HandyHelper.instance.log(item.uid + " equipped by " + this.getName() + " ("+ getId() +")");
     }
 
     public Item uneqipItem(){
@@ -123,13 +122,13 @@ public class Player extends Entity implements Storage {
     @Override
     public void kill() {
         super.kill();
-        SecondGDXGame.instance.helper.log("Oh no im killed!");
+        HandyHelper.instance.log("Oh no im killed!");
     }
 
     public void revive(){
         setHp(getMaxHp());
         isAlive = true;
-        SecondGDXGame.instance.helper.log("Player revived");
+        HandyHelper.instance.log("Player revived");
     }
 
     public void fire(){

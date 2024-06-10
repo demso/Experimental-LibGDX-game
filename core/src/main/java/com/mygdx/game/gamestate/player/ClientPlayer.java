@@ -5,11 +5,23 @@ import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.Interactable;
 import com.mygdx.game.gamestate.objects.items.Item;
 
-public class ClientPlayer extends Player{
+public class ClientPlayer extends Player {
     @Override
     public void fire() {
         super.fire();
         SecondGDXGame.instance.client.onGunFire();
+    }
+
+    @Override
+    public void removeItem(Item item) {
+        super.removeItem(item);
+        GameState.instance.hud.updateInvHUDContent();
+    }
+
+    @Override
+    public void takeItem(Item item) {
+        super.takeItem(item);
+        GameState.instance.hud.updateInvHUDContent();
     }
 
     @Override

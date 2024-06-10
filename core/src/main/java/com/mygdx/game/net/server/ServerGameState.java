@@ -12,7 +12,6 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
@@ -28,11 +27,10 @@ import com.mygdx.game.gamestate.tiledmap.tiled.renderers.OrthogonalTiledMapRende
 import com.mygdx.game.net.GameServer;
 import dev.lyze.gdxUnBox2d.UnBox;
 
-import java.util.HashMap;
 import java.util.Map;
 
-public class ServGameState {
-    public static ServGameState instance;
+public class ServerGameState {
+    public static ServerGameState instance;
     public SecondGDXGame game;
     //public GameScreen gameScreen;
     public Skin skin;

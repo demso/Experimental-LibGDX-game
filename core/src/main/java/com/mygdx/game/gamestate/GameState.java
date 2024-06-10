@@ -29,7 +29,7 @@ import com.mygdx.game.gamestate.player.Player;
 import dev.lyze.gdxUnBox2d.UnBox;
 import net.dermetfan.gdx.physics.box2d.Box2DUtils;
 
-public class GameState implements AbstractGameState{
+public class GameState extends AbstractGameState {
     public static GameState instance;
     public SecondGDXGame game;
     public GameScreen gameScreen;
@@ -150,11 +150,6 @@ public class GameState implements AbstractGameState{
 
     public AcceptHandler getServerHandler() {
         return acceptHandler;
-    }
-
-    @Override
-    public ObjectMap<Long, Player> getPlayers() {
-        return players;
     }
 }
 

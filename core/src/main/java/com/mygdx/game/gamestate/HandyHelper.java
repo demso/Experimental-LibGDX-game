@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class HandyHelper {
     public  static HandyHelper instance;
-    boolean noSpam = true;
+    boolean noSpam = false;
     BufferedWriter writer;
     boolean consoleNeedsRefresh = false;
 

@@ -147,7 +147,7 @@ public class BodyResolver {
         transparentBox.setRadius(0.2f);
         transparentFixtureDef.shape = transparentBox;
         transparentFixtureDef.filter.groupIndex = -10;
-
+        transparentBodyDef.active = false;
         transparentBodyDef.position.set(x, y);
         Body body = world.createBody(transparentBodyDef);
         body.createFixture(transparentFixtureDef);

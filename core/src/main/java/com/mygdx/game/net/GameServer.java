@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.kryonet.Listener;
-import com.esotericsoftware.kryonet.Server;
 import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
@@ -26,43 +25,50 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 public class GameServer {
-    Server server;
+    com.esotericsoftware.kryonet.Server server;
     Listener.TypeListener listener;
     public volatile Map<Long, PlayerInfo> players;
     public volatile Map<Long, Entity> entities;//equals to gamestate.entities
     public volatile Map<Long, Item> items;
-    public volatile AtomicLong entitiesCounter = new AtomicLong(1);
+    public volatile AtomicLong entitiesCounter = new AtomicLong(1);//ONLY GET AND INCRIMENT
     public volatile AtomicLong itemsCounter = new AtomicLong(1);
     Vector2 spawnPoint = new Vector2(25,87);
     Thread endlessThread;
     long sleepTime = Math.round(Globals.SERVER_UPDATE_TIME * 1000);
-    public ServGameState gameState;
+    public ServerGameState gameState;
     public ZombieHelper zhelper = new ZombieHelper(this);
     public ServHandler handler;
     ObjectMap<Storage, Array<Long>> storageListeners = new ObjectMap<>(); //player id -> storage
+    PlayerInfo defaultPlayer;
 
     public final String mapToLoad = "tiled/firstmap/worldmap.tmx";
     public GameServer() {
         try {
             init();
-            server = new Server();
+            server = new com.esotericsoftware.kryonet.Server();
             Registerer.register(server.getKryo());
             listener = new Listener.TypeListener();
             server.addListener(listener);
+            defaultPlayer = new PlayerInfo("default", null).playerSet(spawnPoint.x, spawnPoint.y, 0, 0, 0);
+            defaultPlayer.hp = 10;
+            defaultPlayer.maxHp = defaultPlayer.hp;
             //Log.TRACE();
 //            Log.setLogger(new CustomKryoLogger());
             listener.addTypeHandler(Message.class, (connection, message) -> {
                         System.out.println("Recived on server!");
                     });
             listener.addTypeHandler(Begin.class, (con, msg) -> {
-                        PlayerInfo plInf = new PlayerInfo(msg.name, con).playerSet(spawnPoint.x, spawnPoint.y, 0, 0, 0);
-                        plInf.id = entitiesCounter.get();
-                        entitiesCounter.incrementAndGet();
+                        PlayerInfo plInf = new PlayerInfo(msg.name, con);
+                        plInf.id = entitiesCounter.getAndIncrement();
+                        plInf.x = defaultPlayer.x;
+                        plInf.y = defaultPlayer.y;
+                        plInf.hp = defaultPlayer.hp;
+                        plInf.maxHp = defaultPlayer.maxHp;
                         players.put(plInf.id, plInf);
-                        con.sendTCP(new OnConnection(plInf.id, mapToLoad, plInf.x, plInf.y)
+                        con.sendTCP(new OnConnection(plInf, mapToLoad)
                                 .addPlayers(players.values().toArray(new PlayerInfo[0]))
                                 .addEntities(entities.values().toArray(new Entity[0])));
-                        newPlayerJoined(plInf);
+                        sendToAllPlayersBut(new PlayerJoined(plInf), plInf);
                     });
             listener.addTypeHandler(PlayerMove.class, (con, msg) -> {
                         players.get(msg.playerId).playerSet(msg.x, msg.y, msg.xSpeed, msg.ySpeed, msg.rotation);
@@ -198,11 +204,16 @@ public class GameServer {
             });
             listener.addTypeHandler(AllocateItem.class, (con, msg) -> {
                 Item item = handler.allocateItem(items.get(msg.itemInfo.uid), msg.x, msg.y);
-                server.sendToAllExceptTCP(con.getID(), new AllocateItem().set(new ItemInfo().set(msg.itemInfo.uid, msg.itemInfo.itemId), item.getPosition().x, item.getPosition().y));
+                server.sendToAllExceptTCP(con.getID(),new AllocateItem().set(new ItemInfo().set(item.uid, item.itemId), item.getPosition().x, item.getPosition().y));
             });
             listener.addTypeHandler(RemoveItemFromWorld.class, (con, msg) -> {
                 handler.removeFromWorld(items.get(msg.uid));
                 server.sendToAllExceptTCP(con.getID(), msg);
+            });
+            listener.addTypeHandler(DropItems.class, (con, msg) -> {
+                Item item = handler.allocateItem(items.get(msg.itemUid), msg.x, msg.y);
+                players.get(msg.playerId).removeItem(items.get(msg.itemUid));
+                server.sendToAllExceptTCP(con.getID(),new AllocateItem().set(new ItemInfo().set(item.uid, item.itemId), item.getPosition().x, item.getPosition().y));
             });
 
             server.bind(54555,54777);
@@ -285,10 +296,6 @@ public class GameServer {
 //            sendToAllPlayers(new StoredItems().set((int)Math.floor(pos.x), (int)Math.floor(pos.y), ItemInfo.createItemsInfo(storage.getInventoryItems().toArray(Item.class))));
 //        }
 //    }
-
-    public void newPlayerJoined(PlayerInfo beg){
-        sendToAllPlayersBut(new PlayerJoined(beg), beg);
-    }
 
     public void sendToAllPlayers(Object obj){
 

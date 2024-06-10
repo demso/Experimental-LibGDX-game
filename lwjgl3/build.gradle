@@ -43,6 +43,8 @@ run {
   workingDir = rootProject.file('assets').path
   setIgnoreExitValue(true)
 
+  jvmArgs += "--add-opens=java.base/java.util=ALL-UNNAMED"
+
   if (os.contains('mac')) jvmArgs += "-XstartOnFirstThread"
 }
 

@@ -90,11 +90,8 @@ public class AcceptHandler {
     }
 
     public void playerJoined(PlayerInfo plInf){
-        Player anotherPlayer = AnotherPlayerConstructor.createPlayer(plInf.name);
-        anotherPlayer.setPosition(plInf.x, plInf.y);
-        if (plInf.equippedItem != null)
-            anotherPlayer.equipItem(gameState.itemsFactory.getItem(plInf.equippedItem));
-        gameState.players.put(plInf.id, anotherPlayer);
+        Player player = AnotherPlayerConstructor.createPlayer(gameState, plInf);
+        gameState.players.put(plInf.id, player);
     }
 
     public void playerExited(long playerId) {

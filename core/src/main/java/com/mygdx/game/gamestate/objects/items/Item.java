@@ -13,7 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Null;
-import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.objects.Interactable;
 import com.mygdx.game.gamestate.objects.behaviours.SpriteBehaviour;
@@ -152,8 +151,6 @@ public class Item implements BodyData, Interactable {
 
     public void onDrop(){
         onUnequip();
-        ownerId = -1;
-        owner = null;
     }
 
     public void onEquip(Player player){
@@ -165,6 +162,8 @@ public class Item implements BodyData, Interactable {
     
     public void onUnequip(){
         isEquipped = false;
+        if (GO != null)
+            GO.setEnabled(false);
     }
 
     public boolean isEquipped(){

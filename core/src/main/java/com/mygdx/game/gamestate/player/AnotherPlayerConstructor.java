@@ -10,16 +10,18 @@ import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
+import com.mygdx.game.net.PlayerInfo;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
-public class AnotherPlayerConstructor extends ClientPlayerConstructor {
-    public static Player createPlayer(String name){
+public class AnotherPlayerConstructor {
+    public static Player createPlayer(GameState gameState, PlayerInfo info){
         Player player = new Player();
 
-        player.setName(name);
-        player.setHp(10);
-        player.setMaxHp(10);
+        player.setId(info.id);
+        player.setName(info.name);
+        player.setHp(info.hp);
+        player.setMaxHp(info.maxHp);
         player.setFriendliness(Entity.Friendliness.PLAYER);
         player.setKind(Entity.Kind.ANOTHER_PLAYER);
 
@@ -103,6 +105,10 @@ public class AnotherPlayerConstructor extends ClientPlayerConstructor {
         massData.mass = 0.05f;
         massData.center.set(new Vector2(0f,0f));
         body.setMassData(massData);
+
+        player.setPosition(info.x, info.y);
+        if (info.equippedItem != null)
+            player.equipItem(gameState.itemsFactory.getItem(info.equippedItem));
 
         return player;
     }

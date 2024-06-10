@@ -26,7 +26,7 @@ public class ServerMobsFactory extends MobsFactory {
         tempPosition.set(x,y);
         Zombie zombie = new Zombie(TileResolver.getTile("zombie"), id, world, tempPosition);
 
-        zombie.zombieObject = new GameObject(zombie.getName(), ServGameState.instance.unbox);
+        zombie.zombieObject = new GameObject(zombie.getName(), ServerGameState.instance.unbox);
 
         new Box2dBehaviour(zombie.getBody(), zombie.zombieObject);
         new SpriteBehaviour(zombie.zombieObject, TileResolver.getTile("zombie").getTextureRegion(), Globals.ZOMBIE_RENDER_ORDER);

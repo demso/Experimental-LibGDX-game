@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
 import com.mygdx.game.gamestate.GameState;
-import com.mygdx.game.gamestate.factories.ItemsFactory;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
 import com.mygdx.game.gamestate.objects.tiles.TileInitializer;
@@ -23,9 +22,9 @@ import dev.lyze.gdxUnBox2d.GameObject;
 
 public class ServerMapLoader extends TmxMapLoader {
     World world;
-    ServGameState gameState;
+    ServerGameState gameState;
 
-    public ServerMapLoader(ServGameState gs) {
+    public ServerMapLoader(ServerGameState gs) {
         super();
         this.world = gs.world;
         gameState = gs;

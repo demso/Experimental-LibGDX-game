@@ -14,11 +14,12 @@ import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.bodies.userdata.SimpleUserData;
+import com.mygdx.game.net.PlayerInfo;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
 public class ClientPlayerConstructor {
-    public ClientPlayer createPlayer(GameState gg){
+    public ClientPlayer createPlayer(GameState gg, PlayerInfo info){
         ClientPlayer player = new ClientPlayer();
 
         player.setName(SecondGDXGame.instance.name);
@@ -66,6 +67,7 @@ public class ClientPlayerConstructor {
         new Box2dBehaviour(body, playerObject);
         new PlayerCollisionBehaviour(playerObject);
         PlayerHandler ph = new PlayerHandler(playerObject, player);
+        player.playerHandler = ph;
 
         //Player handler construction
         ph.player = player;
@@ -107,6 +109,12 @@ public class ClientPlayerConstructor {
         massData.mass = 60f;
         massData.center.set(new Vector2(0f,0f));
         body.setMassData(massData);
+
+        player.setPosition(info.x, info.y);
+        player.setId(info.id);
+        player.setName(SecondGDXGame.instance.name);
+        if (info.equippedItem != null)
+            player.equipItem(gg.itemsFactory.getItem(info.equippedItem));
 
         return player;
     }

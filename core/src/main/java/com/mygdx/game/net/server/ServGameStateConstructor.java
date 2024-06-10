@@ -3,7 +3,6 @@ package com.mygdx.game.net.server;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.mygdx.game.gamestate.factories.BodyResolver;
 import com.mygdx.game.gamestate.factories.ItemsFactory;
 import com.mygdx.game.gamestate.tiledmap.tiled.TiledMapTileLayer;
@@ -15,10 +14,10 @@ import java.util.Collections;
 import java.util.HashMap;
 
 public class ServGameStateConstructor {
-    ServGameState gameState;
-    public ServGameState createGameState(GameServer serv){
-        gameState = new ServGameState();
-        ServGameState.instance = gameState;
+    ServerGameState gameState;
+    public ServerGameState createGameState(GameServer serv){
+        gameState = new ServerGameState();
+        ServerGameState.instance = gameState;
 
         gameState.gameServer = serv;
 
@@ -34,7 +33,7 @@ public class ServGameStateConstructor {
         gameState.unbox.getOptions().setTimeStep(gameState.physicsStep);
         gameState.unbox.getOptions().setInterpolateMovement(false);
 
-        gameState.itemsFactory = new ItemsFactory(gameState.unbox, gameState.bodyResolver, null, null);
+        gameState.itemsFactory = new ItemsFactory(gameState.items, gameState.unbox, gameState.bodyResolver, null, null);
 
         gameState.map = new ServerMapLoader(gameState).load(serv.mapToLoad, new TmxMapLoader.Parameters());
         gameState.obstaclesLayer = ((TiledMapTileLayer)gameState.map.getLayers().get("obstacles"));

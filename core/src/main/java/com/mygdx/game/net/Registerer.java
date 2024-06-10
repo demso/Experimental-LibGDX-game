@@ -51,8 +51,9 @@ public class Registerer {
         kryo.register(MoveItemFromStorageToStorage.class);
         kryo.register(AllocateItem.class);
         kryo.register(RemoveItemFromWorld.class);
-        kryo.register(PlayerTakeItems.class);
+        kryo.register(TakeItems.class);
         kryo.register(MyTiledMap.class);
+        kryo.register(DropItems.class);
         //kryo.register();
     }
 }

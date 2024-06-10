@@ -1,6 +1,4 @@
 package com.mygdx.game.gamestate.objects.items.guns;
-
-import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.player.ClientPlayer;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
@@ -19,8 +17,6 @@ import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 import dev.lyze.gdxUnBox2d.BehaviourState;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
-
-import static com.mygdx.game.gamestate.GameState.instance;
 
 public class Gun extends Item {
     GunSpriteBehaviour gunSpriteBehaviour;
@@ -45,10 +41,12 @@ public class Gun extends Item {
 
     @Override
     public Body allocate(Vector2 position){
+        onDrop();
         prepareForRendering();
 
-        physicalBody = GameState.instance.bodyResolver.itemBody(position.x, position.y, this);
+        physicalBody = bodyResolver.itemBody(position.x, position.y, this);
         new Box2dBehaviour(physicalBody, GO);
+
         GO.setEnabled(true);
         if (mouseHandler != null)
             mouseHandler.setPosition(getPosition().x - mouseHandler.getWidth()/2f, getPosition().y - mouseHandler.getHeight()/2f);
@@ -59,17 +57,18 @@ public class Gun extends Item {
     @Override
     protected void prepareForRendering() {
         if (GO == null)
-            GO = new GameObject(itemName, false, instance.unbox);
+            GO = new GameObject(itemName, false, unBox);
 
         if (hud == null)
             return;
+
         if (gunSpriteBehaviour == null || gunSpriteBehaviour.getState().equals(BehaviourState.DESTROYED))
                 gunSpriteBehaviour = new GunSpriteBehaviour(GO, this, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
 
         if (getOwner() instanceof ClientPlayer)
             gunSpriteBehaviour.setRenderOrder(Globals.PLAYER_RENDER_ORDER);
         else
-            gunSpriteBehaviour.setRenderOrder(Globals.DEFAULT_RENDER_ORDER);
+            gunSpriteBehaviour.setRenderOrder(Globals.ANOTHER_PLAYER_RENDER_ORDER);
 
         if (isEquipped()) {}
         else {
