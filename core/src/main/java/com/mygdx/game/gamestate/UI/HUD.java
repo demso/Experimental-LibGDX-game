@@ -251,9 +251,6 @@ public class HUD extends Stage {
         esClosablePopups.add(actor);
     }
 
-    float storageUpdateAccumulator;
-    float storageUpdatePeriod = Globals.CLIENT_STORAGE_UPDATE_PERIOD;
-
     @Override
     public void act(float delta) {
         super.act(delta);
@@ -278,24 +275,6 @@ public class HUD extends Stage {
             }
             showRequestSatisfied = false;
         }
-
-//        if (playerInventoryHud.isVisible()) {
-//            storageUpdateAccumulator += delta;
-//            if (storageUpdateAccumulator > storageUpdatePeriod) {
-//                storageUpdateAccumulator = 0;
-//                gameState.client.getInventoryItemsForPlayer();
-//            }
-//        }
-//        if (storageInventoryHUD.isVisible()) {
-//            storageUpdateAccumulator += delta;
-//            if (storageUpdateAccumulator > storageUpdatePeriod) {
-//                storageUpdateAccumulator = 0;
-//                Vector2 pos = storageInventoryHUD.storage.getPosition();
-//                gameState.client.getStoredItems(pos.x, pos.y);
-//                storageInventoryHUD.refill();
-//            }
-//        }
-
     }
 
     public HUD(GameState gi, ScreenViewport screenViewport, SpriteBatch batch) {

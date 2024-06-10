@@ -58,7 +58,6 @@ public class HUDInputListener extends InputListener {
         if (keycode == Input.Keys.T){
             if (instance.clientPlayer.equipedItem != null && instance.clientPlayer.equipedItem.itemName.equals("Deagle .44"))
                 instance.clientPlayer.fire();
-                //instance.fireBullet(instance.player);
         }
         if (keycode == Input.Keys.W || keycode == Input.Keys.UP){
             instance.clientPlayer.playerObject.getBehaviour(PlayerHandler.class).moveUp = false;
@@ -71,6 +70,9 @@ public class HUDInputListener extends InputListener {
         }
         if (keycode == Input.Keys.D || keycode == Input.Keys.RIGHT){
             instance.clientPlayer.playerObject.getBehaviour(PlayerHandler.class).moveToTheRight = false;
+        }
+        if (keycode == Input.Keys.H){
+            instance.clientPlayer.autoHeal();
         }
         return false;
     }

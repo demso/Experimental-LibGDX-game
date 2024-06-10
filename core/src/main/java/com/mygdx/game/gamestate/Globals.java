@@ -1,14 +1,19 @@
 package com.mygdx.game.gamestate;
 
 public class Globals {
-    public static final int DEFAULT_RENDER_ORDER = 0,
-        ZOMBIE_RENDER_ORDER = DEFAULT_RENDER_ORDER,
-        PLAYER_RENDER_ORDER = 2,
-        ANOTHER_PLAYER_RENDER_ORDER = 1,
-        ITEMS_RENDER_ORDER = DEFAULT_RENDER_ORDER;
+    public static final int
+            DEFAULT_RENDER_ORDER =              0,
+            ZOMBIE_RENDER_ORDER =               DEFAULT_RENDER_ORDER,
+            PLAYER_RENDER_ORDER =               2,
+            ANOTHER_PLAYER_RENDER_ORDER =       1,
+            ITEMS_RENDER_ORDER =                DEFAULT_RENDER_ORDER;
 
-    public static float SERVER_UPDATE_TIME = 1/30f,
-            CLIENT_STORAGE_UPDATE_PERIOD =      0.5f;
+    public static float
+            SERVER_UPDATE_TIME =                1/30f,
+
+            PLAYER_HEALTH =                     20f,
+            ZOMBIE_HEALTH =                     10f,
+            ZOMBIE_DAMAGE =                     1f;
 
     public final static short
             DEFAULT_CONTACT_FILTER =            0x0001,                 //00000000 00000001

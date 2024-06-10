@@ -15,9 +15,13 @@ package com.mygdx.game.gamestate.UI.console.sjconsole;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.TimeUtils;
+import lombok.Getter;
+import lombok.Setter;
 
 public class LogEntry {
-	private String text;
+	@Getter @Setter
+    private String text;
+	@Getter
 	private LogLevel level;
 	private long timeStamp;
 
@@ -27,7 +31,7 @@ public class LogEntry {
 		timeStamp = TimeUtils.millis();
 	}
 
-	public Color getColor () {
+    public Color getColor () {
 		return level.getColor();
 	}
 

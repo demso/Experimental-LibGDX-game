@@ -49,9 +49,11 @@ public class GameServer {
             Registerer.register(server.getKryo());
             listener = new Listener.TypeListener();
             server.addListener(listener);
+
             defaultPlayer = new PlayerInfo("default", null).playerSet(spawnPoint.x, spawnPoint.y, 0, 0, 0);
-            defaultPlayer.hp = 10;
+            defaultPlayer.hp = Globals.PLAYER_HEALTH;
             defaultPlayer.maxHp = defaultPlayer.hp;
+
             //Log.TRACE();
 //            Log.setLogger(new CustomKryoLogger());
             listener.addTypeHandler(Message.class, (connection, message) -> {
@@ -334,8 +336,6 @@ public class GameServer {
     void init(){
         gameState = new ServGameStateConstructor().createGameState(this);
         handler = gameState.serverHandler;
-
-
         players = Collections.synchronizedMap(new HashMap<>());
         entities = gameState.entities;
         items = gameState.items;

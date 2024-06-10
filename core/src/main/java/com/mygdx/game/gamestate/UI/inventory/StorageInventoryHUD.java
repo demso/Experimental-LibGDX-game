@@ -17,11 +17,13 @@ import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
+import lombok.Getter;
 
 import static com.mygdx.game.gamestate.GameState.instance;
 
 public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
     HUD hud;
+    @Getter
     protected Storage storage;
     Array<Actor> popups = new Array<>();
     Skin skin;
@@ -124,13 +126,9 @@ public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
     public void requestShowOnStorage(Storage storage){
         if (this.storage != null){
             hud.closeStorageInventoryHUD(false);
-        }
+       }
         this.storage = storage;
         instance.client.needsStorageUpdate(storage.getPosition().x, storage.getPosition().y);
-    }
-
-    public Storage getStorage(){
-        return storage;
     }
 
     public StorageInventoryHUD(HUD hud, ContextMenu.ConAction... actions) {

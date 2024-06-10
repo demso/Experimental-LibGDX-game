@@ -28,14 +28,14 @@ public abstract class Entity implements BodyData {
         ANOTHER_PLAYER
     }
     @Getter @Setter long id;
-    @Getter float hp = 1;
-    @Getter float maxHp = 1;
+    @Getter protected float hp = 1;
+    @Getter protected float maxHp = 1;
     protected boolean isAlive = true;
 
-    transient @Setter @Getter Body body;
-    @Setter @Getter Friendliness friendliness = Friendliness.NEUTRAL;
-    @Getter @Setter Kind kind;
-    @Setter String name;
+    transient @Setter @Getter protected Body body;
+    @Setter @Getter protected Friendliness friendliness = Friendliness.NEUTRAL;
+    @Getter @Setter protected Kind kind;
+    @Setter protected String name;
 
     public Entity(){}
 

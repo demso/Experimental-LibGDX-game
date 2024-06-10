@@ -423,7 +423,7 @@
  <objectgroup id="5" name="chest_content">
   <object id="4" x="745" y="395" width="16" height="18">
    <properties>
-    <property name="items" value="deagle_44, beef, pistol_magazine, pistol_magazine, pistol_magazine, pistol_magazine, pistol_magazine, pistol_magazine"/>
+    <property name="items" value="deagle_44, beef, pistol_magazine, pistol_magazine, pistol_magazine, pistol_magazine, pistol_magazine, pistol_magazine, medkit, medkit, medkit, medkit"/>
    </properties>
   </object>
   <object id="8" x="779.5" y="394.5" width="10" height="13.5">

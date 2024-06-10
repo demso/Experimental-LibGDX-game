@@ -5,10 +5,12 @@ import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.objects.Interactable;
 import com.mygdx.game.gamestate.objects.items.Item;
+import com.mygdx.game.gamestate.objects.items.Meds;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
 import com.mygdx.game.gamestate.objects.items.guns.GunMagazine;
 
 public class ClientPlayer extends Player {
+    public boolean debug = true;
     @Override
     public boolean fire() {
         if(super.fire()){
@@ -40,21 +42,40 @@ public class ClientPlayer extends Player {
 
     public void reload(){
         if (equipedItem instanceof Gun gun) {
-            GunMagazine magaz = (GunMagazine) getItemOfType(GunMagazine.class);
+            GunMagazine magaz = getItemOfType(GunMagazine.class);
             if (magaz != null) {
                 gun.reload(magaz);
             }
         }
     }
 
-    public Item getItemOfType(Class<? extends Item> itemClass){
+    public <T extends Item> T getItemOfType(Class<T> itemClass){
         for (Item item : getInventoryItems()){
             if (item.getClass().isInstance(itemClass) || item.getClass().equals(itemClass))
-                return item;
+                return (T)item;
         }
         return null;
     }
 
+    public void heal(float hp){
+        if (hp <= 0)
+            return;
+        this.hp += hp;
+        if (this.hp > maxHp)
+            this.hp = maxHp;
+    }
+
+    public void autoHeal(){
+        Meds meds = getItemOfType(Meds.class);
+        if (meds != null) {
+            meds.use();
+            if (debug) {
+                HandyHelper.instance.log("[ClientPlayer:autoHeal] Meds used, player hp: " + hp);
+            }
+        }
+        else
+            HandyHelper.instance.log("[ClientPlayer:autoHeal] No Meds found");
+    }
 
     @Override
     public boolean interact() {

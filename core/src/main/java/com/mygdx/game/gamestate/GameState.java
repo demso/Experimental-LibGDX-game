@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.*;
+import com.mygdx.game.gamestate.UI.console.sjconsole.LogLevel;
 import com.mygdx.game.gamestate.factories.BodyResolver;
 import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;

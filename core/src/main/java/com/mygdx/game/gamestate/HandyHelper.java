@@ -1,11 +1,14 @@
 package com.mygdx.game.gamestate;
 
+import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.gamestate.UI.console.sjconsole.LogEntry;
 import com.mygdx.game.gamestate.UI.console.sjconsole.LogLevel;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class HandyHelper {
     public  static HandyHelper instance;
@@ -29,14 +32,15 @@ public class HandyHelper {
     }
 
     float refreshLogTime = 0;
-    float logRefreshPeriod = 0.2f;
+    float logRefreshPeriod = 0.5f;
 
     public void refreshLogsInConsole(float delta) {
         if (consoleNeedsRefresh) {
             refreshLogTime += delta;
             if (refreshLogTime > logRefreshPeriod) {
                 refreshLogTime = 0f;
-                GameState.instance.console.refreshLogs();
+                if (GameState.instance.console != null)
+                    GameState.instance.console.refreshLogs();
             }
         }
     }
@@ -64,16 +68,31 @@ public class HandyHelper {
 
     String lastString = "";
     long timeOfLastLog;
-    long logPeriod = 2000;
+    long logPeriod = 500;
+    int spamLogCounter = 0;
 
     public void noSpamLog(String toLog, LogLevel level) {
         var curTime = System.currentTimeMillis();
-        if (!lastString.equals(toLog) || curTime - timeOfLastLog > logPeriod){
+        if (!lastString.equals(toLog)){
             logInConsole(toLog, level);
             System.out.println(toLog);
             saveLog(toLog);
             lastString = toLog;
-            timeOfLastLog = curTime;
+            spamLogCounter = 0;
+        } else {
+            if (consoleAvailable() && curTime - timeOfLastLog > logPeriod) {
+                timeOfLastLog = curTime;
+                spamLogCounter += 1;
+                Array<LogEntry> arr = GameState.instance.console.getLog().getLogEntries();
+                LogEntry entry = arr.get(arr.size - 1);
+                if (entry.getLevel() == LogLevel.COMMAND) {
+                    lastString = "";
+                    return;
+                }
+                entry.setText(toLog + " [x" + spamLogCounter + "]");
+                saveLog(toLog);
+                consoleNeedsRefresh = true;
+            }
         }
     }
 
@@ -96,6 +115,12 @@ public class HandyHelper {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private boolean consoleAvailable(){
+        if (GameState.instance == null || GameState.instance.console == null)
+            return false;
+        return true;
     }
 
     private void logInConsole(String toLog, LogLevel lev){

@@ -13,7 +13,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class Zombie extends Entity {
-    @Getter int damage = 4;
+    @Getter float damage = Globals.ZOMBIE_DAMAGE;
     transient public GameObject zombieObject;
     @Getter @Setter float maxSpeed = 1.5f;
     @Getter @Setter float maxAttackCoolDown = 1f;
@@ -23,8 +23,8 @@ public class Zombie extends Entity {
     public Zombie(TiledMapTile tile, long id, World world, Vector2 position){
         setId(id);
         setFriendliness(Friendliness.HOSTILE);
-        setHp(10);
-        setMaxHp(10);
+        setHp(Globals.ZOMBIE_HEALTH);
+        setMaxHp(getHp());
 
         BodyDef bodyDef = MobsFactory.bodyDef(position.x, position.y, BodyDef.BodyType.DynamicBody);
 

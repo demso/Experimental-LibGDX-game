@@ -38,7 +38,7 @@ public class Log {
 		}
 	}
 
-	protected Array<LogEntry> getLogEntries () {
+	public Array<LogEntry> getLogEntries () {
 		return logEntries;
 	}
 

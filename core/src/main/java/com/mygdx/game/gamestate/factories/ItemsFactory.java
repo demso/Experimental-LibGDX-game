@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.objects.items.Item;
+import com.mygdx.game.gamestate.objects.items.Meds;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
 import com.mygdx.game.gamestate.objects.items.guns.GunMagazine;
 import com.mygdx.game.net.messages.common.ItemInfo;
@@ -54,6 +55,11 @@ public class ItemsFactory {
                 GunMagazine magaz = new GunMagazine(uid, itemId, getNameForID(itemId));
                 magaz.setData(unBox, bodyResolver, hud, gameStage, this);
                 createdItem = magaz;
+            }
+            case "medkit" -> {
+                Meds med = new Meds(uid, itemId, getNameForID(itemId));
+                med.setData(unBox, bodyResolver, hud, gameStage, this);
+                createdItem = med;
             }
             default -> {
                 Item item = new Item(uid, itemId, getNameForID(itemId));

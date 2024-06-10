@@ -92,9 +92,6 @@ public class Player extends Entity implements Storage {
         if (equipedItem != null)
             equipedItem.onUnequip();
         equipedItem = item;
-//        if (item instanceof Gun gun){
-//            gun.onEquip(this);
-//        }
         item.onEquip(this);
         HandyHelper.instance.log(item.uid + " equipped by " + this.getName() + " ("+ getId() +")");
     }
