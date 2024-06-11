@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.behaviours.SpriteBehaviour;
@@ -15,22 +15,13 @@ import dev.lyze.gdxUnBox2d.GameObject;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
 import static com.badlogic.gdx.graphics.g2d.Batch.*;
+import static com.badlogic.gdx.graphics.g2d.Batch.Y4;
 
 public class GunSpriteBehaviour extends SpriteBehaviour {
     public static boolean debug = false;
-    Gun gun;
-    ShapeDrawer shapeDrawer;
-    PistolAnimation pistolAnimation;
-
-    public GunSpriteBehaviour(GameObject gameObject, Gun gun, TextureRegion textureRegion, float renderOrder) {
-        super(gameObject, textureRegion, renderOrder);
-        this.gun = gun;
-        setRenderOrder(renderOrder);
-        sprite = new Sprite(textureRegion);
-        sprite.setSize(1, 1);
-        sprite.setOriginCenter();
-        init();
-    }
+    protected Gun gun;
+    protected ShapeDrawer shapeDrawer;
+    protected PistolAnimation pistolAnimation;
 
     public GunSpriteBehaviour(GameObject gameObject, Gun gun, float width, float height, TextureRegion textureRegion, float renderOrder) {
         super(gameObject);
@@ -42,14 +33,11 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
         init();
     }
 
-    public GunSpriteBehaviour(GameObject gameObject, Gun gun, Sprite sprite, float renderOrder) {
-        super(gameObject, sprite, renderOrder);
-        setRenderOrder(renderOrder);
-        this.sprite = sprite;
-        init();
+    protected GunSpriteBehaviour(GameObject go){
+        super(go);
     }
 
-    private void init(){
+    protected void init(){
         setOffset(-sprite.getWidth()/2f, -sprite.getHeight()/2f);
         pistolAnimation = new PistolAnimation();
     }
@@ -70,6 +58,7 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
                 rotation = Double.valueOf(Math.toDegrees(Math.atan2(mousePos.y - player.getPosition().y, mousePos.x - player.getPosition().x))).floatValue();
                 player.itemRotation = rotation;
             }
+
             pistolAnimation.updateAndTransform(delta, rotation, sprite);
         } else {
             super.update(delta);
@@ -88,6 +77,7 @@ public class GunSpriteBehaviour extends SpriteBehaviour {
     @Override
     public void render(Batch batch) {
         super.render(batch);
+
         if (debug) {
             shapeDrawer.setColor(Color.CYAN);
             float[] vertices = sprite.getVertices();

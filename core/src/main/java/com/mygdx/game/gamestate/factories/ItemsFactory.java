@@ -5,8 +5,10 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.objects.items.Meds;
+import com.mygdx.game.gamestate.objects.items.guns.AutoRifle;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
 import com.mygdx.game.gamestate.objects.items.guns.GunMagazine;
+import com.mygdx.game.gamestate.objects.items.guns.Pistol;
 import com.mygdx.game.net.messages.common.ItemInfo;
 import dev.lyze.gdxUnBox2d.UnBox;
 
@@ -47,13 +49,26 @@ public class ItemsFactory {
         Item createdItem;
         switch (itemId) {
             case "deagle_44" -> {
-                Gun gun = new Gun(uid, itemId, getNameForID(itemId));
+                Pistol gun = new Pistol(uid, itemId, getNameForID(itemId));
                 gun.setData(unBox, bodyResolver, hud, gameStage, this);
                 createdItem = gun;
             }
             case "pistol_magazine" -> {
                 GunMagazine magaz = new GunMagazine(uid, itemId, getNameForID(itemId));
                 magaz.setData(unBox, bodyResolver, hud, gameStage, this);
+                magaz.addGunTypes("deagle_44");
+                createdItem = magaz;
+            }
+            case "m4" -> {
+                AutoRifle gun = new AutoRifle(uid, itemId, getNameForID(itemId));
+                gun.setData(unBox, bodyResolver, hud, gameStage, this);
+                createdItem = gun;
+            }
+            case "m4_magazine" -> {
+                GunMagazine magaz = new GunMagazine(uid, itemId, getNameForID(itemId));
+                magaz.setData(unBox, bodyResolver, hud, gameStage, this);
+                magaz.addGunTypes("m4");
+                magaz.setCapacity(30);
                 createdItem = magaz;
             }
             case "medkit" -> {

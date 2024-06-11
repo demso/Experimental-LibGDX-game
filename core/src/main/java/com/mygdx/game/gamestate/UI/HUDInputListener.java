@@ -2,8 +2,10 @@ package com.mygdx.game.gamestate.UI;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.mygdx.game.gamestate.objects.items.guns.Gun;
 import com.mygdx.game.gamestate.player.ClientPlayerHandler;
 
 import static com.mygdx.game.gamestate.GameState.instance;
@@ -56,8 +58,9 @@ public class HUDInputListener extends InputListener {
             instance.hud.togglePlayerInventoryHUD();
         }
         if (keycode == Input.Keys.T){
-            if (instance.clientPlayer.equipedItem != null && instance.clientPlayer.equipedItem.itemName.equals("Deagle .44"))
-                instance.clientPlayer.fire();
+            if (instance.clientPlayer.equipedItem instanceof Gun gun)
+                if (gun.getFireType().equals(Gun.FireType.SEMI_AUTO))
+                    instance.clientPlayer.fire();
         }
         if (keycode == Input.Keys.W || keycode == Input.Keys.UP){
             instance.clientPlayer.playerObject.getBehaviour(ClientPlayerHandler.class).moveUp = false;
@@ -100,6 +103,7 @@ public class HUDInputListener extends InputListener {
             }
             //HandyHelper.instance.log(System.currentTimeMillis() + " ", false);
         }
+
         return false;
     }
 
@@ -110,6 +114,11 @@ public class HUDInputListener extends InputListener {
             RLongPressed = true;
         }
         //HandyHelper.instance.log(System.nanoTime() + " " + RPressedTime + " " + (System.nanoTime() - RPressedTime), false);
+        if (Gdx.input.isKeyPressed(Input.Keys.T)){
+            if (instance.clientPlayer.equipedItem instanceof Gun gun)
+                if (gun.getFireType().equals(Gun.FireType.AUTO))
+                    instance.clientPlayer.fire();
+        }
     }
 
 }

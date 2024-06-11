@@ -1,16 +1,22 @@
 package com.mygdx.game.gamestate.objects.items.guns;
 
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.gamestate.objects.items.Item;
 import lombok.Getter;
+import lombok.Setter;
 
 public class GunMagazine extends Item {
+    @Getter @Setter
     protected int capacity = 10;
     @Getter
     protected int currentAmount;
+    @Getter
+    Array<String> gunTypes;
     protected Gun insertedIn; // null if not inserted in
 
     public GunMagazine(long uid, String iId, String itemName) {
         super(uid, iId, itemName);
+        gunTypes = new Array<>();
         currentAmount = capacity;
     }
 
@@ -34,6 +40,10 @@ public class GunMagazine extends Item {
 
     public Gun getGun(){
         return insertedIn;
+    }
+
+    public void addGunTypes(String... gunTypes){
+        this.gunTypes.addAll(gunTypes);
     }
 
     public int onFire(){

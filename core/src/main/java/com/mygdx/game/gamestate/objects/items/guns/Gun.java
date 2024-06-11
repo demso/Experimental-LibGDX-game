@@ -18,13 +18,20 @@ import dev.lyze.gdxUnBox2d.BehaviourState;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 import lombok.Getter;
+import lombok.Setter;
 
 public class Gun extends Item {
+    public enum FireType {
+        AUTO,
+        SEMI_AUTO
+    }
     protected GunSpriteBehaviour gunSpriteBehaviour;
     protected Vector2 bulletTempRotationVec = new Vector2(1,1);
     protected GunMagazine insertedMagazine;
     @Getter
     protected float reloadTime = 2;
+    @Getter @Setter
+    protected FireType fireType = FireType.SEMI_AUTO;
 
     public Gun(long uid, String tileName, String itemName) {
         super(uid, tileName, itemName);
@@ -89,7 +96,8 @@ public class Gun extends Item {
             return;
 
         if (gunSpriteBehaviour == null || gunSpriteBehaviour.getState().equals(BehaviourState.DESTROYED))
-                gunSpriteBehaviour = new GunSpriteBehaviour(GO, this, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
+            createSpriteBehaviour();
+                //gunSpriteBehaviour = new GunSpriteBehaviour(GO, this, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
 
         if (getOwner() instanceof ClientPlayer)
             gunSpriteBehaviour.setRenderOrder(Globals.PLAYER_RENDER_ORDER);
@@ -121,6 +129,10 @@ public class Gun extends Item {
             if (hud != null)
                 gameStage.addActor(mouseHandler);
         }
+    }
+
+    protected void createSpriteBehaviour(){
+        gunSpriteBehaviour = new GunSpriteBehaviour(GO, this, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
     }
 
     @Override

@@ -5,7 +5,7 @@ import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.UI.console.sjconsole.CommandExecutor;
 import com.mygdx.game.gamestate.UI.console.sjconsole.annotation.ConsoleDoc;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
-import com.mygdx.game.gamestate.objects.items.guns.GunSpriteBehaviour;
+import com.mygdx.game.gamestate.objects.items.guns.PistolSprite;
 
 public class ConsoleCommands extends CommandExecutor {
     GameState gameState;
@@ -32,7 +32,7 @@ public class ConsoleCommands extends CommandExecutor {
     public final void debug(String type, boolean bool) {
         switch (type) {
             case "gunSprite" -> {
-                GunSpriteBehaviour.debug = bool;
+                PistolSprite.debug = bool;
             }
         }
     }
