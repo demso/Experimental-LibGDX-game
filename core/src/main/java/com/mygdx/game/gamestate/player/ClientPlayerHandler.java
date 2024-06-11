@@ -10,10 +10,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.SecondGDXGame;
+import com.mygdx.game.Utils;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.objects.behaviours.SpriteBehaviour;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
+import com.mygdx.game.gamestate.objects.items.guns.GunMagazine;
 import com.mygdx.game.net.messages.client.PlayerMove;
 import dev.lyze.gdxUnBox2d.GameObject;
 import dev.lyze.gdxUnBox2d.behaviours.BehaviourAdapter;
@@ -54,12 +56,14 @@ public class ClientPlayerHandler extends BehaviourAdapter implements PlayerMoveR
 
     ReloadAnimation reloadAnimation;
     Sprite reloadSprite;
+    Gun gunReloading;
+    GunMagazine magReloading;
 
     @Override
     public void start() {
         reloadAnimation = new ReloadAnimation();
         reloadSprite = new Sprite(new Texture(Gdx.files.internal("visual/textures/reload_icon.png")));
-        reloadSprite.setSize(0.5f, 0.5f);
+        reloadSprite.setSize(0.3f, 0.3f);
         reloadSprite.setOriginCenter();
     }
 
@@ -106,18 +110,33 @@ public class ClientPlayerHandler extends BehaviourAdapter implements PlayerMoveR
             player.needsReload = false;
         }
 
-        if (player.needsReload && !player.isReloading) {
+        if (player.needsReload) {
+            if (player.equipedItem instanceof Gun gun) {
+                GunMagazine magaz = player.getItemOfType(GunMagazine.class);
+                if (magaz != null) {
+                    gunReloading = gun;
+                    magReloading = magaz;
+                    player.needsReload = false;
+                    player.isReloading = true;
+                    gun.reload(null);
+                    reloadAnimation.start(((Gun)player.equipedItem).getReloadTime() * player.reloadFactor);
+                }
+            }
             player.needsReload = false;
-            player.isReloading = true;
-            reloadAnimation.start(10f);
         }
 
         if (player.isReloading){
+            if (player.equipedItem != gunReloading) {
+                player.isReloading = false;
+                return;
+            }
+            player.reloadProgress = Utils.round(1 - reloadAnimation.getProgress(), 1);
             Vector2 pos = player.getPosition();
-            reloadSprite.setPosition(pos.x + 0.5f, pos.y + 0.5f );
+            reloadSprite.setPosition(pos.x + 0.2f, pos.y + 0.2f);
             reloadAnimation.updateAndTransform(delta,reloadSprite);
             if (reloadAnimation.isFinished()){
                 player.isReloading = false;
+                gunReloading.reload(magReloading);
             }
         }
 
@@ -125,8 +144,6 @@ public class ClientPlayerHandler extends BehaviourAdapter implements PlayerMoveR
 
     @Override
     public void render(Batch batch) {
-        if (player.isReloading)
-            reloadSprite.draw(batch);
        // batch.draw(walkDown.getKeyFrame(2), player.getPosition().x - player.WIDTH/2 + player.WIDTH, player.getPosition().y - player.WIDTH * 1/4, -player.WIDTH, player.HEIGHT);
         if (player.facing == Player.Facing.Right)
             batch.draw(currentFrame, player.getPosition().x - player.WIDTH/2 + player.WIDTH, player.getPosition().y - player.WIDTH * 1/4, -player.WIDTH, player.HEIGHT);
@@ -150,6 +167,8 @@ public class ClientPlayerHandler extends BehaviourAdapter implements PlayerMoveR
                         1, 1, rotation);
             }
         }
+        if (player.isReloading)
+            reloadSprite.draw(batch);
     }
 
     byte indexer = 0;
@@ -216,6 +235,10 @@ public class ClientPlayerHandler extends BehaviourAdapter implements PlayerMoveR
 //            indexer = 0;
 //        }
 //        indexer += 1;
+    }
+
+    public void cancelReload(){
+        player.isReloading = false;
     }
 
     @Override

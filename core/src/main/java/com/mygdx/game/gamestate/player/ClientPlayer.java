@@ -52,6 +52,12 @@ public class ClientPlayer extends Player {
 //        }
     }
 
+    public void cancelReload(){
+        needsReload = false;
+        var plHand = (ClientPlayerHandler)playerHandler;
+        plHand.cancelReload();
+    }
+
     public <T extends Item> T getItemOfType(Class<T> itemClass){
         for (Item item : getInventoryItems()){
             if (item.getClass().isInstance(itemClass) || item.getClass().equals(itemClass))

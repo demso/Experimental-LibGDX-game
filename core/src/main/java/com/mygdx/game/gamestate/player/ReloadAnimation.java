@@ -10,13 +10,14 @@ public class ReloadAnimation {
     float animationProgress;
     float stopTime = 0f, curStopTime;
     float alpha;
+    float startProgressOffset = 0;
     public ReloadAnimation(){
         interpolation = Interpolation.linear;
     }
     public void start(float time){
         timeToPlay = time;
         animationTime = timeToPlay;
-        animationProgress = 0.5f;
+        animationProgress = 0;
         curStopTime = 0;
     }
     public void stop(){
@@ -29,6 +30,7 @@ public class ReloadAnimation {
 
     public void updateAndTransform(float delta, Sprite sprite){
         if (animationTime <= 0) {
+            animationTime = 0;
             return;
         }
         animationTime -= delta;
@@ -40,12 +42,16 @@ public class ReloadAnimation {
         animationProgress = Math.min(1, animationProgress);
         alpha = interpolation.apply(animationProgress);
 
-        sprite.setRotation(360 * (alpha - 0.5f));
+        sprite.setRotation(360 * ((1-alpha) + startProgressOffset));
 
         if (animationProgress >= 1) {
             curStopTime = stopTime;
             animationProgress = 0;
         }
+    }
+
+    public float getProgress(){
+        return animationTime / timeToPlay;
     }
 
     class MyInterpolation extends Interpolation {

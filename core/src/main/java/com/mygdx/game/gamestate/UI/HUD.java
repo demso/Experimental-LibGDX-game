@@ -1,6 +1,7 @@
 package com.mygdx.game.gamestate.UI;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayer;
 import com.esotericsoftware.kryonet.Client;
@@ -29,6 +30,10 @@ import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
 import dev.lyze.gdxUnBox2d.GameObject;
+import io.github.fourlastor.scope.Group;
+import io.github.fourlastor.scope.ObjectScope;
+import io.github.fourlastor.scope.Scope;
+import io.github.fourlastor.scope.ScopeRenderer;
 
 public class HUD extends Stage {
     boolean debug = false;
@@ -224,7 +229,9 @@ public class HUD extends Stage {
         Vector2 vel = gameState.clientPlayer.getBody().getLinearVelocity();
         labelText.append("Player velocity : ").append(Utils.round(vel.x, 1)).append(", ").append(Utils.round(vel.y, 1)).append("\n");
         clObj = gameState.clientPlayer.getClosestObject();
-        labelText.append("Closest object : ").append(clObj == null ? null : clObj.getUserData() instanceof SimpleUserData ? ((SimpleUserData) clObj.getUserData()).bodyName + " " + clObj.getPosition() : clObj.getUserData()).append("\n\n");
+        labelText.append("Closest object : ").append(clObj == null ? null : clObj.getUserData() instanceof SimpleUserData ? ((SimpleUserData) clObj.getUserData()).bodyName + " " + clObj.getPosition() : clObj.getUserData()).append("\n");
+        if (gameState.clientPlayer.reloadProgress < 1)
+            labelText.append("Reload progress: " + gameState.clientPlayer.reloadProgress + "\n");
         if (debugEntries.size > 0)
             debugEntries.values().forEach((kall) -> labelText.append(kall).append("\n\n"));
         Vector3 mouse_position = new Vector3(0,0,0);
@@ -288,6 +295,17 @@ public class HUD extends Stage {
         infoPanel.refresh();
     }
 
+    ScopeRenderer scopeRenderer;
+    Group scopeGroup;
+
+    @Override
+    public void draw() {
+        super.draw();
+//        scopeRenderer.start();
+//        scopeRenderer.render(scopeGroup);
+//        scopeRenderer.end();
+    }
+
     public HUD(GameState gi, ScreenViewport screenViewport, SpriteBatch batch) {
         super(screenViewport, batch);
         gameState = gi;
@@ -315,6 +333,26 @@ public class HUD extends Stage {
         panels.space(5);
         addActor(panels);
 
-        //setDebugAll(true);
+        scopeRenderer = new ScopeRenderer(16);
+        scopeGroup = new Group(new ObjectScope("Settings", infoPanel));
+    }
+
+    public static class Settings {
+        public float floatVal = 12.3f;
+
+
+        @Scope.Lens(name = "a name")
+        public int intVal = 99;
+
+        public InnerSettings innerSettings = new InnerSettings();
+
+        public Color color = new Color(Color.DARK_GRAY);
+    }
+
+    public static class InnerSettings {
+        public int another;
+
+        @Scope.Lens(name = "Anything goes")
+        public boolean anythingGoes;
     }
 }

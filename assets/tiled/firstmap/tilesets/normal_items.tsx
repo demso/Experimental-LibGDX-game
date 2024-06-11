@@ -61,4 +61,14 @@
    <property name="name" value="pistol_magazine"/>
   </properties>
  </tile>
+ <tile id="12">
+  <properties>
+   <property name="name" value="m4"/>
+  </properties>
+ </tile>
+ <tile id="13">
+  <properties>
+   <property name="name" value="m4_magazine"/>
+  </properties>
+ </tile>
 </tileset>

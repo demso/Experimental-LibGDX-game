@@ -52,6 +52,7 @@ public class Player extends Entity implements Storage {
 
     public boolean needsReload;
     public boolean isReloading;
+    public float reloadProgress = 1;
 
     public float reloadFactor = 1f;
 
@@ -134,7 +135,7 @@ public class Player extends Entity implements Storage {
 
     public boolean fire(){
         if (equipedItem != null && equipedItem instanceof Gun gun) {
-            gun.fireBullet(this);
+            gun.fireBullet();
             return true;
         }
         return false;

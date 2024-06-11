@@ -23,9 +23,10 @@ public class ClientPlayerConstructor {
     public ClientPlayer createPlayer(GameState gameState, PlayerInfo info){
         ClientPlayer player = new ClientPlayer();
 
+        player.setId(info.id);
         player.setName(SecondGDXGame.instance.name);
-        player.setHp(10);
-        player.setMaxHp(10);
+        player.setHp(info.hp);
+        player.setMaxHp(info.maxHp);
         player.setFriendliness(Entity.Friendliness.PLAYER);
         player.setKind(Entity.Kind.PLAYER);
 

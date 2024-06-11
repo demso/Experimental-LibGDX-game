@@ -17,11 +17,15 @@ import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 import dev.lyze.gdxUnBox2d.BehaviourState;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
+import lombok.Getter;
 
 public class Gun extends Item {
     GunSpriteBehaviour gunSpriteBehaviour;
     Vector2 bulletTempRotationVec = new Vector2(1,1);
     GunMagazine insertedMagazine;
+    @Getter
+    float reloadTime = 2;
+
 
     public Gun(long uid, String tileName, String itemName) {
         super(uid, tileName, itemName);
@@ -49,15 +53,17 @@ public class Gun extends Item {
         return insertedMagazine;
     }
 
-    public void fireBullet(Player player){
+    public void fireBullet(){
+        if (!isEquipped())
+            return;
         if (insertedMagazine == null || insertedMagazine.getCurrentAmount() == 0){
             HandyHelper.instance.log("[Player("+ owner.getName()+"):fire] Not enough ammo (" + ((insertedMagazine == null) ? "no magazine in gun" : insertedMagazine.getCurrentAmount()) + ")");
             return;
         }
         insertedMagazine.onFire();
-        bulletTempRotationVec.setAngleDeg(player.itemRotation);
+        bulletTempRotationVec.setAngleDeg(((Player)owner).itemRotation);
         gunSpriteBehaviour.onFire();
-        new Bullet(TileResolver.getTile("bullet"), player.getPosition(), bulletTempRotationVec);
+        new Bullet(TileResolver.getTile("bullet"), owner.getPosition(), bulletTempRotationVec);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.mygdx.game.gamestate.UI;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -14,6 +15,7 @@ import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
 import com.mygdx.game.gamestate.player.ClientPlayer;
 import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
+import io.github.fourlastor.scope.Scope;
 import lombok.Setter;
 
 public class InfoPanel extends Group {
@@ -25,6 +27,20 @@ public class InfoPanel extends Group {
     Skin skin2x = SecondGDXGame.instance.skin;
     HUD hud;
     ClientPlayer player;
+    @Scope.Lens(name = "Ammo ImgX")
+    public int ammoImagePosX = 65;
+    @Scope.Lens(name = "Ammo ImgY")
+    public int ammoImagePosY = 7;
+    @Scope.Lens(name = "Ammo LblX")
+    public int ammoLabelPosX = 105;
+    @Scope.Lens(name = "Ammo LblY")
+    public int ammoLabelPosY = 25;
+    @Scope.Lens(name = "HPOffX")
+    public int hpOffsetX = 0;
+    @Scope.Lens(name = "HPOffY")
+    public int hpOffsetY = 0;
+   // public Vector2 posss = new Vector2();
+
 
     public void update(float delta){
         if (player == null){
@@ -65,19 +81,19 @@ public class InfoPanel extends Group {
 
         hpLabel = new Label(11 + "", skin2x);
         hpLabel.setColor(Color.WHITE);
-        hpLabel.setPosition(46, 45);
+        hpLabel.setPosition(45, 45);
 
         ammoLabel = new Label(10 + "", skin);
-        ammoLabel.setPosition(105, 25);
+        ammoLabel.setPosition(110, 20);
 
 
         hpImage = new Image(new Texture("visual/textures/heart_icon.png"));
-        hpImage.setSize(100, 100);
-        hpImage.setPosition(12, 10);
+        hpImage.setSize(72, 72);
+        hpImage.setPosition(25, 25);
 
         ammoImage = new Image(TileResolver.getTile("pistol_magazine").getTextureRegion());
         ammoImage.setSize(60, 60);
-        ammoImage.setPosition(65, 7);
+        ammoImage.setPosition(70, 2);
 
         addActor(hpImage);
         addActor(ammoImage);

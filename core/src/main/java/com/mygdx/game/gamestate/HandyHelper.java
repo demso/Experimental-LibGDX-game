@@ -84,12 +84,14 @@ public class HandyHelper {
                 timeOfLastLog = curTime;
                 spamLogCounter += 1;
                 Array<LogEntry> arr = GameState.instance.console.getLog().getLogEntries();
-                LogEntry entry = arr.get(arr.size - 1);
-                if (entry.getLevel() == LogLevel.COMMAND) {
-                    lastString = "";
-                    return;
+                if (arr.size > 1) {
+                    LogEntry entry = arr.get(arr.size - 1);
+                    if (entry.getLevel() == LogLevel.COMMAND) {
+                        lastString = "";
+                        return;
+                    }
+                    entry.setText(toLog + " [x" + spamLogCounter + "]");
                 }
-                entry.setText(toLog + " [x" + spamLogCounter + "]");
                 saveLog(toLog);
                 consoleNeedsRefresh = true;
             }
