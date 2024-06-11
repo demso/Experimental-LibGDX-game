@@ -4,10 +4,10 @@ import com.mygdx.game.gamestate.objects.items.Item;
 import lombok.Getter;
 
 public class GunMagazine extends Item {
-    int capacity = 10;
+    protected int capacity = 10;
     @Getter
-    int currentAmount;
-    Gun insertedIn; // null if not inserted in
+    protected int currentAmount;
+    protected Gun insertedIn; // null if not inserted in
 
     public GunMagazine(long uid, String iId, String itemName) {
         super(uid, iId, itemName);

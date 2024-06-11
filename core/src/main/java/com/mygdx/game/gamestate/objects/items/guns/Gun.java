@@ -20,12 +20,11 @@ import dev.lyze.gdxUnBox2d.GameObject;
 import lombok.Getter;
 
 public class Gun extends Item {
-    GunSpriteBehaviour gunSpriteBehaviour;
-    Vector2 bulletTempRotationVec = new Vector2(1,1);
-    GunMagazine insertedMagazine;
+    protected GunSpriteBehaviour gunSpriteBehaviour;
+    protected Vector2 bulletTempRotationVec = new Vector2(1,1);
+    protected GunMagazine insertedMagazine;
     @Getter
-    float reloadTime = 2;
-
+    protected float reloadTime = 2;
 
     public Gun(long uid, String tileName, String itemName) {
         super(uid, tileName, itemName);
