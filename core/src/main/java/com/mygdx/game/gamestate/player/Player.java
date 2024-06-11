@@ -50,6 +50,11 @@ public class Player extends Entity implements Storage {
 
     public float itemRotation;
 
+    public boolean needsReload;
+    public boolean isReloading;
+
+    public float reloadFactor = 1f;
+
     @Nullable
     public Body getClosestObject(){
         return closestObject;

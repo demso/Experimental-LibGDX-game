@@ -63,7 +63,7 @@ public class MainMenuScreen implements Screen {
                     return true;
                 }
                 if (keycode == Input.Keys.SPACE){
-                    game.setScreen(game.gameScreen);
+                    ((ClickListener) playButton.getListeners().get(1)).clicked(new InputEvent(), 0, 0);
                     return true;
                 }
                 if (keycode == Input.Keys.B){

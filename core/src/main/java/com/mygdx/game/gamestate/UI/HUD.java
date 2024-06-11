@@ -3,7 +3,9 @@ package com.mygdx.game.gamestate.UI;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayer;
-import com.mygdx.game.gamestate.Globals;
+import com.esotericsoftware.kryonet.Client;
+import com.mygdx.game.Utils;
+import com.mygdx.game.gamestate.player.ClientPlayer;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -43,6 +45,8 @@ public class HUD extends Stage {
     volatile boolean showRequestSatisfied;
     volatile int showRequestX, showRequestY;
     Item[] showRequestItems;
+    public ClientPlayer clientPlayer;
+    InfoPanel infoPanel;
 
     public void showItemInfoWindow(Item item){
         getActors().removeValue(itemPopups.get(item), true);
@@ -217,7 +221,8 @@ public class HUD extends Stage {
     StringBuilder labelText = new StringBuilder();
     public void drawTileDebugInfo() {
         labelText = new StringBuilder();
-        labelText.append("Player velocity : ").append(gameState.clientPlayer.getBody().getLinearVelocity()).append("\n");
+        Vector2 vel = gameState.clientPlayer.getBody().getLinearVelocity();
+        labelText.append("Player velocity : ").append(Utils.round(vel.x, 1)).append(", ").append(Utils.round(vel.y, 1)).append("\n");
         clObj = gameState.clientPlayer.getClosestObject();
         labelText.append("Closest object : ").append(clObj == null ? null : clObj.getUserData() instanceof SimpleUserData ? ((SimpleUserData) clObj.getUserData()).bodyName + " " + clObj.getPosition() : clObj.getUserData()).append("\n\n");
         if (debugEntries.size > 0)
@@ -264,8 +269,7 @@ public class HUD extends Stage {
             label.setText("");
 
         if (debug)
-            SecondGDXGame.instance.helper.log("[HUD:250] " + esClosablePopups.toString());
-
+            SecondGDXGame.instance.helper.log("[HUD:act] " + esClosablePopups.toString());
 
         if (showRequestSatisfied){
             Vector2 vec = storageInventoryHUD.getStorage().getPosition();
@@ -275,6 +279,13 @@ public class HUD extends Stage {
             }
             showRequestSatisfied = false;
         }
+
+        infoPanel.update(delta);
+    }
+
+    public void setClientPlayer(ClientPlayer pl){
+        clientPlayer = pl;
+        infoPanel.refresh();
     }
 
     public HUD(GameState gi, ScreenViewport screenViewport, SpriteBatch batch) {
@@ -286,7 +297,6 @@ public class HUD extends Stage {
         panels = new HorizontalGroup();
 
         playerInventoryHud = new PlayerInventoryHUD(this);
-
         playerInventoryHud.setVisible(false);
 
         storageInventoryHUD = new StorageInventoryHUD(this, ContextMenu.ConAction.Drop, ContextMenu.ConAction.Description, ContextMenu.ConAction.Equip, ContextMenu.ConAction.Take);
@@ -297,7 +307,11 @@ public class HUD extends Stage {
         label.setWidth(350);
         label.setAlignment(Align.topLeft);
 
+        infoPanel = new InfoPanel(this);
+        infoPanel.setPosition(0, 0, Align.bottomLeft);
+
         addActor(label);
+        addActor(infoPanel);
         panels.space(5);
         addActor(panels);
 

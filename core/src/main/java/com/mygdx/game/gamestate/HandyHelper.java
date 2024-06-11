@@ -104,6 +104,7 @@ public class HandyHelper {
             System.out.println(toLog);
             logInConsole(toLog, LogLevel.DEFAULT);
             saveLog(toLog);
+            lastString = toLog;
             timeOfPeriodicLog = System.currentTimeMillis();
         }
     }

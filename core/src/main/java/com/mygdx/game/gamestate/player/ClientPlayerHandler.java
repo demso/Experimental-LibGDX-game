@@ -2,20 +2,23 @@ package com.mygdx.game.gamestate.player;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
+import com.mygdx.game.gamestate.objects.behaviours.SpriteBehaviour;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
 import com.mygdx.game.net.messages.client.PlayerMove;
 import dev.lyze.gdxUnBox2d.GameObject;
 import dev.lyze.gdxUnBox2d.behaviours.BehaviourAdapter;
 
-public class PlayerHandler extends BehaviourAdapter implements PlayerMoveReceiver {
+public class ClientPlayerHandler extends BehaviourAdapter implements PlayerMoveReceiver {
     public boolean moveUp,
             moveDown,
             moveToTheRight,
@@ -31,9 +34,9 @@ public class PlayerHandler extends BehaviourAdapter implements PlayerMoveReceive
 
     float frameDuration = 0.1f;
 
-    Player player;
+    ClientPlayer player;
 
-    public PlayerHandler(GameObject gameObject, Player player) {
+    public ClientPlayerHandler(GameObject gameObject, Player player) {
         super(gameObject);
         setRenderOrder(Globals.PLAYER_RENDER_ORDER);
     }
@@ -49,7 +52,16 @@ public class PlayerHandler extends BehaviourAdapter implements PlayerMoveReceive
 
     float accumulator;
 
-    float rotation;
+    ReloadAnimation reloadAnimation;
+    Sprite reloadSprite;
+
+    @Override
+    public void start() {
+        reloadAnimation = new ReloadAnimation();
+        reloadSprite = new Sprite(new Texture(Gdx.files.internal("visual/textures/reload_icon.png")));
+        reloadSprite.setSize(0.5f, 0.5f);
+        reloadSprite.setOriginCenter();
+    }
 
     @Override
     public void update(float delta) {
@@ -90,12 +102,31 @@ public class PlayerHandler extends BehaviourAdapter implements PlayerMoveReceive
                 }
                 break;
         }
+        if (player.needsReload && player.isReloading) {
+            player.needsReload = false;
+        }
 
+        if (player.needsReload && !player.isReloading) {
+            player.needsReload = false;
+            player.isReloading = true;
+            reloadAnimation.start(10f);
+        }
+
+        if (player.isReloading){
+            Vector2 pos = player.getPosition();
+            reloadSprite.setPosition(pos.x + 0.5f, pos.y + 0.5f );
+            reloadAnimation.updateAndTransform(delta,reloadSprite);
+            if (reloadAnimation.isFinished()){
+                player.isReloading = false;
+            }
+        }
 
     }
 
     @Override
     public void render(Batch batch) {
+        if (player.isReloading)
+            reloadSprite.draw(batch);
        // batch.draw(walkDown.getKeyFrame(2), player.getPosition().x - player.WIDTH/2 + player.WIDTH, player.getPosition().y - player.WIDTH * 1/4, -player.WIDTH, player.HEIGHT);
         if (player.facing == Player.Facing.Right)
             batch.draw(currentFrame, player.getPosition().x - player.WIDTH/2 + player.WIDTH, player.getPosition().y - player.WIDTH * 1/4, -player.WIDTH, player.HEIGHT);

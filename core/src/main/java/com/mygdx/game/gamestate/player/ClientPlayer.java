@@ -41,12 +41,15 @@ public class ClientPlayer extends Player {
     }
 
     public void reload(){
-        if (equipedItem instanceof Gun gun) {
-            GunMagazine magaz = getItemOfType(GunMagazine.class);
-            if (magaz != null) {
-                gun.reload(magaz);
-            }
-        }
+        needsReload = true;
+//        if (equipedItem instanceof Gun gun) {
+//            GunMagazine magaz = getItemOfType(GunMagazine.class);
+//            if (magaz != null) {
+//                gun.reload(magaz);
+//            } else {
+//                gun.reload(null);
+//            }
+//        }
     }
 
     public <T extends Item> T getItemOfType(Class<T> itemClass){

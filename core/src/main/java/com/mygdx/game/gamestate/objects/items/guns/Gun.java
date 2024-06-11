@@ -30,10 +30,23 @@ public class Gun extends Item {
     }
 
     public void reload(GunMagazine mag){
-        if (insertedMagazine != null)
+        if (insertedMagazine != null){
             insertedMagazine.onUnInsert();
+        }
+        if (mag == null) {
+            insertedMagazine = null;
+            return;
+        }
         mag.onInsert(this);
         insertedMagazine = mag;
+    }
+
+    public boolean hasMagazine(){
+        return insertedMagazine != null;
+    }
+
+    public GunMagazine getMagazine(){
+        return insertedMagazine;
     }
 
     public void fireBullet(Player player){

@@ -49,6 +49,7 @@ public class Item implements BodyData, Interactable {
     protected GameObject GO;
     protected @Getter SpriteBehaviour spriteBehaviour;
     ItemsFactory factory;
+    @Getter public boolean isDisposed;
 
 
     public Item(long uid, TiledMapTile tile, String itemName){
@@ -183,6 +184,7 @@ public class Item implements BodyData, Interactable {
         if (GO != null && GO.getState() != GameObjectState.DESTROYED)
             GO.destroy();
         factory.onItemDispose(this);
+        isDisposed = true;
     }
 
     @Override

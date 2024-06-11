@@ -86,6 +86,7 @@ public class GameConstructor {
 
         gameState.clientPlayer = new ClientPlayerConstructor().createPlayer(gameState, msg.yourPlayerInfo);
 
+        gameState.hud.setClientPlayer(gameState.clientPlayer);
 
         gameState.console = new InGameConsole(SecondGDXGame.instance.skin1x,true);
         gameState.console.setDisplayKeyID(Input.Keys.GRAVE);

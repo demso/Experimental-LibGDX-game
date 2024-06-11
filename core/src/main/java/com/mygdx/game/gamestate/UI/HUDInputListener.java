@@ -4,9 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.mygdx.game.gamestate.GameState;
-import com.mygdx.game.gamestate.HandyHelper;
-import com.mygdx.game.gamestate.player.PlayerHandler;
+import com.mygdx.game.gamestate.player.ClientPlayerHandler;
 
 import static com.mygdx.game.gamestate.GameState.instance;
 
@@ -21,12 +19,14 @@ public class HUDInputListener extends InputListener {
 
     @Override
     public boolean keyUp (InputEvent event, int keycode) {
-        if (keycode == Input.Keys.ESCAPE)
+        if (keycode == Input.Keys.ESCAPE){
             if (!instance.hud.closeTopPopup())
                 Gdx.app.exit();
+        }
         if (keycode == Input.Keys.B){
             instance.debug = !instance.debug;
-            instance.hud.setDebugAll(instance.debug);
+            if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT))
+                instance.hud.setDebugAll(instance.debug);
             instance.gameStage.setDebugAll(instance.debug);
         }
         if (keycode == Input.Keys.EQUALS){
@@ -60,16 +60,16 @@ public class HUDInputListener extends InputListener {
                 instance.clientPlayer.fire();
         }
         if (keycode == Input.Keys.W || keycode == Input.Keys.UP){
-            instance.clientPlayer.playerObject.getBehaviour(PlayerHandler.class).moveUp = false;
+            instance.clientPlayer.playerObject.getBehaviour(ClientPlayerHandler.class).moveUp = false;
         }
         if (keycode == Input.Keys.S || keycode == Input.Keys.DOWN){
-            instance.clientPlayer.playerObject.getBehaviour(PlayerHandler.class).moveDown = false;
+            instance.clientPlayer.playerObject.getBehaviour(ClientPlayerHandler.class).moveDown = false;
         }
         if (keycode == Input.Keys.A || keycode == Input.Keys.LEFT){
-            instance.clientPlayer.playerObject.getBehaviour(PlayerHandler.class).moveToTheLeft = false;
+            instance.clientPlayer.playerObject.getBehaviour(ClientPlayerHandler.class).moveToTheLeft = false;
         }
         if (keycode == Input.Keys.D || keycode == Input.Keys.RIGHT){
-            instance.clientPlayer.playerObject.getBehaviour(PlayerHandler.class).moveToTheRight = false;
+            instance.clientPlayer.playerObject.getBehaviour(ClientPlayerHandler.class).moveToTheRight = false;
         }
         if (keycode == Input.Keys.H){
             instance.clientPlayer.autoHeal();
@@ -81,16 +81,16 @@ public class HUDInputListener extends InputListener {
     @Override
     public boolean keyDown(InputEvent event, int keycode) {
         if (keycode == Input.Keys.W || keycode == Input.Keys.UP){
-            instance.clientPlayer.playerObject.getBehaviour(PlayerHandler.class).moveUp = true;
+            instance.clientPlayer.playerObject.getBehaviour(ClientPlayerHandler.class).moveUp = true;
         }
         if (keycode == Input.Keys.S || keycode == Input.Keys.DOWN){
-            instance.clientPlayer.playerObject.getBehaviour(PlayerHandler.class).moveDown = true;
+            instance.clientPlayer.playerObject.getBehaviour(ClientPlayerHandler.class).moveDown = true;
         }
         if (keycode == Input.Keys.A || keycode == Input.Keys.LEFT){
-            instance.clientPlayer.playerObject.getBehaviour(PlayerHandler.class).moveToTheLeft = true;
+            instance.clientPlayer.playerObject.getBehaviour(ClientPlayerHandler.class).moveToTheLeft = true;
         }
         if (keycode == Input.Keys.D || keycode == Input.Keys.RIGHT){
-            instance.clientPlayer.playerObject.getBehaviour(PlayerHandler.class).moveToTheRight = true;
+            instance.clientPlayer.playerObject.getBehaviour(ClientPlayerHandler.class).moveToTheRight = true;
         }
 
         if (keycode == Input.Keys.R){

@@ -7,11 +7,12 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.*;
-import com.mygdx.game.gamestate.UI.console.sjconsole.LogLevel;
 import com.mygdx.game.gamestate.factories.BodyResolver;
 import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.items.Item;
+import com.mygdx.game.gamestate.objects.items.guns.Gun;
+import com.mygdx.game.gamestate.objects.items.guns.GunMagazine;
 import com.mygdx.game.gamestate.player.ClientPlayer;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.*;
@@ -154,6 +155,17 @@ public class GameState extends AbstractGameState {
             debugRenderer.line(beginV, endV);
             debugRenderer.setColor(Color.YELLOW);
             debugRenderer.end();
+        }
+    }
+
+    public void reloadGun(){
+        if (clientPlayer.equipedItem instanceof Gun gun) {
+            GunMagazine magaz = clientPlayer.getItemOfType(GunMagazine.class);
+            if (magaz != null) {
+                gun.reload(magaz);
+            } else {
+                gun.reload(null);
+            }
         }
     }
 

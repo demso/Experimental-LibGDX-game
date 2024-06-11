@@ -67,7 +67,7 @@ public class ClientPlayerConstructor {
 
         new Box2dBehaviour(body, playerObject);
         new PlayerCollisionBehaviour(playerObject);
-        PlayerHandler ph = new PlayerHandler(playerObject, player);
+        ClientPlayerHandler ph = new ClientPlayerHandler(playerObject, player);
         player.playerHandler = ph;
 
         //Player handler construction
