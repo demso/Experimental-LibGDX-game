@@ -24,8 +24,10 @@ public class ClientPlayer extends Player {
         Grenade item = getItemOfType(Grenade.class);
         if (item != null) {
             item.fire(time, true);
+            GameState.instance.client.onGrenadeThrown(item);
             return true;
         }
+
         return false;
     }
 

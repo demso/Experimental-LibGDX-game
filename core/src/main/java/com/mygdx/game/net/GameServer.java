@@ -89,14 +89,25 @@ public class GameServer {
                         startWave();
                         //server.sendToTCP(con.getID(), new PlayerEquip().set(ItemInfo.createItemInfo(gameState.itemsFactory.getItem(itemsCounter.incrementAndGet(), "deagle_44"), msg.playerId, null, true)));
                     });
-            listener.addTypeHandler(EntityShot.class, (con, msg) -> {
-                        Entity zomb = entities.get(msg.id);
-                        if (zomb == null || !zomb.isAlive()){
-                            HandyHelper.instance.log("[GameServer:93] Entity is unreachable on server, is null = " + (zomb == null)
-                                    + ", hp = " + (zomb == null ? "" : zomb.getHp()));
+            listener.addTypeHandler(EntityHurt.class, (con, msg) -> {
+                        Entity entity = entities.get(msg.id);
+                        if (entity == null && players.get(msg.id) != null) {
+                            PlayerInfo plInf = players.get(msg.id);
+                            plInf.hp = Math.max(0, plInf.hp - msg.damage);
+                            if (plInf.hp <= 0) {
+                                plInf.isAlive = false;
+                                sendToAllPlayers(new KillEntity().set(msg.id));
+                            } else
+                                server.sendToAllExceptTCP(players.get(msg.playerId).connection.getID(), msg);
                             return;
                         }
-                        if (zomb instanceof Zombie zombie) {
+
+                        if (entity == null || !entity.isAlive()){
+                            HandyHelper.instance.log("[GameServer:93] Entity is unreachable on server, is null = " + (entity == null)
+                                    + ", hp = " + (entity == null ? "" : entity.getHp()));
+                            return;
+                        }
+                        if (entity instanceof Zombie zombie) {
                             zombie.hurt(msg.damage);
                             if (!zombie.isAlive()) {
                                 killEntity(msg.id);
@@ -224,9 +235,20 @@ public class GameServer {
                 if (item == null){
                     item = (Grenade) gameState.itemsFactory.getItem(msg.uid, msg.tileName);
                     item.fire(Math.round(msg.timeToDetonation * 1000), false);
+                } else {
+                    if ( item.getGameObject() != null){
+                        GrenadeHandler handler = item.getGameObject().getBehaviour(GrenadeHandler.class);
+                        if (handler != null)
+                            handler.requestUpdate(msg);
+                    }
                 }
-                item.getGameObject().getBehaviour(GrenadeHandler.class).requestUpdate(msg);
                 server.sendToAllExceptTCP(con.getID(),msg);
+            });
+            listener.addTypeHandler(DisposeItem.class, (con, msg) -> {
+                Item item = gameState.items.get(msg.uid);
+                if (item != null)
+                    item.dispose();
+                server.sendToAllExceptTCP(con.getID(), msg);
             });
 
             server.bind(54555,54777);

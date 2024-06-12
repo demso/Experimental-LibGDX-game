@@ -73,6 +73,8 @@ public class GameConstructor {
 
         gameState.map = new ClientMapLoader(gameState.world).load(msg.map, new TmxMapLoader.Parameters());
 
+        gameState.hud.init();
+
         gameState.shapeRenderer.setProjectionMatrix(gameState.camera.combined);
         gameState.renderer = new OrthogonalTiledMapRenderer(gameState.map, 1f / (float) GameState.TILE_SIDE);
         gameState.batch = gameState.renderer.getBatch();

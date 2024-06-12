@@ -117,6 +117,8 @@ public class BodyResolver {
         FixtureDef fullFixtureDef = new FixtureDef();
         fullBox.setAsBox(0.5f, 0.5f);
         fullFixtureDef.shape = fullBox;
+        fullFixtureDef.restitution = 0.2f;
+        fullFixtureDef.friction = 1;
 
         Body body = world.createBody(fullBodyDef);
         body.createFixture(fullFixtureDef);
@@ -143,17 +145,19 @@ public class BodyResolver {
     public Body itemBody(float x, float y, Object userData){
         BodyDef transparentBodyDef = new BodyDef();
         transparentBodyDef.type = BodyDef.BodyType.DynamicBody;
+        transparentBodyDef.fixedRotation = false;
         CircleShape transparentBox = new CircleShape();
         FixtureDef transparentFixtureDef = new FixtureDef();
         transparentBox.setRadius(0.2f);
         transparentFixtureDef.shape = transparentBox;
-        transparentFixtureDef.filter.groupIndex = -10;
+        transparentFixtureDef.restitution = 0.1f;
+        transparentFixtureDef.friction = 1f;
         transparentBodyDef.active = false;
         transparentBodyDef.position.set(x, y);
         Body body = world.createBody(transparentBodyDef);
         body.createFixture(transparentFixtureDef);
         Filter filtr = body.getFixtureList().get(0).getFilterData();
-        filtr.maskBits = Globals.PLAYER_INTERACT_CONTACT_FILTER;
+        filtr.maskBits = Globals.ALL_CONTACT_FILTER & ~Globals.LIGHT_CONTACT_FILTER & ~Globals.PLAYER_CONTACT_FILTER;
         body.getFixtureList().get(0).refilter();
         body.setUserData(userData);
 

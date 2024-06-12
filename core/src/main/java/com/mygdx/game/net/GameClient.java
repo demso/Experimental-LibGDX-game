@@ -6,12 +6,13 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Listener;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
+import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.AcceptHandler;
+import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.objects.items.grenade.Grenade;
 import com.mygdx.game.gamestate.objects.items.grenade.GrenadeHandler;
-import com.mygdx.game.gamestate.objects.items.grenade.GrenadeSprite;
 import com.mygdx.game.net.messages.client.*;
 import com.mygdx.game.net.messages.common.*;
 import com.mygdx.game.net.messages.common.tileupdate.CloseTile;
@@ -92,9 +93,21 @@ public class GameClient {
                     if (!checkReady(msg)) return;
                     handler.receivedKillEntity(msg.entityId);
                 });
-        listener.addTypeHandler(EntityShot.class, (con, msg) -> {
+        listener.addTypeHandler(EntityHurt.class, (con, msg) -> {
                     if (!checkReady(msg)) return;
-                    GameState.instance.entities.get(msg.id).hurt(msg.damage);
+                    Entity entity = GameState.instance.entities.get(msg.id);
+                    if (entity != null) {
+                        entity.hurt(msg.damage);
+                        return;
+                    }
+                    entity = GameState.instance.players.get(msg.id);
+                    if (entity != null) {
+                        entity.hurt(msg.damage);
+                        return;
+                    }
+                    if (msg.id == GameState.instance.clientPlayer.getId()) {
+                        GameState.instance.clientPlayer.hurt(msg.damage);
+                    }
                 });
         listener.addTypeHandler(GunFire.class, (con, msg) -> {
                     if (!checkReady(msg)) return;
@@ -139,8 +152,16 @@ public class GameClient {
             if (item == null){
                 item = (Grenade) gameState.itemsFactory.getItem(msg.uid, msg.tileName);
                 item.fire(Math.round(msg.timeToDetonation * 1000), false);
+            } else if ( item.getGameObject() != null){
+                GrenadeHandler handler = item.getGameObject().getBehaviour(GrenadeHandler.class);
+                if (handler != null)
+                    handler.requestUpdate(msg);
             }
-            item.getGameObject().getBehaviour(GrenadeHandler.class).requestUpdate(msg);
+        });
+        listener.addTypeHandler(DisposeItem.class, (con, msg) -> {
+            Item item = gameState.items.get(msg.uid);
+            if (item != null)
+                item.dispose();
         });
 
     }
@@ -166,7 +187,7 @@ public class GameClient {
     }
 
     public void onHit(long id, float damage){
-        client.sendTCP(new EntityShot().set(id, damage, GameState.instance.clientPlayer.getId()));
+        client.sendTCP(new EntityHurt().set(id, damage, GameState.instance.clientPlayer.getId()));
     }
 
     public void onGunFire(){
@@ -203,6 +224,14 @@ public class GameClient {
         localGrenades.add(gr);
     }
 
+    public void disposeItem(Item item){
+        client.sendTCP(new DisposeItem().set(item.uid));
+    }
+
+    public void entityHurt(Entity entity, float damage){
+        client.sendTCP(new EntityHurt().set(entity.getId(), damage, GameState.instance.clientPlayer.getId()));
+    }
+
 //    public void getStoredItems(float x, float y){
 //        client.sendTCP(new GetStoredItems().set((int) Math.floor(x), (int) Math.floor(y)));
 //    }
@@ -215,10 +244,17 @@ public class GameClient {
         client.sendTCP(new StopStorageUpdate().set(GameState.instance.clientPlayer.getId(), (int) Math.floor(x), (int) Math.floor(y)));
     }
 
+
+    float updateTimeAccumulator = 0;
+    float updatePeriod = (Globals.SERVER_UPDATE_TIME);
     public void update(float delta){
-        if (localGrenades.size > 0){
-            for (Grenade gr : localGrenades) {
-                client.sendTCP(new GrenadeInfo().set(gr.uid, gr.stringID, gr.timeToDetonation, gr.getPosition().x, gr.getPosition().y, gr.getPhysicalBody().getLinearVelocity().x, gr.getPhysicalBody().getLinearVelocity().y));
+        if (localGrenades.size > 0) {
+            updateTimeAccumulator += delta;
+            if (updateTimeAccumulator >= updatePeriod) {
+                for (Grenade gr : localGrenades) {
+                    client.sendTCP(new GrenadeInfo().set(gr.uid, gr.stringID, gr.timeToDetonation, gr.getPosition().x, gr.getPosition().y, gr.getPhysicalBody().getLinearVelocity().x, gr.getPhysicalBody().getLinearVelocity().y));
+                }
+                updateTimeAccumulator = 0;
             }
         }
     }

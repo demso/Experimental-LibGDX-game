@@ -10,7 +10,7 @@ public class AutoRifle extends Gun{
 
     public AutoRifle(long uid, String tileName, String itemName) {
         super(uid, tileName, itemName);
-        reloadTime = 5;
+        reloadTime = 2.5f;
         spriteWidth = 0.5f;
         spiteHeight = 0.5f;
         setFireType(FireType.AUTO);

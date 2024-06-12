@@ -56,9 +56,9 @@ public class Window implements Interactable, BodyData, Closeable, Openable {
         player.getBody().getFixtureList().get(0).refilter();
         if (player.getId() == gameState.clientPlayer.getId()){
             if (isOpen)
-                gameState.client.onTileOpen((int)Math.floor(physicalBody.getPosition().x + 0.05f), (int)Math.floor(physicalBody.getPosition().y + 0.05f));
+                gameState.client.onTileOpen((int)Math.floor(physicalBody.getPosition().x), (int)Math.floor(physicalBody.getPosition().y));
             else
-                gameState.client.onTileClose((int)Math.floor(physicalBody.getPosition().x + 0.05f), (int)Math.floor(physicalBody.getPosition().y + 0.05f));
+                gameState.client.onTileClose((int)Math.floor(physicalBody.getPosition().x), (int)Math.floor(physicalBody.getPosition().y));
         }
     }
 

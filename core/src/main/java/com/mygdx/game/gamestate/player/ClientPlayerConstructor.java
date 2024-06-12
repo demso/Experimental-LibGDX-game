@@ -58,7 +58,7 @@ public class ClientPlayerConstructor {
         body.createFixture(sensorFixtureDef).setUserData(new SimpleUserData("playerInteractionBubble"));
         sensorCircle.dispose();
 
-        body.setLinearDamping(12);
+        body.setLinearDamping(12f);
 
         player.setBody(body);
 
@@ -108,7 +108,8 @@ public class ClientPlayerConstructor {
         light.setContactFilter(f);
 
         MassData massData = new MassData();
-        massData.mass = 60f;
+        massData.mass = 1f;
+        massData.I = 1;
         massData.center.set(new Vector2(0f,0f));
         body.setMassData(massData);
 

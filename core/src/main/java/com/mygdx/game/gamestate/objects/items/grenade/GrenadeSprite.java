@@ -6,9 +6,9 @@ import com.mygdx.game.net.messages.client.GrenadeInfo;
 import dev.lyze.gdxUnBox2d.GameObject;
 
 public class GrenadeSprite extends SpriteBehaviour {
-//    public boolean needsUpdate;
-//    public GrenadeInfo grenadeInfo;
-//
+    public boolean needsUpdate;
+    public GrenadeInfo grenadeInfo;
+    float timeToExplosion;
     public GrenadeSprite(GameObject gameObject, float width, float height, TextureRegion textureRegion, float renderOrder) {
         super(gameObject, width, height, textureRegion, renderOrder);
     }
@@ -19,7 +19,7 @@ public class GrenadeSprite extends SpriteBehaviour {
 //
 //        }
 //    }
-
+//
 //    @Override
 //    public void fixedUpdate() {
 //        super.fixedUpdate();
@@ -31,12 +31,14 @@ public class GrenadeSprite extends SpriteBehaviour {
 //            grenade.detonation();
 //        }
 //    }
-
+//
 //    public void requestUpdate(GrenadeInfo info){
 //        needsUpdate = true;
 //        grenadeInfo = info;
 //    }
-
-
+//
+//    public void thrown(float time){
+//        timeToExplosion = time;
+//    }
 
 }

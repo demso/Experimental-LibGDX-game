@@ -325,16 +325,18 @@ public class HUD extends Stage {
         label.setWidth(350);
         label.setAlignment(Align.topLeft);
 
-        infoPanel = new InfoPanel(this);
-        infoPanel.setPosition(0, 0, Align.bottomLeft);
-
         addActor(label);
-        addActor(infoPanel);
         panels.space(5);
         addActor(panels);
+//
+//        scopeRenderer = new ScopeRenderer(16);
+//        scopeGroup = new Group(new ObjectScope("Settings", infoPanel));
+    }
 
-        scopeRenderer = new ScopeRenderer(16);
-        scopeGroup = new Group(new ObjectScope("Settings", infoPanel));
+    public void init(){
+        infoPanel = new InfoPanel(this);
+        infoPanel.setPosition(0, 0, Align.bottomLeft);
+        addActor(infoPanel);
     }
 
     public static class Settings {

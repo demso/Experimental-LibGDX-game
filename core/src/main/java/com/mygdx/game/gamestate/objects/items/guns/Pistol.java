@@ -6,6 +6,7 @@ public class Pistol extends Gun{
 
     public Pistol(long uid, String tileName, String itemName) {
         super(uid, tileName, itemName);
+        reloadTime = 1f;
         setFireType(FireType.SEMI_AUTO);
     }
 

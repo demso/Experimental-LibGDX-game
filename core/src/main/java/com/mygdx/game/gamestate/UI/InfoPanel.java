@@ -57,6 +57,7 @@ public class InfoPanel extends Group {
                 showAmmo(false);
             }
             hpLabel.setText(Math.round(player.getHp()) + "");
+            showHP(true);
         } else {
             showAmmo(false);
             showHP(false);

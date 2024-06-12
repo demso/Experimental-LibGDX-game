@@ -37,8 +37,16 @@ public class AcceptHandler {
         if (entitiesToKill.size != 0) {
             for (long id : entitiesToKill.toArray()){
                 Entity entity = gameState.entities.get(id);
-                entity.kill();
-                gameState.entities.remove(entity.getId());
+                if (entity != null) {
+                    entity.kill();
+                    gameState.entities.remove(entity.getId());
+                    return;
+                }
+                entity = gameState.players.get(id);
+                if (entity != null) {
+                    entity.kill();
+                    return;
+                }
             }
             entitiesToKill.clear();
         }
@@ -99,6 +107,8 @@ public class AcceptHandler {
     }
 
     public void gunFire(GunFire msg){
+        if (gameState.players.get(msg.playerID) == null)
+            return;
         gameState.players.get(msg.playerID).fire();
     }
 
