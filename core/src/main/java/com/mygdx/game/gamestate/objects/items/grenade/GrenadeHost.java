@@ -1,24 +1,24 @@
 package com.mygdx.game.gamestate.objects.items.grenade;
 
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ArrayMap;
-import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.*;
+import com.mygdx.game.Utils;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.objects.bodies.CollisionBehaviour;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
+import com.mygdx.game.gamestate.objects.bodies.userdata.SimpleUserData;
 import dev.lyze.gdxUnBox2d.Behaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
-import net.dermetfan.gdx.physics.box2d.Box2DUtils;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class GrenadeHost extends CollisionBehaviour<Grenade> {
     float timeToExplosion;
-    public ObjectSet<Entity> nearEntities = new ObjectSet<>();
+    Array<ContactData> nearEntities = new Array<>();
+    ObjectSet<Entity> bodiesInEpicenter= new ObjectSet<>();
 
     public GrenadeHost(GameObject gameObject) {
         super(gameObject);
@@ -28,7 +28,7 @@ public class GrenadeHost extends CollisionBehaviour<Grenade> {
     public void onCollisionEnter(Behaviour other, Contact contact) {
         preCol(contact);
         if (thisFixture.isSensor() && otherUserData instanceof Entity entity) {
-            nearEntities.add(entity);
+            bodiesInEpicenter.add(entity);
         }
     }
 
@@ -36,7 +36,17 @@ public class GrenadeHost extends CollisionBehaviour<Grenade> {
     public void onCollisionExit(Behaviour other, Contact contact) {
         preCol(contact);
         if (thisFixture.isSensor() && otherUserData instanceof Entity entity) {
-            nearEntities.remove(entity);
+            bodiesInEpicenter.remove(entity);
+        }
+    }
+
+    class ContactData{
+        Body body;
+        float fraction;
+        int position;
+        ContactData(Body body, float fraction){
+            this.body = body;
+            this.fraction = fraction;
         }
     }
 
@@ -54,15 +64,12 @@ public class GrenadeHost extends CollisionBehaviour<Grenade> {
         }
     }
 
-    Vector2 vec = new Vector2();
-    ArrayMap<Entity, Float> entitiesOnRay = new ArrayMap<>();
-    int rayNum = 15;
+    int rayNum = 30;
     Array<Vector2> rayEnds = new Array<>();
     public void detonation(){
         Grenade grenade = ((Grenade)(getGameObject().getBox2dBehaviour().getBody().getUserData()));
         World world = grenade.physicalBody.getWorld();
-        entitiesOnRay.clear();
-
+        nearEntities.clear();
 
         float anglePart = 360f / rayNum;
         for (int i = 0; i < rayNum; i++) {
@@ -70,47 +77,68 @@ public class GrenadeHost extends CollisionBehaviour<Grenade> {
             rayEnds.add(endVec.scl(grenade.radius));
         }
 
+        HashMap<Body,ContactData> colliders= new HashMap<>();
         for (Vector2 pos : rayEnds) {
+            colliders.clear();
             world.rayCast(
-                    (fixture, point, normal, fraction) -> {
-                        if (((fixture.getFilterData().maskBits & (Globals.DEFAULT_CONTACT_FILTER)) == 0) || fixture.isSensor())
-                            return -1;
-                        Object data = fixture.getBody().getUserData();
-                        if (data instanceof Entity entity1) {
-                            if (fraction < entitiesOnRay.get(entity1, 1f) )
-                                entitiesOnRay.put(entity1, fraction);
+                    (fixture, point, normal, fraction) ->
+                    {
+                        Body body = fixture.getBody();
+                        ContactData contactData = colliders.get(body);
+                        if (contactData != null) {
+                            if (contactData.fraction > fraction) colliders.put(body, new ContactData(body, fraction));
+                        } else {
+                            colliders.put(body, new ContactData(fixture.getBody(), fraction));
                         }
-                        return 1;
+                        return fraction;
                     },
                     grenade.physicalBody.getPosition(),
                     new Vector2(grenade.physicalBody.getPosition()).add(pos)
             );
+
+
+            ContactData[] contacts = colliders.values().toArray(new ContactData[0]);
+            Arrays.sort(contacts, (o1, o2) -> {
+                int ret = 0;
+                if ( o1.fraction > o2.fraction)
+                    ret = 1;
+                else if (o1.fraction < o2.fraction)
+                    ret = -1;
+                return ret;
+            });
+
+            for (int i = 0; i < contacts.length; i++) {
+                ContactData contact = contacts[i];
+                Fixture fixture = contact.body.getFixtureList().first();
+                if (((fixture.getFilterData().categoryBits & (Globals.DEFAULT_CONTACT_FILTER)) == 1) || fixture.isSensor())
+                    break;
+                if (contact.body.getUserData() instanceof Entity)
+                    nearEntities.add(contact);
+            }
         }
 
-        Vector2 addPos1 = new Vector2(grenade.physicalBody.getPosition());
-        addPos1.y += grenade.radius;
-        Vector2 addPos2 = new Vector2(grenade.physicalBody.getPosition());
-        addPos2.y -= grenade.radius;
-        world.rayCast(
-                (fixture, point, normal, fraction) -> {
-                    if (((fixture.getFilterData().maskBits & (Globals.DEFAULT_CONTACT_FILTER)) == 0) || fixture.isSensor())
-                        return -1;
-                    Object data = fixture.getBody().getUserData();
-                    if (data instanceof Entity entity1) {
-                        if (fraction < entitiesOnRay.get(entity1, 1f) )
-                            entitiesOnRay.put(entity1, fraction);
-                    }
-                    return 1;
-                },
-                addPos1,
-                addPos2
-        );
+        for (Entity entity : new ObjectSet.ObjectSetIterator<>(bodiesInEpicenter)) {
+            boolean skip = false;
+            for (int j = 0; j < nearEntities.size; j++) {
+                ContactData cd = nearEntities.get(j);
+                if (cd.body == entity.getBody()) {
+                    skip = true;
+                    break;
+                }
+            }
+            if (skip)
+                continue;
 
-        for (int i = 0; i < entitiesOnRay.size; i++) {
-            Entity entity = entitiesOnRay.getKeyAt(i);
-            float fract = entitiesOnRay.getValueAt(i);
-            float damage = Math.max(0, 1 - (fract + 0.1f * i + (float) Math.random() * 0.3f * i)) * grenade.damage;
-            HandyHelper.instance.log("[GrenadeHost:detonation] Damage for " + entity.getName() + " " + damage);
+            nearEntities.add(new ContactData(entity.getBody(), 0));
+        }
+
+        for (int i = 0; i < nearEntities.size; i++) {
+            ContactData contact = nearEntities.get(i);
+            Entity entity = (Entity) contact.body.getUserData();
+            float fract = contact.fraction;
+            //float damage = Math.max(0, 1 - (fract + 0.1f * contact.position + (float) Math.random() * 0.3f * contact.position)) * grenade.damage;
+            float damage = Math.max(0, 1 - (fract)) * grenade.damage;
+            HandyHelper.instance.log("[GrenadeHost:detonation] Damaged " + entity.getName() + " " + Utils.round(damage,1));
             entity.hurt(damage);
             GameState.instance.client.entityHurt(entity, damage);
         }
@@ -120,5 +148,16 @@ public class GrenadeHost extends CollisionBehaviour<Grenade> {
 
     public void thrown(float time){
         timeToExplosion = time;
+    }
+}
+
+class RCCallback implements RayCastCallback {
+    @Override
+    final public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
+        if (fixture.getBody().getUserData().getClass().equals(SimpleUserData.class) || ((fixture.getFilterData().categoryBits & (Globals.DEFAULT_CONTACT_FILTER)) == 1) || fixture.isSensor())
+            return -1;
+        Object data = fixture.getBody().getUserData();
+        //do some other stuff
+        return fraction;
     }
 }
