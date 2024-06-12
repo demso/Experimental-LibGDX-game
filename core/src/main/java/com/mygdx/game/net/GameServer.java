@@ -53,7 +53,7 @@ public class GameServer {
             server.addListener(listener);
 
             defaultPlayer = new PlayerInfo("default", null).playerSet(spawnPoint.x, spawnPoint.y, 0, 0, 0);
-            defaultPlayer.hp = Globals.PLAYER_HEALTH;
+            defaultPlayer.hp = Globals.PLAYER_HEALTH * 100;
             defaultPlayer.maxHp = defaultPlayer.hp;
 
             //Log.TRACE();

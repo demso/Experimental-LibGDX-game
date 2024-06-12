@@ -1,6 +1,7 @@
 package com.mygdx.game.net;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Listener;
@@ -252,7 +253,9 @@ public class GameClient {
             updateTimeAccumulator += delta;
             if (updateTimeAccumulator >= updatePeriod) {
                 for (Grenade gr : localGrenades) {
-                    client.sendTCP(new GrenadeInfo().set(gr.uid, gr.stringID, gr.timeToDetonation, gr.getPosition().x, gr.getPosition().y, gr.getPhysicalBody().getLinearVelocity().x, gr.getPhysicalBody().getLinearVelocity().y));
+                    Body body = gr.getPhysicalBody();
+                    Vector2 vel = body.getLinearVelocity();
+                    client.sendTCP(new GrenadeInfo().set(gr.uid, gr.stringID, gr.timeToDetonation, gr.getPosition().x, gr.getPosition().y, vel.x, vel.y, body.getTransform().getRotation()));
                 }
                 updateTimeAccumulator = 0;
             }

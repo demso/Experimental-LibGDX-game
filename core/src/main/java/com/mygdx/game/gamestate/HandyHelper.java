@@ -103,7 +103,7 @@ public class HandyHelper {
 
     public void periodicLog(String toLog){
         if (System.currentTimeMillis() - timeOfPeriodicLog > periodicLogTime){
-            System.out.println(toLog);
+            //System.out.println(toLog);
             logInConsole(toLog, LogLevel.DEFAULT);
             saveLog(toLog);
             lastString = toLog;

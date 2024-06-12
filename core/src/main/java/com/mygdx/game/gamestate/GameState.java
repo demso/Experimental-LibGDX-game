@@ -91,6 +91,7 @@ public class GameState extends AbstractGameState {
 //            itemsString.append(i.toString()).append("\n");
 //        }
         HandyHelper.instance.periodicLog("items: " + items.toString() + "\n inv: " + clientPlayer.getInventoryItems());
+        HandyHelper.instance.log("[GameState:update]Player hp: " + clientPlayer.getHp());
 
         getServerHandler().update(deltaTime);
         client.update(deltaTime);

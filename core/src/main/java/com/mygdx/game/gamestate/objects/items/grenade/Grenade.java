@@ -29,7 +29,9 @@ public class Grenade extends Item {
 
             physicalBody = bodyResolver.notInteractableItemBody(0, 0, this);
             physicalBody.setLinearDamping(0);
+            physicalBody.setAngularDamping(0);
             physicalBody.getFixtureList().get(0).setRestitution(0);
+            physicalBody.setMassData(new MassData().set(0.1f, new Vector2(0, -0.1f), 0.1f));
 
             new Box2dBehaviour(physicalBody, gameObject);
             new GrenadeHandler(gameObject);
@@ -61,7 +63,9 @@ public class Grenade extends Item {
             var shape = new CircleShape();
             shape.setRadius(radius);
             detector.shape = shape;
-            physicalBody.createFixture(detector).setUserData(this);
+            Fixture detectFix = physicalBody.createFixture(detector);
+            detectFix.setUserData(this);
+            detectFix.refilter();
 
             physicalBody.setMassData(new MassData().set(0.5f, new Vector2(0, -0.1f), 0.1f));
 
