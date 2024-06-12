@@ -142,6 +142,7 @@ public class BodyResolver {
 
     public Body itemBody(float x, float y, Object userData){
         BodyDef transparentBodyDef = new BodyDef();
+        transparentBodyDef.type = BodyDef.BodyType.DynamicBody;
         CircleShape transparentBox = new CircleShape();
         FixtureDef transparentFixtureDef = new FixtureDef();
         transparentBox.setRadius(0.2f);
@@ -152,10 +153,18 @@ public class BodyResolver {
         Body body = world.createBody(transparentBodyDef);
         body.createFixture(transparentFixtureDef);
         Filter filtr = body.getFixtureList().get(0).getFilterData();
-        filtr.maskBits = 0x0002;
+        filtr.maskBits = Globals.PLAYER_INTERACT_CONTACT_FILTER;
         body.getFixtureList().get(0).refilter();
         body.setUserData(userData);
 
+        return body;
+    }
+
+    public Body notInteractableItemBody(float x, float y, Object userData){
+        Body body = itemBody(x, y, userData);
+        Filter filter = body.getFixtureList().get(0).getFilterData();
+        filter.maskBits = Globals.ALL_CONTACT_FILTER & ~Globals.PLAYER_INTERACT_CONTACT_FILTER & ~Globals.PLAYER_CONTACT_FILTER & ~Globals.LIGHT_CONTACT_FILTER;
+        body.getFixtureList().get(0).refilter();
         return body;
     }
 

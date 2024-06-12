@@ -105,9 +105,14 @@ if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14)) {
 // If the above line doesn't produce a runnable executable, you can try using the below line instead of the above one.
 //        imageOptions = ["--icon", "icons/logo.icns", "--java-options", "\"-XstartOnFirstThread\""]
       }
-      imageOptions.add("--java-options" as int, "--add-opens=java.base/java.util=ALL-UNNAMED")
+      //imageOptions.add("--java-options" as int, "--add-opens=java.base/java.util=ALL-UNNAMED")
     }
 
+    launcher {
+      jvmArgs = [
+              '--add-opens=java.base/java.util=ALL-UNNAMED'
+      ]
+    }
   }
 }
 

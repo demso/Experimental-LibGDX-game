@@ -77,10 +77,14 @@ public class HUDInputListener extends InputListener {
         if (keycode == Input.Keys.H){
             instance.clientPlayer.autoHeal();
         }
+        if (keycode == Input.Keys.G){
+            instance.clientPlayer.throwGrenade(System.currentTimeMillis() - GPressedTime);
+        }
         return false;
     }
     long RPressedTime = 0;
     boolean RLongPressed;
+    long GPressedTime = 0;
     @Override
     public boolean keyDown(InputEvent event, int keycode) {
         if (keycode == Input.Keys.W || keycode == Input.Keys.UP){
@@ -95,13 +99,15 @@ public class HUDInputListener extends InputListener {
         if (keycode == Input.Keys.D || keycode == Input.Keys.RIGHT){
             instance.clientPlayer.playerObject.getBehaviour(ClientPlayerHandler.class).moveToTheRight = true;
         }
-
         if (keycode == Input.Keys.R){
             if (Gdx.input.isKeyPressed(Input.Keys.R)) {
                 RPressedTime = System.nanoTime();
                 RLongPressed = false;
             }
             //HandyHelper.instance.log(System.currentTimeMillis() + " ", false);
+        }
+        if (keycode == Input.Keys.G){
+            GPressedTime = System.currentTimeMillis();
         }
 
         return false;
@@ -114,7 +120,7 @@ public class HUDInputListener extends InputListener {
             RLongPressed = true;
         }
         //HandyHelper.instance.log(System.nanoTime() + " " + RPressedTime + " " + (System.nanoTime() - RPressedTime), false);
-        if (Gdx.input.isKeyPressed(Input.Keys.T)){
+        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
             if (instance.clientPlayer.equipedItem instanceof Gun gun)
                 if (gun.getFireType().equals(Gun.FireType.AUTO))
                     instance.clientPlayer.fire();

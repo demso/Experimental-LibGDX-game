@@ -66,7 +66,7 @@ public class PlayerInventoryHUD extends StorageInventoryHUD{
     }
 
     public PlayerInventoryHUD(HUD hud) {
-        super(hud,  ContextMenu.ConAction.Description, ContextMenu.ConAction.Drop, ContextMenu.ConAction.Equip, ContextMenu.ConAction.Store);
+        super(hud,  ContextMenu.ConAction.Store, ContextMenu.ConAction.Equip, ContextMenu.ConAction.Drop, ContextMenu.ConAction.Description);
         setName("PlayerInventoryScrollPane");
         contextMenu.disableActions(ContextMenu.ConAction.Store);
     }

@@ -1,6 +1,7 @@
 package com.mygdx.game.net;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Listener;
 import com.mygdx.game.SecondGDXGame;
@@ -8,6 +9,9 @@ import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.AcceptHandler;
 import com.mygdx.game.gamestate.objects.items.Item;
+import com.mygdx.game.gamestate.objects.items.grenade.Grenade;
+import com.mygdx.game.gamestate.objects.items.grenade.GrenadeHandler;
+import com.mygdx.game.gamestate.objects.items.grenade.GrenadeSprite;
 import com.mygdx.game.net.messages.client.*;
 import com.mygdx.game.net.messages.common.*;
 import com.mygdx.game.net.messages.common.tileupdate.CloseTile;
@@ -22,6 +26,7 @@ public class GameClient {
     public OnConnection startMessage;
     public AcceptHandler handler;
     public GameState gameState;
+    public ObjectSet<Grenade> localGrenades = new ObjectSet<>();
 
     public GameClient(){
         client = new Client();
@@ -129,6 +134,15 @@ public class GameClient {
             if (item != null)
                 item.dispose();
         });
+        listener.addTypeHandler(GrenadeInfo.class, (con, msg) -> {
+            Grenade item = (Grenade) gameState.items.get(msg.uid);
+            if (item == null){
+                item = (Grenade) gameState.itemsFactory.getItem(msg.uid, msg.tileName);
+                item.fire(Math.round(msg.timeToDetonation * 1000), false);
+            }
+            item.getGameObject().getBehaviour(GrenadeHandler.class).requestUpdate(msg);
+        });
+
     }
 
     public boolean checkReady(Object obj) {
@@ -185,6 +199,10 @@ public class GameClient {
         client.sendTCP(new RemoveItemFromWorld().set(item.uid));
     }
 
+    public void onGrenadeThrown(Grenade gr){
+        localGrenades.add(gr);
+    }
+
 //    public void getStoredItems(float x, float y){
 //        client.sendTCP(new GetStoredItems().set((int) Math.floor(x), (int) Math.floor(y)));
 //    }
@@ -195,6 +213,14 @@ public class GameClient {
 
     public void stopStorageUpdate(float x, float y){
         client.sendTCP(new StopStorageUpdate().set(GameState.instance.clientPlayer.getId(), (int) Math.floor(x), (int) Math.floor(y)));
+    }
+
+    public void update(float delta){
+        if (localGrenades.size > 0){
+            for (Grenade gr : localGrenades) {
+                client.sendTCP(new GrenadeInfo().set(gr.uid, gr.stringID, gr.timeToDetonation, gr.getPosition().x, gr.getPosition().y, gr.getPhysicalBody().getLinearVelocity().x, gr.getPhysicalBody().getLinearVelocity().y));
+            }
+        }
     }
 
     public String connect(String host){

@@ -8,7 +8,7 @@ import lombok.Setter;
 public class GunMagazine extends Item {
     @Getter @Setter
     protected int capacity = 10;
-    @Getter
+    @Getter @Setter
     protected int currentAmount;
     @Getter
     Array<String> gunTypes;

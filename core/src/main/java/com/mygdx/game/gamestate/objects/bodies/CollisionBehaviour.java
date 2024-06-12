@@ -13,14 +13,14 @@ public class CollisionBehaviour<T> extends BehaviourAdapter {
     protected Fixture thisFixture;
     protected Fixture otherFixture;
 
-    Body thisBody;
+    protected Body thisBody;
     protected Body otherBody;
 
-    Object thisUserData;
+    protected Object thisUserData;
     protected Object otherUserData;
 
-    Object thisFixtureUserData;
-    Object otherFixtureUserData;
+    protected Object thisFixtureUserData;
+    protected Object otherFixtureUserData;
 
     protected String otherBodyUserName;
 

@@ -3,10 +3,10 @@ package com.mygdx.game.gamestate.factories;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.mygdx.game.gamestate.UI.HUD;
+import com.mygdx.game.gamestate.objects.items.grenade.Grenade;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.objects.items.Meds;
 import com.mygdx.game.gamestate.objects.items.guns.AutoRifle;
-import com.mygdx.game.gamestate.objects.items.guns.Gun;
 import com.mygdx.game.gamestate.objects.items.guns.GunMagazine;
 import com.mygdx.game.gamestate.objects.items.guns.Pistol;
 import com.mygdx.game.net.messages.common.ItemInfo;
@@ -69,12 +69,18 @@ public class ItemsFactory {
                 magaz.setData(unBox, bodyResolver, hud, gameStage, this);
                 magaz.addGunTypes("m4");
                 magaz.setCapacity(30);
+                magaz.setCurrentAmount(magaz.getCapacity());
                 createdItem = magaz;
             }
             case "medkit" -> {
                 Meds med = new Meds(uid, itemId, getNameForID(itemId));
                 med.setData(unBox, bodyResolver, hud, gameStage, this);
                 createdItem = med;
+            }
+            case "grenade" -> {
+                Grenade item = new Grenade(uid, itemId, getNameForID(itemId));
+                item.setData(unBox, bodyResolver, hud, gameStage, this);
+                createdItem = item;
             }
             default -> {
                 Item item = new Item(uid, itemId, getNameForID(itemId));
@@ -108,6 +114,11 @@ public class ItemsFactory {
         itemNames.put("beef", "Beef");
         itemNames.put("watches", "Watches");
         itemNames.put("shotgun_ammo", "Shotgun ammo");
+        itemNames.put("m4", "Auto rifle");
+        itemNames.put("m4_magazine", "Rifle magazine");
+        itemNames.put("pistol_magazine", "Pistol magazine");
+        itemNames.put("medkit", "Medkit");
+        itemNames.put("grenade", "Grenade");
     }
 
     private void addToContainer(Item item) {

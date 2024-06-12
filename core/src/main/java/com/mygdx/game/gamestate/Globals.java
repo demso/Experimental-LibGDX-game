@@ -24,6 +24,7 @@ public class Globals {
             ZOMBIE_CONTACT_FILTER =             0x0010,                 //00000000 00010000
             ALL_CONTACT_FILTER =                -1,                     //11111111 11111111
             NONE_CONTACT_FILTER =               0X0000,
+            GRENADE_CONTACT_FILTER =            0X0020,              //00000000 0010000
 
             PLAYER_CONTACT_GROUP =              -42,
             LIGHT_CONTACT_GROUP =               -10;

@@ -11,6 +11,6 @@ public class Pistol extends Gun{
 
     @Override
     protected void createSpriteBehaviour() {
-        gunSpriteBehaviour = new PistolSprite(GO, this, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
+        gunSpriteBehaviour = new PistolSprite(gameObject, this, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
     }
 }

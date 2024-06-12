@@ -71,4 +71,9 @@
    <property name="name" value="m4_magazine"/>
   </properties>
  </tile>
+ <tile id="14">
+  <properties>
+   <property name="name" value="grenade"/>
+  </properties>
+ </tile>
 </tileset>

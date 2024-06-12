@@ -9,6 +9,8 @@ import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.Zombie;
 import com.mygdx.game.gamestate.objects.items.Item;
+import com.mygdx.game.gamestate.objects.items.grenade.Grenade;
+import com.mygdx.game.gamestate.objects.items.grenade.GrenadeHandler;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
 import com.mygdx.game.gamestate.tiledmap.tiled.TiledMapTileLayer;
 import com.mygdx.game.net.messages.client.*;
@@ -216,6 +218,15 @@ public class GameServer {
                 Item item = handler.allocateItem(items.get(msg.itemUid), msg.x, msg.y);
                 players.get(msg.playerId).removeItem(items.get(msg.itemUid));
                 server.sendToAllExceptTCP(con.getID(),new AllocateItem().set(new ItemInfo().set(item.uid, item.stringID), item.getPosition().x, item.getPosition().y));
+            });
+            listener.addTypeHandler(GrenadeInfo.class, (con, msg) -> {
+                Grenade item = (Grenade) gameState.items.get(msg.uid);
+                if (item == null){
+                    item = (Grenade) gameState.itemsFactory.getItem(msg.uid, msg.tileName);
+                    item.fire(Math.round(msg.timeToDetonation * 1000), false);
+                }
+                item.getGameObject().getBehaviour(GrenadeHandler.class).requestUpdate(msg);
+                server.sendToAllExceptTCP(con.getID(),msg);
             });
 
             server.bind(54555,54777);

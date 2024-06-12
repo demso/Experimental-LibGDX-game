@@ -46,7 +46,8 @@ public class Item implements BodyData, Interactable {
     public String description = "First you must develop a Skin that implements all the widgets you plan to use in your layout. You can't use a widget if it doesn't have a valid style. Do this how you would usually develop a Skin in Scene Composer.";
     public float spriteWidth = 0.7f;
     public float spiteHeight = 0.7f;
-    protected GameObject GO;
+    @Getter
+    protected GameObject gameObject;
     protected @Getter SpriteBehaviour spriteBehaviour;
     ItemsFactory factory;
     @Getter public boolean isDisposed;
@@ -76,19 +77,19 @@ public class Item implements BodyData, Interactable {
         prepareForRendering();
 
         physicalBody = bodyResolver.itemBody(position.x, position.y, this);
-        new Box2dBehaviour(physicalBody, GO);
-        GO.setEnabled(true);
+        new Box2dBehaviour(physicalBody, gameObject);
+        gameObject.setEnabled(true);
         if (mouseHandler != null)
             mouseHandler.setPosition(getPosition().x - mouseHandler.getWidth()/2f, getPosition().y - mouseHandler.getHeight()/2f);
         return physicalBody;
     }
 
-    protected void prepareForRendering(){
-        if (unBox != null && GO == null)
-            GO = new GameObject(itemName, false, unBox);
+    public void prepareForRendering(){
+        if (unBox != null && gameObject == null)
+            gameObject = new GameObject(itemName, false, unBox);
 
         if (hud != null && spriteBehaviour == null)
-            spriteBehaviour = new SpriteBehaviour(GO, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.ITEMS_RENDER_ORDER);
+            spriteBehaviour = new SpriteBehaviour(gameObject, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.ITEMS_RENDER_ORDER);
 
         if (hud != null && mouseHandler == null) {
             mouseHandler = new Table();
@@ -114,6 +115,10 @@ public class Item implements BodyData, Interactable {
             gameStage.addActor(mouseHandler);
     }
 
+    protected void createSpriteBehaviour(){
+        spriteBehaviour = new SpriteBehaviour(gameObject, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.ITEMS_RENDER_ORDER);
+    }
+
     public void removeFromWorld(){
         if (mouseHandler != null){
             gameStage.getActors().removeValue(mouseHandler, true);
@@ -128,9 +133,9 @@ public class Item implements BodyData, Interactable {
     }
 
     public void clearPhysicalBody(){
-        GO.setEnabled(false);
+        gameObject.setEnabled(false);
         physicalBody = null;
-        GO.destroy(GO.getBox2dBehaviour());
+        gameObject.destroy(gameObject.getBox2dBehaviour());
     }
 
     @Override
@@ -168,12 +173,16 @@ public class Item implements BodyData, Interactable {
         if (!isEquipped())
             return;
         isEquipped = false;
-        if (GO != null)
-            GO.setEnabled(false);
+        if (gameObject != null)
+            gameObject.setEnabled(false);
     }
 
     public boolean isEquipped(){
         return isEquipped;
+    }
+
+    public boolean isOwnedByPlayer(){
+        return owner instanceof Player;
     }
 
     public void dispose(){
@@ -181,15 +190,15 @@ public class Item implements BodyData, Interactable {
         if (owner != null)
             owner.removeItem(this);
         onDrop();
-        if (GO != null && GO.getState() != GameObjectState.DESTROYED)
-            GO.destroy();
+        if (gameObject != null && gameObject.getState() != GameObjectState.DESTROYED)
+            gameObject.destroy();
         factory.onItemDispose(this);
         isDisposed = true;
     }
 
     @Override
     public String toString() {
-        return "(" + uid + ") " + itemName;
+        return "(" + uid + ") " + itemName + " [" + owner + "] ";
     }
 
     @Override

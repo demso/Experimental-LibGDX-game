@@ -139,7 +139,8 @@ public class ClientPlayerHandler extends BehaviourAdapter implements PlayerMoveR
                 gunReloading.reload(magReloading);
             }
         }
-
+        Vector3 mousePos = GameState.instance.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+        player.itemRotation = Double.valueOf(Math.toDegrees(Math.atan2(mousePos.y - player.getPosition().y, mousePos.x - player.getPosition().x))).floatValue();
     }
 
     @Override

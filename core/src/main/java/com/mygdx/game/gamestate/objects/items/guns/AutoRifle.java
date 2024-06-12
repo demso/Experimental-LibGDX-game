@@ -11,6 +11,8 @@ public class AutoRifle extends Gun{
     public AutoRifle(long uid, String tileName, String itemName) {
         super(uid, tileName, itemName);
         reloadTime = 5;
+        spriteWidth = 0.5f;
+        spiteHeight = 0.5f;
         setFireType(FireType.AUTO);
     }
 
@@ -18,14 +20,13 @@ public class AutoRifle extends Gun{
     public void fireBullet() {
         long curTime = System.currentTimeMillis();
         if (curTime - lastShotTime > timeBetweenShots) {
-        super.fireBullet();
-        lastShotTime = System.currentTimeMillis();
+            super.fireBullet();
+            lastShotTime = System.currentTimeMillis();
         }
-
     }
 
     @Override
     protected void createSpriteBehaviour() {
-        gunSpriteBehaviour = new AutoRifleSprite(GO, this, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
+        gunSpriteBehaviour = new AutoRifleSprite(gameObject, this, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
     }
 }

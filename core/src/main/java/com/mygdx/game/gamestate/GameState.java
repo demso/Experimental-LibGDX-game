@@ -90,9 +90,10 @@ public class GameState extends AbstractGameState {
 //        for (Item i : items.values()) {
 //            itemsString.append(i.toString()).append("\n");
 //        }
-        HandyHelper.instance.periodicLog(items.toString());
+        HandyHelper.instance.periodicLog("items: " + items.toString() + "\n inv: " + clientPlayer.getInventoryItems());
 
         getServerHandler().update(deltaTime);
+        client.update(deltaTime);
     }
 
     public void render(float deltaTime){

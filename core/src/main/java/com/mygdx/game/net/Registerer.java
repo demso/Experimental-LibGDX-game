@@ -3,6 +3,7 @@ package com.mygdx.game.net;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryo.Kryo;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
+import com.mygdx.game.gamestate.objects.items.grenade.Grenade;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
 import com.mygdx.game.net.messages.client.*;
 import com.mygdx.game.net.messages.common.*;
@@ -54,6 +55,7 @@ public class Registerer {
         kryo.register(TakeItems.class);
         kryo.register(MyTiledMap.class);
         kryo.register(DropItems.class);
+        kryo.register(Grenade.class);
         //kryo.register();
     }
 }

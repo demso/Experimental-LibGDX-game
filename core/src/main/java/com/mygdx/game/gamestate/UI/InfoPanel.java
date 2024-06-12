@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Align;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.HandyHelper;
@@ -81,7 +82,8 @@ public class InfoPanel extends Group {
 
         hpLabel = new Label(11 + "", skin2x);
         hpLabel.setColor(Color.WHITE);
-        hpLabel.setPosition(45, 45);
+        hpLabel.setPosition(46, 45);
+        hpLabel.setAlignment(Align.center);
 
         ammoLabel = new Label(10 + "", skin);
         ammoLabel.setPosition(110, 20);

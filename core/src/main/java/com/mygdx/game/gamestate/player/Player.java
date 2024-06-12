@@ -166,6 +166,11 @@ public class Player extends Entity implements Storage {
     }
 
 
+    @Override
+    public String toString() {
+        return getName();
+    }
+
     public Vector2 getPosition() {
         return super.getPosition();
     }

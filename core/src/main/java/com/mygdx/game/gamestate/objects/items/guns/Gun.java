@@ -78,9 +78,9 @@ public class Gun extends Item {
         prepareForRendering();
 
         physicalBody = bodyResolver.itemBody(position.x, position.y, this);
-        new Box2dBehaviour(physicalBody, GO);
+        new Box2dBehaviour(physicalBody, gameObject);
 
-        GO.setEnabled(true);
+        gameObject.setEnabled(true);
         if (mouseHandler != null)
             mouseHandler.setPosition(getPosition().x - mouseHandler.getWidth()/2f, getPosition().y - mouseHandler.getHeight()/2f);
         
@@ -88,9 +88,9 @@ public class Gun extends Item {
     }
 
     @Override
-    protected void prepareForRendering() {
-        if (GO == null)
-            GO = new GameObject(itemName, false, unBox);
+    public void prepareForRendering() {
+        if (gameObject == null)
+            gameObject = new GameObject(itemName, false, unBox);
 
         if (hud == null)
             return;
@@ -132,21 +132,21 @@ public class Gun extends Item {
     }
 
     protected void createSpriteBehaviour(){
-        gunSpriteBehaviour = new GunSpriteBehaviour(GO, this, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
+        gunSpriteBehaviour = new GunSpriteBehaviour(gameObject, this, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
     }
 
     @Override
     public void onEquip(Player player){
         super.onEquip(player);
         prepareForRendering();
-        GO.setEnabled(true);
+        gameObject.setEnabled(true);
     }
 
     @Override
     public void onUnequip() {
         isEquipped = false;
-        if (GO != null)
-            GO.setEnabled(false);
+        if (gameObject != null)
+            gameObject.setEnabled(false);
     }
 
 

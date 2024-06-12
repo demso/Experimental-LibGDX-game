@@ -4,10 +4,9 @@ import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.objects.Interactable;
+import com.mygdx.game.gamestate.objects.items.grenade.Grenade;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.objects.items.Meds;
-import com.mygdx.game.gamestate.objects.items.guns.Gun;
-import com.mygdx.game.gamestate.objects.items.guns.GunMagazine;
 
 public class ClientPlayer extends Player {
     public boolean debug = true;
@@ -18,6 +17,15 @@ public class ClientPlayer extends Player {
             return true;
         }
 
+        return false;
+    }
+
+    public boolean throwGrenade(long time){
+        Grenade item = getItemOfType(Grenade.class);
+        if (item != null) {
+            item.fire(time, true);
+            return true;
+        }
         return false;
     }
 
@@ -75,6 +83,8 @@ public class ClientPlayer extends Player {
     }
 
     public void autoHeal(){
+        if (getHp() == getMaxHp())
+            return;
         Meds meds = getItemOfType(Meds.class);
         if (meds != null) {
             meds.use();

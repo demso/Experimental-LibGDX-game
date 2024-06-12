@@ -63,7 +63,7 @@ public abstract class Entity implements BodyData {
 
     @Override
     public String getName() {
-        return name == null ? friendliness + " Entity" : name;
+        return "(" + id + ")" + name;
     }
     public void kill(){
         isAlive = false;

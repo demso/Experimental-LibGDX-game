@@ -317,7 +317,7 @@ public class HUD extends Stage {
         playerInventoryHud = new PlayerInventoryHUD(this);
         playerInventoryHud.setVisible(false);
 
-        storageInventoryHUD = new StorageInventoryHUD(this, ContextMenu.ConAction.Drop, ContextMenu.ConAction.Description, ContextMenu.ConAction.Equip, ContextMenu.ConAction.Take);
+        storageInventoryHUD = new StorageInventoryHUD(this, ContextMenu.ConAction.Take, ContextMenu.ConAction.Equip, ContextMenu.ConAction.Drop, ContextMenu.ConAction.Description);
         storageInventoryHUD.setVisible(false);
 
         label = new Label("", skin);
