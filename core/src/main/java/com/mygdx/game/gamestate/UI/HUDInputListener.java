@@ -120,11 +120,7 @@ public class HUDInputListener extends InputListener {
             RLongPressed = true;
         }
         //HandyHelper.instance.log(System.nanoTime() + " " + RPressedTime + " " + (System.nanoTime() - RPressedTime), false);
-        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
-            if (instance.clientPlayer.equipedItem instanceof Gun gun)
-                if (gun.getFireType().equals(Gun.FireType.AUTO))
-                    instance.clientPlayer.fire();
-        }
+
     }
 
 }

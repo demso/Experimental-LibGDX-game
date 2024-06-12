@@ -56,6 +56,7 @@ public class GameState extends AbstractGameState {
     public static final float TILE_SIDE = 32f;
     public HUD hud;
     public Stage gameStage;
+    public GameStageInputListener GSIL;
     public float physicsStep = 1/75f;
     public InGameConsole console;
     public ShapeRenderer shapeRenderer;
@@ -82,6 +83,7 @@ public class GameState extends AbstractGameState {
     private void update(float deltaTime) {
         //Input Listener Update
         HUDIL.update();
+        GSIL.update(deltaTime);
         //CAMERA UPDATE
         camera.position.set(clientPlayer.getPosition(), 0);
         camera.update();

@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.UI.HUD;
+import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
 
 import static com.mygdx.game.gamestate.GameState.instance;
@@ -11,21 +12,17 @@ import static com.mygdx.game.gamestate.GameState.instance;
 public class PlayerInventoryHUD extends StorageInventoryHUD{
 
     public void storageInventoryNear(){
-        contextMenu.enableActions(ContextMenu.ConAction.Store);
+        contextMenu.enableActions(ContextMenu.Action.Store);
         if (contextMenu.isVisible())
             contextMenu.update();
     }
 
     @Override
-    public boolean contextAction(ContextMenu.ConAction action, ContextMenu contextMenu) {
+    public boolean contextAction(ContextMenu.Action action, ContextMenu contextMenu) {
         boolean handled = true;
         switch (action) {
             case Store -> {
-                GameState.instance.clientPlayer.removeItem(contextMenu.itemEntry.item);
-                hud.storageInventoryHUD.getStorage().takeItem(contextMenu.itemEntry.item);
-                Vector2 pos = hud.storageInventoryHUD.getStorage().getPosition();
-                instance.client.storedItem(contextMenu.itemEntry.item,(int)Math.floor(pos.x), (int)Math.floor(pos.y));
-                instance.hud.updateInvHUDContent();
+                storeAction(contextMenu.itemEntry.item);
             }
             case Equip -> {
                 GameState.instance.clientPlayer.equipItem(contextMenu.itemEntry.item);
@@ -39,8 +36,18 @@ public class PlayerInventoryHUD extends StorageInventoryHUD{
         return super.contextAction(action, contextMenu);
     }
 
+    public void storeAction(Item item){
+        if (item == null || !storage.getInventoryItems().contains(item, true))
+            return;
+        GameState.instance.clientPlayer.removeItem(item);
+        hud.storageInventoryHUD.getStorage().takeItem(item);
+        Vector2 pos = hud.storageInventoryHUD.getStorage().getPosition();
+        instance.client.storedItem(item,(int)Math.floor(pos.x), (int)Math.floor(pos.y));
+        instance.hud.updateInvHUDContent();
+    }
+
     public void storageInventoryFar(){
-        contextMenu.disableActions(ContextMenu.ConAction.Store);
+        contextMenu.disableActions(ContextMenu.Action.Store);
         if (contextMenu.isVisible())
             contextMenu.update();
     }
@@ -66,8 +73,8 @@ public class PlayerInventoryHUD extends StorageInventoryHUD{
     }
 
     public PlayerInventoryHUD(HUD hud) {
-        super(hud,  ContextMenu.ConAction.Store, ContextMenu.ConAction.Equip, ContextMenu.ConAction.Drop, ContextMenu.ConAction.Description);
+        super(hud,  ContextMenu.Action.Store, ContextMenu.Action.Equip, ContextMenu.Action.Drop, ContextMenu.Action.Description);
         setName("PlayerInventoryScrollPane");
-        contextMenu.disableActions(ContextMenu.ConAction.Store);
+        contextMenu.disableActions(ContextMenu.Action.Store);
     }
 }

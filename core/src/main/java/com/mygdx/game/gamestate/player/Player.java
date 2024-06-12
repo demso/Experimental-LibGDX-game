@@ -135,8 +135,7 @@ public class Player extends Entity implements Storage {
 
     public boolean fire(){
         if (equipedItem != null && equipedItem instanceof Gun gun) {
-            gun.fireBullet();
-            return true;
+            return gun.fireBullet();
         }
         return false;
     }

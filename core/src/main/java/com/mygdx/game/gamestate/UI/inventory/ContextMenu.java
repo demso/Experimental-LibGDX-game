@@ -10,24 +10,25 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.OrderedMap;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.UI.HUD;
 
 import java.util.Comparator;
 
 public class ContextMenu extends Table {
-    public enum ConAction {
+    public enum Action {
         Drop, Store , Description, Equip, Take
     }
-    public ObjectMap<ConAction, Button> allActions = new ObjectMap<>();//порядок и conaction
-    public ObjectMap<ConAction, Button> actions = new ObjectMap<>();
+    public ObjectMap<Action, Button> allActions = new ObjectMap<>();//порядок и conaction
+    public OrderedMap<Action, Button> actions = new OrderedMap<>();
     HUD hud;
     InventoryHUD inventory;
     public InputListener hideListener;
     ItemEntry itemEntry;
     Label.LabelStyle ls;
     String storageName;
-    public ContextMenu(HUD hud, InventoryHUD ih, ConAction... actions){
+    public ContextMenu(HUD hud, InventoryHUD ih, Action... actions){
         super(SecondGDXGame.skin);
         this.hud = hud;
         inventory = ih;
@@ -75,7 +76,7 @@ public class ContextMenu extends Table {
     }
 
     int index = 0;
-    Button createEntry(ConAction action){
+    Button createEntry(Action action){
         Button button = new Button(getSkin());
         button.setName("Inventory context menu \"" + action.toString()+ "\" button");
         button.addListener(createListener(action));
@@ -96,13 +97,13 @@ public class ContextMenu extends Table {
         return button;
     }
 
-    void createEntries(ConAction... actions){
-        for (ConAction action : actions){
+    void createEntries(Action... actions){
+        for (Action action : actions){
             createEntry(action);
         }
     }
 
-    ClickListener createListener(ConAction action){
+    ClickListener createListener(Action action){
         return new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -112,14 +113,14 @@ public class ContextMenu extends Table {
         };
     }
 
-    public void disableActions(ConAction... actions){
-        for (ConAction action : actions)
+    public void disableActions(Action... actions){
+        for (Action action : actions)
             this.actions.remove(action);
         validate();
     }
 
-    public void enableActions(ConAction... actions){
-        for (ConAction action : actions){
+    public void enableActions(Action... actions){
+        for (Action action : actions){
             if (allActions.get(action) == null)
                 continue;
             this.actions.put(action, allActions.get(action));

@@ -59,17 +59,19 @@ public class Gun extends Item {
         return insertedMagazine;
     }
 
-    public void fireBullet(){
-        if (!isEquipped())
-            return;
-        if (insertedMagazine == null || insertedMagazine.getCurrentAmount() == 0){
-            HandyHelper.instance.log("[Player("+ owner.getName()+"):fire] Not enough ammo (" + ((insertedMagazine == null) ? "no magazine in gun" : insertedMagazine.getCurrentAmount()) + ")");
-            return;
+    public boolean fireBullet(){
+        if (isOwnedByClientPlayer()) {
+            if (!isEquipped()) return false;
+            if (insertedMagazine == null || insertedMagazine.getCurrentAmount() == 0) {
+                HandyHelper.instance.log("[Player(" + owner.getName() + "):fire] Not enough ammo (" + ((insertedMagazine == null) ? "no magazine in gun" : insertedMagazine.getCurrentAmount()) + ")");
+                return false;
+            }
+            insertedMagazine.onFire();
         }
-        insertedMagazine.onFire();
         bulletTempRotationVec.setAngleDeg(((Player)owner).itemRotation);
         gunSpriteBehaviour.onFire();
         new Bullet(TileResolver.getTile("bullet"), owner.getPosition(), bulletTempRotationVec);
+        return true;
     }
 
     @Override
@@ -133,6 +135,10 @@ public class Gun extends Item {
 
     protected void createSpriteBehaviour(){
         gunSpriteBehaviour = new GunSpriteBehaviour(gameObject, this, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
+    }
+
+    public boolean isOwnedByClientPlayer(){
+        return owner instanceof ClientPlayer;
     }
 
     @Override

@@ -1,11 +1,11 @@
 package com.mygdx.game.gamestate.UI;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayer;
-import com.esotericsoftware.kryonet.Client;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.mygdx.game.Utils;
+import com.mygdx.game.gamestate.UI.inventory.*;
 import com.mygdx.game.gamestate.player.ClientPlayer;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
@@ -22,23 +22,17 @@ import com.badlogic.gdx.utils.ArrayMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.SecondGDXGame;
-import com.mygdx.game.gamestate.UI.inventory.ContextMenu;
-import com.mygdx.game.gamestate.UI.inventory.PlayerInventoryHUD;
-import com.mygdx.game.gamestate.UI.inventory.StorageInventoryHUD;
 import com.mygdx.game.gamestate.objects.bodies.userdata.SimpleUserData;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
 import dev.lyze.gdxUnBox2d.GameObject;
-import io.github.fourlastor.scope.Group;
-import io.github.fourlastor.scope.ObjectScope;
-import io.github.fourlastor.scope.Scope;
-import io.github.fourlastor.scope.ScopeRenderer;
 
 public class HUD extends Stage {
     boolean debug = false;
     public PlayerInventoryHUD playerInventoryHud;
     public StorageInventoryHUD storageInventoryHUD;
+    public InventoryTools tools;
     HorizontalGroup panels;
     public GameState gameState;
     ObjectMap<Item, ItemInfoPopUp> itemPopups =  new ObjectMap<>();
@@ -82,12 +76,17 @@ public class HUD extends Stage {
             return;
         }
         panels.addActor(storageInventoryHUD);
+
+        tools.setVisible(true);
+        panels.addActor(tools);
+
         storageInventoryHUD.onShow(storage);
         showPlayerInventoryHud();
         if (GameState.instance.clientPlayer.getClosestObject() == null || GameState.instance.clientPlayer.getClosestObject().getUserData() != storage)
             playerInventoryHud.storageInventoryNear();
         storageInventoryHUD.setVisible(true);
-        setScrollFocus(storageInventoryHUD);
+        if (!storageInventoryHUD.isBottomEdge())
+            setScrollFocus(storageInventoryHUD);
         addEscClosable(panels);
         updatePanels();
     }
@@ -96,6 +95,10 @@ public class HUD extends Stage {
         if (!storageInventoryHUD.isVisible())
             return;
         panels.removeActor(storageInventoryHUD);
+
+        panels.removeActor(tools);
+        tools.setVisible(false);
+
         if (closePlayer)
             closePlayerInventoryHud();
         storageInventoryHUD.setVisible(false);
@@ -159,8 +162,24 @@ public class HUD extends Stage {
             temZeroVector.set(0,0);
             oldPPos.set(playerInventoryHud.localToStageCoordinates(temZeroVector));
         }
+        storageInventoryHUD.onPositionChanging();
+        storageInventoryHUD.layout();
+        storageInventoryHUD.validate();
+        playerInventoryHud.onPositionChanging();
+        playerInventoryHud.layout();
+        playerInventoryHud.validate();
 
-        panels.setPosition((Gdx.graphics.getWidth()- panels.getPrefWidth())/2f,(Gdx.graphics.getHeight() - panels.getMaxHeight())/2f, Align.bottomLeft);
+        tools.setHeight(storageInventoryHUD.getPrefHeight());
+        tools.update();
+        tools.layout();
+        tools.validate();
+
+        panels.layout();
+        panels.validate();
+
+        panels.setPosition((Gdx.graphics.getWidth() - panels.getPrefWidth())/2f,Gdx.graphics.getHeight() / 2f, Align.bottomLeft);
+
+
         panels.validate();
 
         if (storageInventoryHUD.isVisible()){
@@ -225,6 +244,7 @@ public class HUD extends Stage {
     Body clObj;
     StringBuilder labelText = new StringBuilder();
     public void drawTileDebugInfo() {
+        setDebugAll(true);
         labelText = new StringBuilder();
         Vector2 vel = gameState.clientPlayer.getBody().getLinearVelocity();
         labelText.append("Player velocity : ").append(Utils.round(vel.x, 1)).append(", ").append(Utils.round(vel.y, 1)).append("\n");
@@ -272,8 +292,10 @@ public class HUD extends Stage {
         label.setPosition(100, height - 100);
         if(GameState.instance.debug)
             drawTileDebugInfo();
-        else
+        else {
             label.setText("");
+            setDebugAll(false);
+        }
 
         if (debug)
             SecondGDXGame.instance.helper.log("[HUD:act] " + esClosablePopups.toString());
@@ -295,9 +317,6 @@ public class HUD extends Stage {
         infoPanel.refresh();
     }
 
-    ScopeRenderer scopeRenderer;
-    Group scopeGroup;
-
     @Override
     public void draw() {
         super.draw();
@@ -317,8 +336,11 @@ public class HUD extends Stage {
         playerInventoryHud = new PlayerInventoryHUD(this);
         playerInventoryHud.setVisible(false);
 
-        storageInventoryHUD = new StorageInventoryHUD(this, ContextMenu.ConAction.Take, ContextMenu.ConAction.Equip, ContextMenu.ConAction.Drop, ContextMenu.ConAction.Description);
+        storageInventoryHUD = new StorageInventoryHUD(this, ContextMenu.Action.Take, ContextMenu.Action.Equip, ContextMenu.Action.Drop, ContextMenu.Action.Description);
         storageInventoryHUD.setVisible(false);
+
+        tools = new InventoryTools(this);
+        tools.setVisible(false);
 
         label = new Label("", skin);
         label.setFontScale(0.5f);
@@ -337,24 +359,5 @@ public class HUD extends Stage {
         infoPanel = new InfoPanel(this);
         infoPanel.setPosition(0, 0, Align.bottomLeft);
         addActor(infoPanel);
-    }
-
-    public static class Settings {
-        public float floatVal = 12.3f;
-
-
-        @Scope.Lens(name = "a name")
-        public int intVal = 99;
-
-        public InnerSettings innerSettings = new InnerSettings();
-
-        public Color color = new Color(Color.DARK_GRAY);
-    }
-
-    public static class InnerSettings {
-        public int another;
-
-        @Scope.Lens(name = "Anything goes")
-        public boolean anythingGoes;
     }
 }

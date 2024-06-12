@@ -23,6 +23,7 @@ public class SecondGDXGame extends Game {
     public Skin skin1x;
     public static BitmapFont font;
     public static BitmapFont fontRoboto14;
+    public BitmapFont fontRoboto12;
     public HandyHelper helper;
     public GameClient client;
     public GameServer server;
@@ -49,11 +50,17 @@ public class SecondGDXGame extends Game {
         parameter.size = 14;
         fontRoboto14 = generator.generateFont(parameter);
 
+        generator = new FreeTypeFontGenerator(Gdx.files.internal("Roboto-Regular.ttf"));
+        parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 12;
+        fontRoboto12 = generator.generateFont(parameter);
+
         generator.dispose(); // don't forget to dispose to avoid memory leaks!
         skin = new Skin(Gdx.files.internal("vis/skin/x2/uiskin.json"));
         skin.add("default14font", fontRoboto14);
+        skin.add("default12font", fontRoboto12);
         skin1x = new Skin(Gdx.files.internal("vis/skin/x1/uiskin.json"));
-        skin1x.add("default14font", fontRoboto14);
+        skin1x.add("default12font", fontRoboto12);
         Button.ButtonStyle bs = skin.get(Button.ButtonStyle.class);
 
         menuScreen = new MainMenuScreen(this);

@@ -65,7 +65,9 @@ public class GameConstructor {
         gameState.hud = new HUD(gameState, new ScreenViewport(), gameState.game.batch);
         gameState.camera = new OrthographicCamera();
         gameState.gameStage = new Stage(new ScreenViewport(gameState.camera));
-        gameState.gameStage.addListener(new GameStageInputListener());
+        var GSIL = new GameStageInputListener();
+        gameState.gameStage.addListener(GSIL);
+        gameState.GSIL = GSIL;
 
         gameState.itemsFactory = new ItemsFactory(gameState.items, gameState.unbox, gameState.bodyResolver, gameState.hud, gameState.gameStage);
 

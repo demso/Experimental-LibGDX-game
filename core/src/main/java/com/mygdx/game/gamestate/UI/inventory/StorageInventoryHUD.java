@@ -58,7 +58,7 @@ public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
         hud.closePopup(contextMenu);
     }
 
-    public boolean contextAction(ContextMenu.ConAction action, ContextMenu contextMenu){
+    public boolean contextAction(ContextMenu.Action action, ContextMenu contextMenu){
         boolean handled = true;
         switch (action){
             case Drop -> {
@@ -67,22 +67,28 @@ public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
                 instance.client.droppedItem(contextMenu.itemEntry.item, pos);
             }
             case Equip -> {
-                contextAction(ContextMenu.ConAction.Take, contextMenu);
+                contextAction(ContextMenu.Action.Take, contextMenu);
                 instance.clientPlayer.equipItem(contextMenu.itemEntry.item);
             }
             case Description -> {}
             case Take -> {
-                storage.removeItem(contextMenu.itemEntry.item);
-                GameState.instance.clientPlayer.takeItem(contextMenu.itemEntry.item);
-
-                Vector2 pos = storage.getPosition();
-                instance.hud.updateInvHUDContent();//todo update when items are taken or stored from server not on client
-                instance.client.tookItemFromStorage(contextMenu.itemEntry.item, (int)Math.floor(pos.x), (int)Math.floor(pos.y));
+                takeAction(contextMenu.itemEntry.item);
             }
             default -> handled = false;
         }
         closeItemContextMenu(contextMenu);
         return handled;
+    }
+
+    public void takeAction(Item item) {
+        if (item == null || !storage.getInventoryItems().contains(item, true))
+            return;
+        storage.removeItem(item);
+        GameState.instance.clientPlayer.takeItem(item);
+
+        Vector2 pos = storage.getPosition();
+        instance.hud.updateInvHUDContent();//todo update when items are taken or stored from server not on client
+        instance.client.tookItemFromStorage(item, (int)Math.floor(pos.x), (int)Math.floor(pos.y));
     }
 
     public void putItemFromInventory(ItemEntry itemEntry){
@@ -110,6 +116,10 @@ public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
         }
     }
 
+    public void onPositionChanging(){
+        setSize(400,Gdx.graphics.getHeight() * 0.7f);
+    }
+
     @Override
     public void setPosition(float x, float y, int align) {
         float offsetX = x-this.getX(), offsetY = y-this.getY();
@@ -131,13 +141,13 @@ public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
         instance.client.needsStorageUpdate(storage.getPosition().x, storage.getPosition().y);
     }
 
-    public StorageInventoryHUD(HUD hud, ContextMenu.ConAction... actions) {
+    public StorageInventoryHUD(HUD hud, ContextMenu.Action... actions) {
         super(null, SecondGDXGame.skin);
         skin = SecondGDXGame.skin;
         this.hud = hud;
         ScrollPane.ScrollPaneStyle sps = this.getStyle();
         sps.background = skin.getDrawable("default-pane");
-        setSize(400,300);
+         ;
         setName("StorageInventoryScrollPane");
         setFadeScrollBars(false);
         addListener(new InputListener(){
