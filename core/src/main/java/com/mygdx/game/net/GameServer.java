@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.Utils;
 import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.HandyHelper;
@@ -47,12 +48,13 @@ public class GameServer {
     PlayerInfo defaultPlayer;
     public boolean started;
     Rectangle worldBorders;
+    int entitiesLimit = 350;
 
     public final String mapToLoad = "tiled/firstmap/worldmap.tmx";
     public GameServer() {
         try {
             init();
-            server = new Server(32768, 32768);
+            server = new Server(524288, 524288);
             Registerer.register(server.getKryo());
             listener = new Listener.TypeListener();
             server.addListener(listener);
@@ -114,6 +116,8 @@ public class GameServer {
                         }
                         if (entity instanceof Zombie zombie) {
                             zombie.hurt(msg.damage);
+                            if (msg.impulseX != 0 || msg.impulseY != 0)
+                                zombie.getBody().applyLinearImpulse(new Vector2(msg.impulseX, msg.impulseY), Vector2.Zero, true);
                             if (!zombie.isAlive()) {
                                 killEntity(msg.id);
                                 sendToAllPlayers(new KillEntity().set(msg.id));
@@ -282,6 +286,7 @@ public class GameServer {
                 spawner();
                 tempTime = curTime;
                 sendUpdatePlayersAndEntities();
+                HandyHelper.instance.log("[GameServer] Entities counter: " + entities.size());
                 //sendStorageUpdates();
                 Thread.sleep(sleepTime);
         }
@@ -406,7 +411,7 @@ public class GameServer {
     long waveDuration = 60 * 1000;
 
     void spawner(){
-        if (started && wave > 0 && (System.currentTimeMillis() - lastSpawnTime > spawnPeriod)){
+        if (started && wave > 0 && (System.currentTimeMillis() - lastSpawnTime > spawnPeriod && entities.size() < entitiesLimit)){
 
             if (waveDuration < System.currentTimeMillis() - waveStartTime){
                 newWave();

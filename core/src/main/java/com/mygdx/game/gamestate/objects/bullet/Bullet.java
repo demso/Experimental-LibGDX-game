@@ -17,7 +17,7 @@ public class Bullet implements BodyData {
     GameObject bulletObject;
     Body body;
     Vector2 moveVec;
-    @Getter int damage = 3;
+    @Getter int damage = 4;
     public Bullet(TiledMapTile tile,  Vector2 position, Vector2 target) {
         float bulletSpeed = 200f;
         body = GameState.instance.bodyResolver.bulletBody(position.x, position.y, this);

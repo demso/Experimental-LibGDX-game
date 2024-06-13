@@ -15,7 +15,7 @@ import lombok.Setter;
 public class Zombie extends Entity {
     @Getter float damage = Globals.ZOMBIE_DAMAGE;
     transient public GameObject zombieObject;
-    @Getter @Setter float maxSpeed = 1.5f;
+    @Getter @Setter float maxSpeed = 3f;
     @Getter @Setter float maxAttackCoolDown = 1f;
     @Getter @Setter float attackCoolDown = 0;
     transient public ZombieAIBehaviour zombieHandler;
@@ -29,7 +29,7 @@ public class Zombie extends Entity {
         BodyDef bodyDef = MobsFactory.bodyDef(position.x, position.y, BodyDef.BodyType.DynamicBody);
 
         CircleShape circle = new CircleShape();
-        circle.setRadius(0.2f);
+        circle.setRadius(0.3f);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
         fixtureDef.density = 1f;
@@ -43,7 +43,7 @@ public class Zombie extends Entity {
         getBody().setFixedRotation(true);
 
         MassData massData = new MassData();
-        massData.mass = 0.05f;
+        massData.mass = 50f;
         massData.center.set(new Vector2(0f,0f));
 
         getBody().setMassData(massData);

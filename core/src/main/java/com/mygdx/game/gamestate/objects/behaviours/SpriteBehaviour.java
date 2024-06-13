@@ -1,12 +1,15 @@
 package com.mygdx.game.gamestate.objects.behaviours;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.mygdx.game.SecondGDXGame;
+import com.mygdx.game.gamestate.GameState;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 import dev.lyze.gdxUnBox2d.behaviours.BehaviourAdapter;
@@ -73,6 +76,9 @@ public class SpriteBehaviour extends BehaviourAdapter {
 
     @Override
     public void render(Batch batch) {
+        Vector3 vec = GameState.instance.camera.project(new Vector3(sprite.getX(), sprite.getY(), 0f));
+        if (vec.x < 0 || vec.x > Gdx.graphics.getWidth() || vec.y < 0 || vec.y > Gdx.graphics.getHeight())
+            return;
         sprite.draw(batch);
     }
 

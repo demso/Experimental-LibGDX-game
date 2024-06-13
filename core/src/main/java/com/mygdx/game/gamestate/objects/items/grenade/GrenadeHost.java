@@ -140,7 +140,7 @@ public class GrenadeHost extends CollisionBehaviour<Grenade> {
             ContactData contact = contacts[i];
             Entity entity = (Entity) contact.body.getUserData();
             float fract = contact.fraction;
-            float damage = Math.max(0, 1 - (fract - 0.1f + (0.1f  + (float) Math.random() * 0.2f) * contact.position )) * grenade.damage;
+            float damage = Math.max(0, 1 - (fract + (0.1f  + (float) Math.random() * 0.2f) * contact.position )) * grenade.damage;
             //float damage = Math.max(0, 1 - (fract)) * grenade.damage;
             HandyHelper.instance.log("[GrenadeHost:detonation] Damaged " + entity.getName() + " " + Utils.round(damage,1) + " f: " + (1 - fract));
             entity.hurt(damage);

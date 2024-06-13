@@ -182,6 +182,7 @@ public class BodyResolver {
         fixtureDef.shape = circle;
         fixtureDef.density = 1f;
         fixtureDef.friction = 100f;
+        fixtureDef.restitution = -100;
 
         fixtureDef.filter.categoryBits = Globals.BULLET_CONTACT_FILTER;
         fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits & ~Globals.LIGHT_CONTACT_FILTER & ~Globals.PLAYER_CONTACT_FILTER & ~Globals.PLAYER_INTERACT_CONTACT_FILTER);
@@ -190,7 +191,7 @@ public class BodyResolver {
         body.setFixedRotation(true);
 
         MassData massData = new MassData();
-        massData.mass = 0.007f;
+        massData.mass = 0.7f;
         massData.center.set(new Vector2(0f,0f));
         body.setMassData(massData);
 

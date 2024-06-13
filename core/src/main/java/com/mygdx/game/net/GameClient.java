@@ -31,7 +31,7 @@ public class GameClient {
     public ObjectSet<Grenade> localGrenades = new ObjectSet<>();
 
     public GameClient(){
-        client = new Client(32768, 32768);
+        client = new Client(524288, 524288);
         Registerer.register(client.getKryo());
         listener = new Listener.TypeListener();
         client.addListener(listener);
@@ -187,8 +187,8 @@ public class GameClient {
         client.sendTCP(new PlayerMove().set(playerId, pos.x, pos.y, speed.x,speed.y, GameState.instance.clientPlayer.itemRotation));
     }
 
-    public void onHit(long id, float damage){
-        client.sendTCP(new EntityHurt().set(id, damage, GameState.instance.clientPlayer.getId()));
+    public void onHit(long id, float damage, Vector2 impulse){
+        client.sendTCP(new EntityHurt().set(id, damage, GameState.instance.clientPlayer.getId()).setKnockbackImpulse(impulse.x, impulse.y));
     }
 
     public void onGunFire(){
