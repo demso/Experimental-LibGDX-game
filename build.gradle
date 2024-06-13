@@ -39,7 +39,7 @@ allprojects {
 
 configure(subprojects) {
   apply plugin: 'java-library'
-  sourceCompatibility = 17
+  sourceCompatibility = 21
   compileJava {
     options.incremental = true
   }
@@ -63,7 +63,7 @@ configure(subprojects) {
 
   java {
     toolchain {
-      languageVersion = JavaLanguageVersion.of(17)
+      languageVersion = JavaLanguageVersion.of(21)
     }
   }
 }

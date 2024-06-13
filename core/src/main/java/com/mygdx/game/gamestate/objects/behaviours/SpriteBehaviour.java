@@ -75,4 +75,6 @@ public class SpriteBehaviour extends BehaviourAdapter {
     public void render(Batch batch) {
         sprite.draw(batch);
     }
+
+
 }

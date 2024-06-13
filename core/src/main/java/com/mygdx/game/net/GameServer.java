@@ -1,9 +1,12 @@
 package com.mygdx.game.net;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.kryonet.Server;
+import com.mygdx.game.Utils;
 import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
@@ -42,12 +45,14 @@ public class GameServer {
     public ServHandler handler;
     ObjectMap<Storage, Array<Long>> storageListeners = new ObjectMap<>(); //player id -> storage
     PlayerInfo defaultPlayer;
+    public boolean started;
+    Rectangle worldBorders;
 
     public final String mapToLoad = "tiled/firstmap/worldmap.tmx";
     public GameServer() {
         try {
             init();
-            server = new com.esotericsoftware.kryonet.Server();
+            server = new Server(32768, 32768);
             Registerer.register(server.getKryo());
             listener = new Listener.TypeListener();
             server.addListener(listener);
@@ -86,7 +91,7 @@ public class GameServer {
                         sendToAllPlayersBut(msg, inf);
                     });
             listener.addTypeHandler(Ready.class, (con, msg) -> {
-                        startWave();
+                        startGame();
                         //server.sendToTCP(con.getID(), new PlayerEquip().set(ItemInfo.createItemInfo(gameState.itemsFactory.getItem(itemsCounter.incrementAndGet(), "deagle_44"), msg.playerId, null, true)));
                     });
             listener.addTypeHandler(EntityHurt.class, (con, msg) -> {
@@ -252,6 +257,7 @@ public class GameServer {
             });
 
             server.bind(54555,54777);
+
             server.start();
 
             endlessThread = new Thread(() -> {
@@ -372,29 +378,67 @@ public class GameServer {
         players = Collections.synchronizedMap(new HashMap<>());
         entities = gameState.entities;
         items = gameState.items;
+        Vector2 mapSize = new Vector2((int)gameState.map.getProperties().get("width"),(int) gameState.map.getProperties().get("height"));
+        worldBorders = new Rectangle(0, 0, mapSize.x, mapSize.y);
     }
 
-    void startWave() {
-        wave = 0;
+    void startGame(){
+        if (started)
+            return;
+        started = true;
+        newWave();
+    }
+
+    long waveStartTime;
+
+    void newWave() {
+        wave += 1;
+        waveStartTime = System.currentTimeMillis();
     }
 
     Vector2 spawnCenter = new Vector2(10, 85);
     float spawnRadius = 5f;
-    long spawnPeriod = 2000;
+    long spawnPeriod = 5000;
     Vector2 zombieSpawnPoint = new Vector2(1, 1).nor().scl(spawnRadius);
     int wave = 0;
     long lastSpawnTime = 0;
 
+    long waveDuration = 60 * 1000;
+
     void spawner(){
-        if (wave > 0 && (System.currentTimeMillis() - lastSpawnTime > spawnPeriod)){
-            float endSpawnPointX;
-            float endSpawnPointY;
-            do {
-                zombieSpawnPoint.rotateDeg((float) Math.random()*360);
-                endSpawnPointX = spawnCenter.x + zombieSpawnPoint.x;
-                endSpawnPointY = spawnCenter.y + zombieSpawnPoint.y;
-            } while (((TiledMapTileLayer)gameState.map.getLayers().get("obstacles")).getCell((int)endSpawnPointX, (int)endSpawnPointY) != null);
-            spawnZombie(endSpawnPointX, endSpawnPointY);
+        if (started && wave > 0 && (System.currentTimeMillis() - lastSpawnTime > spawnPeriod)){
+
+            if (waveDuration < System.currentTimeMillis() - waveStartTime){
+                newWave();
+                HandyHelper.instance.log("[GameServer] New wave: " + wave);
+            }
+
+            Vector2 pos = new Vector2();
+            float minX = worldBorders.x + 1, maxX = worldBorders.x + worldBorders.width, minY = worldBorders.y + 1, maxY = worldBorders.y + worldBorders.height;
+
+            float amountMultiplier = 3;
+            int packSizeMultiplier = 7;
+            int howMuchSpawns = Math.round(amountMultiplier) * wave; //pack of zombies counter per spawn
+
+            for (int i = 0; i < howMuchSpawns; i++) {
+                do {
+                    float random1 = (float) Math.random() * (worldBorders.width - 2), random2 = (float) Math.random() * (worldBorders.height - 2);
+                    pos.set(minX, minY).add(random1, random2);
+                } while (((TiledMapTileLayer) gameState.map.getLayers().get("obstacles")).getCell((int) pos.x, (int) pos.y) != null);
+
+
+                long pack = Math.round( Math.max(Math.random() * packSizeMultiplier * Math.cbrt(wave), 1));
+                float spawnRadius = (float) Math.sqrt(pack) + 0.5f;
+
+                for (int j = 0; j < pack; j++) {
+                    float spawnX = pos.x + (float) Math.random() * spawnRadius,
+                            spawnY = pos.y + (float) Math.random() * spawnRadius;
+                    spawnZombie(spawnX, spawnY);
+
+                }
+                //HandyHelper.instance.log("[GameServer:spawner] Spawning zombie pack at: " + Utils.round(pos.x, 1) + ", " + Utils.round(pos.y, 1) + " with size: " + pack);
+            }
+
             lastSpawnTime = System.currentTimeMillis();
         }
     }

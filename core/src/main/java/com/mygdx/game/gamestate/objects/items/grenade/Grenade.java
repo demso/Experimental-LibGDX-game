@@ -16,7 +16,7 @@ public class Grenade extends Item {
     public float detonationTime = 3f;
     public float timeToDetonation = 0f;
     public float damage = 25f;
-    public float radius = 3f;
+    public float radius = 4f;
 
     public Grenade(long uid, String iId, String itemName) {
         super(uid, iId, itemName);
@@ -43,8 +43,8 @@ public class Grenade extends Item {
 
             float time = (float) t/1000f + 0.05f;
 
-            if (time > 3f) {
-                time = 3f;
+            if (time > 1.8f) {
+                time = 1.8f;
             }
 
             physicalBody = bodyResolver.notInteractableItemBody(player.getPosition().x, player.getPosition().y, this);
@@ -61,7 +61,7 @@ public class Grenade extends Item {
             detector.filter.maskBits &= ~Globals.LIGHT_CONTACT_FILTER;
             detector.density = 0.001f;
             var shape = new CircleShape();
-            shape.setRadius(radius);
+            shape.setRadius(physicalBody.getFixtureList().first().getShape().getRadius());
             detector.shape = shape;
             Fixture detectFix = physicalBody.createFixture(detector);
             detectFix.setUserData(this);

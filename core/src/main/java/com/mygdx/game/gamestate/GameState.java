@@ -6,11 +6,13 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.*;
 import com.mygdx.game.gamestate.factories.BodyResolver;
 import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.items.Item;
+import com.mygdx.game.gamestate.objects.items.grenade.GrenadeHost;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
 import com.mygdx.game.gamestate.objects.items.guns.GunMagazine;
 import com.mygdx.game.gamestate.player.ClientPlayer;
@@ -30,6 +32,7 @@ import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.player.Player;
 import dev.lyze.gdxUnBox2d.UnBox;
 import net.dermetfan.gdx.physics.box2d.Box2DUtils;
+import space.earlygrey.shapedrawer.ShapeDrawer;
 
 import java.lang.StringBuilder;
 
@@ -60,6 +63,7 @@ public class GameState extends AbstractGameState {
     public float physicsStep = 1/75f;
     public InGameConsole console;
     public ShapeRenderer shapeRenderer;
+    public ShapeDrawer shapeDrawer;
     public UnBox unbox;
     public HUDInputListener HUDIL;
     public ObjectMap<Long, Player> players;
@@ -70,6 +74,8 @@ public class GameState extends AbstractGameState {
     public BodyResolver bodyResolver;
     public MobsFactory mobsFactory;
     public ItemsFactory itemsFactory;
+    public Array<Vector2> rayEnds = new Array<>();
+    public Vector2 grPos = new Vector2();
 
     public void tester(){
 //        clientPlayer.takeItem(ItemsFactory.getItem("10mm_fmj"));
@@ -93,7 +99,7 @@ public class GameState extends AbstractGameState {
 //            itemsString.append(i.toString()).append("\n");
 //        }
         HandyHelper.instance.periodicLog("items: " + items.toString() + "\n inv: " + clientPlayer.getInventoryItems());
-        HandyHelper.instance.log("[GameState:update]Player hp: " + clientPlayer.getHp());
+        //HandyHelper.instance.log("[GameState:update]Player hp: " + clientPlayer.getHp());
 
         getServerHandler().update(deltaTime);
         client.update(deltaTime);
@@ -115,6 +121,7 @@ public class GameState extends AbstractGameState {
         unbox.render(batch);
 
         batch.end();
+
 
         gameStage.act(deltaTime);
         gameStage.draw();
@@ -146,7 +153,15 @@ public class GameState extends AbstractGameState {
         if (console.isVisible())
             console.draw();
 
-
+//        if (rayEnds != null && rayEnds.size > 0){
+//            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+//            shapeRenderer.setProjectionMatrix(camera.combined);
+//            shapeRenderer.setColor(Color.GOLDENROD);
+//            for(Vector2 vec2 : rayEnds){
+//                shapeRenderer.line(new Vector2(grPos), new Vector2(grPos).add(vec2));
+//            }
+//            shapeRenderer.end();
+//        }
     }
 
     Vector2 beginV;

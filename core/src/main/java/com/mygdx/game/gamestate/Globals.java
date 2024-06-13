@@ -12,7 +12,7 @@ public class Globals {
             SERVER_UPDATE_TIME =                1/30f,
 
             PLAYER_HEALTH =                     20f,
-            ZOMBIE_HEALTH =                     10f,
+            ZOMBIE_HEALTH =                     8f,
             ZOMBIE_DAMAGE =                     1f;
 
     public final static short

@@ -2,10 +2,12 @@ package dev.lyze.gdxUnBox2d.behaviours;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import dev.lyze.gdxUnBox2d.Behaviour;
+import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
@@ -92,5 +94,13 @@ public class BehaviourAdapter extends Behaviour {
     @Override
     public void onDestroy() {
 
+    }
+
+    public Vector2 getBodyPosition(){
+        return getGameObject().getBehaviour(Box2dBehaviour.class).getBody().getPosition();
+    }
+
+    public <T> T getUserData(Class<T> clazz){
+        return clazz.cast(getGameObject().getBox2dBehaviour().getBody().getUserData());
     }
 }

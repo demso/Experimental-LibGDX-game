@@ -210,7 +210,7 @@ public class ClientMapLoader extends TmxMapLoader {
         //world borders
         BodyDef borderBodyDef = new BodyDef();
         borderBodyDef.type = BodyDef.BodyType.StaticBody;
-        Vector2 mapSize = new Vector2((int)mymap.getProperties().get("width"),(int) mymap.getProperties().get("width"));
+        Vector2 mapSize = new Vector2((int)mymap.getProperties().get("width"),(int) mymap.getProperties().get("height"));
         borderBodyDef.position.set(0,0);
         Body borderBody = mymap.world.createBody(borderBodyDef);
         EdgeShape borderShape = new EdgeShape();

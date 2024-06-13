@@ -31,7 +31,7 @@ public class GameClient {
     public ObjectSet<Grenade> localGrenades = new ObjectSet<>();
 
     public GameClient(){
-        client = new Client();
+        client = new Client(32768, 32768);
         Registerer.register(client.getKryo());
         listener = new Listener.TypeListener();
         client.addListener(listener);

@@ -177,7 +177,7 @@ public class HUD extends Stage {
         panels.layout();
         panels.validate();
 
-        panels.setPosition((Gdx.graphics.getWidth() - panels.getPrefWidth())/2f,Gdx.graphics.getHeight() / 2f, Align.bottomLeft);
+        panels.setPosition(Math.round((Gdx.graphics.getWidth()/2f - (panels.getPrefWidth()-tools.getPrefWidth()/2f)/2f)), Math.round(Gdx.graphics.getHeight() / 2f), Align.bottomLeft);
 
 
         panels.validate();

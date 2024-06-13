@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.mygdx.game.gamestate.AcceptHandler;
@@ -34,6 +35,7 @@ import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.player.ClientPlayerConstructor;
 import com.mygdx.game.gamestate.tiledmap.loader.ClientMapLoader;
 import dev.lyze.gdxUnBox2d.UnBox;
+import space.earlygrey.shapedrawer.ShapeDrawer;
 
 public class GameConstructor {
     GameState gameState;
@@ -87,6 +89,9 @@ public class GameConstructor {
         initTextures();
         initScene2D();
         initPhysics();
+
+        gameState.shapeDrawer = new ShapeDrawer(gameState.batch, new TextureRegion(gameState.userSelection, 1,1,1,1));
+        gameState.shapeDrawer.setDefaultLineWidth(0.03f);
 
         gameState.clientPlayer = new ClientPlayerConstructor().createPlayer(gameState, msg.yourPlayerInfo);
 
