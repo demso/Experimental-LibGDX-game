@@ -14,7 +14,7 @@ import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.UI.console.sjconsole.LogLevel;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
-import com.mygdx.game.gamestate.player.ClientPlayer;
+import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 import io.github.fourlastor.scope.Scope;
 import lombok.Setter;
@@ -27,7 +27,7 @@ public class InfoPanel extends Group {
     Skin skin = SecondGDXGame.instance.skin1x;
     Skin skin2x = SecondGDXGame.instance.skin;
     HUD hud;
-    ClientPlayer player;
+    Player player;
     @Scope.Lens(name = "Ammo ImgX")
     public int ammoImagePosX = 65;
     @Scope.Lens(name = "Ammo ImgY")

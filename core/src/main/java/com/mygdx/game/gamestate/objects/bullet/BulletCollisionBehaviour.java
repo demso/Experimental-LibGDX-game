@@ -53,8 +53,8 @@ public class BulletCollisionBehaviour extends CollisionBehaviour<Bullet> {
         switch (otherBodyUserName) {
             case "zombie" -> {
                 if (otherUserData instanceof Zombie zombie){
-                    //zombie.hurt(data.getDamage());
-                    GameState.instance.client.onHit(zombie.getId(), data.getDamage(), new Vector2(thisBody.getLinearVelocity()).scl(thisBody.getMass()));
+                    zombie.hurt(data.getDamage());
+                    //GameState.instance.client.onHit(zombie.getId(), data.getDamage(), new Vector2(thisBody.getLinearVelocity()).scl(thisBody.getMass()));
                 }
             }
         }

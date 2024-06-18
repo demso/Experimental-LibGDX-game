@@ -9,18 +9,18 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.mygdx.game.SecondGDXGame;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Utils;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
-import com.mygdx.game.gamestate.objects.behaviours.SpriteBehaviour;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
 import com.mygdx.game.gamestate.objects.items.guns.GunMagazine;
-import com.mygdx.game.net.messages.client.PlayerMove;
 import dev.lyze.gdxUnBox2d.GameObject;
 import dev.lyze.gdxUnBox2d.behaviours.BehaviourAdapter;
 
-public class ClientPlayerHandler extends BehaviourAdapter implements PlayerMoveReceiver {
+import java.util.Arrays;
+
+public class ClientPlayerHandler extends BehaviourAdapter{
     public boolean moveUp,
             moveDown,
             moveToTheRight,
@@ -36,10 +36,11 @@ public class ClientPlayerHandler extends BehaviourAdapter implements PlayerMoveR
 
     float frameDuration = 0.1f;
 
-    ClientPlayer player;
+    Player player;
 
     public ClientPlayerHandler(GameObject gameObject, Player player) {
         super(gameObject);
+        this.player = player;
         setRenderOrder(Globals.PLAYER_RENDER_ORDER);
     }
 
@@ -47,12 +48,6 @@ public class ClientPlayerHandler extends BehaviourAdapter implements PlayerMoveR
     Vector2 movingImpulse = new Vector2();
 
     Vector2 zeroVector = new Vector2(0, 0);
-
-    boolean needsUpdate;
-
-    PlayerMove playerMove;
-
-    float accumulator;
 
     ReloadAnimation reloadAnimation;
     Sprite reloadSprite;
@@ -69,20 +64,6 @@ public class ClientPlayerHandler extends BehaviourAdapter implements PlayerMoveR
 
     @Override
     public void update(float delta) {
-        accumulator += delta;
-
-        if (accumulator >= Globals.SERVER_UPDATE_TIME){
-            SecondGDXGame.instance.client.sendPlayerMove(GameState.instance.clientPlayer.getId(), player.getPosition(), player.getBody().getLinearVelocity());
-            accumulator = 0;
-        }
-
-        if (needsUpdate && playerMove != null){
-            player.getBody().setTransform(playerMove.x, playerMove.y, player.getBody().getTransform().getRotation());
-            player.getBody().setLinearVelocity(playerMove.xSpeed, playerMove.ySpeed);
-            needsUpdate = false;
-            playerMove = null;
-        }
-
         if (delta > 0.1f) delta = 0.1f;
         stateTime += delta;
         switch (player.getState()) {
@@ -112,10 +93,11 @@ public class ClientPlayerHandler extends BehaviourAdapter implements PlayerMoveR
 
         if (player.needsReload) {
             if (player.equipedItem instanceof Gun gun) {
-                GunMagazine magaz = player.getItemOfType(GunMagazine.class);
-                if (magaz != null) {
+                Array<GunMagazine> magazs = player.getItemsOfType(GunMagazine.class);
+                var magaz = Arrays.stream(magazs.toArray(GunMagazine.class)).filter(magaz0 -> magaz0.getGunTypes().contains(gun.stringID, false)).findFirst();
+                if (magaz.isPresent()) {
                     gunReloading = gun;
-                    magReloading = magaz;
+                    magReloading = magaz.get();
                     player.needsReload = false;
                     player.isReloading = true;
                     gun.reload(null);
@@ -172,8 +154,6 @@ public class ClientPlayerHandler extends BehaviourAdapter implements PlayerMoveR
             reloadSprite.draw(batch);
     }
 
-    byte indexer = 0;
-
     @Override
     public void fixedUpdate()  {
         if (player.isAlive() && (moveUp || moveDown || moveToTheRight || moveToTheLeft)){
@@ -219,7 +199,6 @@ public class ClientPlayerHandler extends BehaviourAdapter implements PlayerMoveR
             }
 
             movingImpulse = movingVector.scl(player.currentSpeedMultiplier * player.normalSpeed * player.getBody().getMass() *  player.getBody().getLinearDamping() * GameState.instance.physicsStep);
-
             player.getBody().applyLinearImpulse(movingImpulse, zeroVector, true);
 
         }
@@ -230,26 +209,9 @@ public class ClientPlayerHandler extends BehaviourAdapter implements PlayerMoveR
         if (player.closestObject != null){
             player.playerObject.getBehaviour(PlayerCollisionBehaviour.class).updatePlayerClosestObject();
         }
-
-//        if (indexer == 2){
-//            SecondGDXGame.instance.client.sendPlayerMove(SecondGDXGame.instance.name, player.getPosition(), player.getBody().getLinearVelocity());
-//            indexer = 0;
-//        }
-//        indexer += 1;
     }
 
     public void cancelReload(){
         player.isReloading = false;
-    }
-
-    @Override
-    public void receivePlayerUpdate(PlayerMove move) {
-//        Vector2 pos = player.getBody().getPosition();
-//        Vector2 speed = player.getBody().getLinearVelocity();
-//        if (Math.abs(pos.x - move.x) < 0.05 && Math.abs(pos.y - move.y) < 0.05
-//                && Math.abs(speed.x - move.xSpeed) < 0.05 && Math.abs(speed.y - move.ySpeed) < 0.05)
-//            return;
-//        needsUpdate = true;
-//        playerMove = move;
     }
 }

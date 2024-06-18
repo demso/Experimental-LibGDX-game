@@ -1,17 +1,16 @@
 package com.mygdx.game;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Collections;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.HandyHelper;
-import com.mygdx.game.net.GameClient;
 import com.mygdx.game.net.GameServer;
-import com.mygdx.game.net.messages.server.OnConnection;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.screens.MainMenuScreen;
 
@@ -27,7 +26,6 @@ public class SecondGDXGame extends Game {
     public static BitmapFont fontRoboto18;
     public BitmapFont fontRoboto12;
     public HandyHelper helper;
-    public GameClient client;
     public GameServer server;
     public boolean readyToInit = false;
     public boolean gameIsReady = false;
@@ -86,38 +84,22 @@ public class SecondGDXGame extends Game {
         this.setScreen(menuScreen);
     }
 
-    public void createServerAndConnect(String name){
+    public void createServerAndConnect(){
         this.name = menuScreen.nameField.getText();
-        server = new GameServer();
-
-        connectToServer("127.0.0.1", name);
-        Gdx.graphics.setTitle(" SERVER");
-
+        startGame();
         //setScreen(gameScreen);
     }
 
     public boolean connectToServer(String ip, String name){
-        this.name = name;
-        client = new GameClient();
-        String er = client.connect(ip);
-        if (er == null) {
-            menuScreen.showInfoDialog("Connecting...");
-            HandyHelper.instance.log("[Client] Waiting for data from server to start game");
-        } else {
-            menuScreen.showErrorDialog(er);
-            return false;
-        }
-        return  true;
+        menuScreen.showErrorDialog("Not available now");
+        return  false;
     }
 
-    public void startGame(OnConnection msg){
+    public void startGame(){
         if (getScreen() == gameScreen)
             setScreen(menuScreen);
 
         gameScreen = new GameScreen();
-        gameScreen.gameState = new GameConstructor().createGameState(msg);
-        gameScreen.gameState.clientPlayer.setId(msg.yourPlayerInfo.id);
-        gameScreen.gameState.tester();//создаем клиент
 
         ready();
 
@@ -126,19 +108,11 @@ public class SecondGDXGame extends Game {
 
     public void endGame(EndCause cause){
         setScreen(menuScreen);
-        switch (cause) {
-            case SERVER_LOST -> {
-                menuScreen.showClosableInfoDialog("Connection lost.");
-                clean();
-            }
-            case OK_END -> {
-                clean();
-            }
-        }
+        clean();
+        gameIsReady = false;
     }
 
     public void ready(){
-        client.ready(gameScreen.gameState);
         gameIsReady = true;
     }
 
@@ -153,17 +127,6 @@ public class SecondGDXGame extends Game {
             gameScreen = null;
             name = null;
             GameState.instance = null;
-            try {
-                if (client != null) {
-                    client.dispose();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            client = null;
-            if (server != null)
-                server.dispose();
-            server = null;
         }   catch (Exception e) {
             e.printStackTrace();
         }
@@ -171,28 +134,13 @@ public class SecondGDXGame extends Game {
 
     @Override
     public void render() {
-        if (endCause != null){
-            endGame(endCause);
-            endCause = null;
-        }
         super.render();
-        if (readyToInit){
-            startGame(client.startMessage);
-            client.startMessage = null;
-            readyToInit = false;
-        }
-        helper.refreshLogsInConsole(Gdx.graphics.getDeltaTime());
     }
 
     @Override
     public void dispose() {
+        endGame(EndCause.SERVER_LOST);
         super.dispose();
-        if (server != null){
-            server.dispose();
-        }
-        if (client != null) {
-            client.dispose();
-        }
     }
 
     public enum EndCause {

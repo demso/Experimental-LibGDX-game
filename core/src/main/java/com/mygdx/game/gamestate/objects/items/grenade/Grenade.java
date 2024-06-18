@@ -22,22 +22,8 @@ public class Grenade extends Item {
         super(uid, iId, itemName);
     }
 
-    public void fire(long t, boolean real){
-        if (!real) {
-            onDrop();
-            prepareForRendering();
-
-            physicalBody = bodyResolver.notInteractableItemBody(0, 0, this);
-            physicalBody.setLinearDamping(0);
-            physicalBody.setAngularDamping(0);
-            physicalBody.getFixtureList().get(0).setRestitution(0);
-            physicalBody.setMassData(new MassData().set(0.1f, new Vector2(0, -0.1f), 0.1f));
-
-            new Box2dBehaviour(physicalBody, gameObject);
-            new GrenadeHandler(gameObject);
-            gameObject.setEnabled(true);
-        }
-        if (real && owner instanceof Player player) {
+    public void fire(long t){
+        if (owner instanceof Player player) {
             onDrop();
             prepareForRendering();
 
@@ -52,7 +38,6 @@ public class Grenade extends Item {
 
             physicalBody.setAngularDamping(1);
 
-            //physicalBody.getFixtureList().get(0).setDensity(10);
             physicalBody.getFixtureList().get(0).setRestitution(1f);
             physicalBody.getFixtureList().get(0).setFriction(0.1f);
 
@@ -84,27 +69,7 @@ public class Grenade extends Item {
         }
     }
 
-//    float fract = 1;
-//    Vector2 vec = new Vector2();
     public void onDetonation(){
-//        World world = physicalBody.getWorld();
-//        nearEntities.forEach(entity -> {
-//            world.rayCast(
-//                    (fixture, point, normal, fraction) -> {
-//                        if (((fixture.getFilterData().maskBits & (Globals.DEFAULT_CONTACT_FILTER)) == 0) || fixture.isSensor())
-//                            return -1;
-//                        Object data = fixture.getBody().getUserData();
-//                        if (data == entity) {
-//                            fract = fraction;
-//                        } else if (data instanceof Entity) {
-//                            fract = fraction +  0.1f + (float) Math.random() * 0.3f;
-//                        };
-//                        return fraction;
-//                    },
-//                    physicalBody.getPosition(),
-//                    new Vector2(physicalBody.getPosition()).add( new Vector2(entity.getPosition()).sub(physicalBody.getPosition()).nor().scl(3)));
-//            entity.hurt(Math.max(0, 1 - fract) * damage);
-//        });
         dispose();
     }
 
@@ -124,7 +89,6 @@ public class Grenade extends Item {
 
     @Override
     public void dispose() {
-        GameState.instance.client.localGrenades.remove(this);
         super.dispose();
     }
 }

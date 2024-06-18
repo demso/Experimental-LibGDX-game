@@ -69,8 +69,6 @@ public abstract class Entity implements BodyData {
         isAlive = false;
     };
 
-    public void serverUpdate(ZombieMove move){}
-
     public void setPosition(float x, float y){
         getBody().setTransform(x, y, getBody().getTransform().getRotation());
     }

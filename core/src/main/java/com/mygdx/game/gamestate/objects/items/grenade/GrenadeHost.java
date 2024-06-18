@@ -61,7 +61,6 @@ public class GrenadeHost extends CollisionBehaviour<Grenade> {
         if (timeToExplosion <= 0) {
             detonation();
             grenade.onDetonation();
-            GameState.instance.client.disposeItem(grenade);
         }
     }
 
@@ -121,20 +120,6 @@ public class GrenadeHost extends CollisionBehaviour<Grenade> {
             }
         }
 
-//        for (Entity entity : new ObjectSet.ObjectSetIterator<>(bodiesInEpicenter)) {
-//            boolean skip = false;
-//            for (int j = 0; j < nearEntities.size; j++) {
-//                ContactData cd = nearEntities.get(j);
-//                if (cd.body == entity.getBody()) {
-//                    skip = true;
-//                    break;
-//                }
-//            }
-//            if (skip)
-//                continue;
-//
-//            nearEntities.add(new ContactData(entity.getBody(), 0));
-//        }
         ContactData[] contacts = nearEntities.values().toArray(new ContactData[0]);
         for (int i = 0; i < contacts.length; i++) {
             ContactData contact = contacts[i];
@@ -144,11 +129,10 @@ public class GrenadeHost extends CollisionBehaviour<Grenade> {
             //float damage = Math.max(0, 1 - (fract)) * grenade.damage;
             HandyHelper.instance.log("[GrenadeHost:detonation] Damaged " + entity.getName() + " " + Utils.round(damage,1) + " f: " + (1 - fract));
             entity.hurt(damage);
-            GameState.instance.client.entityHurt(entity, damage);
         }
 
         nearEntities.clear();
-        GameState.instance.client.localGrenades.remove(grenade);
+        //GameState.instance.client.localGrenades.remove(grenade);
     }
 
     @Override

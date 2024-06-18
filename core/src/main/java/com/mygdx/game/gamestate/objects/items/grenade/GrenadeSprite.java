@@ -1,13 +1,8 @@
 package com.mygdx.game.gamestate.objects.items.grenade;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.behaviours.SpriteBehaviour;
-import com.mygdx.game.net.messages.client.GrenadeInfo;
 import dev.lyze.gdxUnBox2d.GameObject;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 

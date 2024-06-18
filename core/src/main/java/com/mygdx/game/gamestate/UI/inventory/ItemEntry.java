@@ -1,5 +1,7 @@
 package com.mygdx.game.gamestate.UI.inventory;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -8,16 +10,16 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
-import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.SecondGDXGame;
+import com.mygdx.game.gamestate.objects.items.Item;
 
 public class ItemEntry extends Button {
 
     ItemEntry itemEntry;
-    InventoryHUD inventoryHUD;
+    StorageInventoryHUD inventoryHUD;
     Item item;
 
-    ItemEntry(InventoryHUD iHUD, Item item){
+    ItemEntry(StorageInventoryHUD iHUD, Item item){
         super(SecondGDXGame.skin);
         itemEntry = this;
         inventoryHUD = iHUD;
@@ -40,7 +42,13 @@ public class ItemEntry extends Button {
             @Override
             public void clicked(InputEvent e, float x, float y){
                 super.clicked(e, x, y);
-                inventoryHUD.showItemContextMenu(itemEntry);
+                if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT))
+                    if (inventoryHUD instanceof PlayerInventoryHUD pihud)
+                        pihud.storeAction(item);
+                    else
+                        inventoryHUD.takeAction(item);
+                else
+                    inventoryHUD.showItemContextMenu(itemEntry);
             }
         });
     }

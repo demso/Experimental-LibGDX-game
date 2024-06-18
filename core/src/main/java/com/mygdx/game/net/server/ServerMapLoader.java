@@ -22,9 +22,9 @@ import dev.lyze.gdxUnBox2d.GameObject;
 
 public class ServerMapLoader extends TmxMapLoader {
     World world;
-    ServerGameState gameState;
+    GameState gameState;
 
-    public ServerMapLoader(ServerGameState gs) {
+    public ServerMapLoader(GameState gs) {
         super();
         this.world = gs.world;
         gameState = gs;
@@ -184,7 +184,7 @@ public class ServerMapLoader extends TmxMapLoader {
             if (curCell.getData() != null && curCell.getData() instanceof Storage storage && s != null && !s.trim().isEmpty()) {
                 String[] items = object.getProperties().get("items", String.class).split(",");
                 for (String item : items) {
-                    Item createdItem = gameState.itemsFactory.getItem(gameState.gameServer.itemsCounter.getAndIncrement(), item.trim().toLowerCase());
+                    Item createdItem = gameState.itemsFactory.getItem(gameState.itemsCounter++, item.trim().toLowerCase());
                     storage.takeItem(createdItem);
                 }
             }
