@@ -47,7 +47,9 @@ public class GameStageInputListener extends InputListener {
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
                 if (instance.clientPlayer.equipedItem instanceof Gun gun)
                     if (gun.getFireType().equals(Gun.FireType.AUTO))
-                        instance.clientPlayer.fire();
+                        synchronized (instance.world) {
+                            instance.clientPlayer.fire();
+                        }
             }
     }
 }

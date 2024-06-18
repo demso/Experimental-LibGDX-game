@@ -116,8 +116,13 @@ public class GrenadeHost extends CollisionBehaviour<Grenade> {
                 Fixture fixture = contact.body.getFixtureList().first();
                 if (((fixture.getFilterData().categoryBits & (Globals.DEFAULT_CONTACT_FILTER)) == 1) || fixture.isSensor())
                     break;
-                if (contact.body.getUserData() instanceof Entity)
-                    nearEntities.put(contact.body,contact);
+                if (contact.body.getUserData() instanceof Entity) {
+                    ContactData existingData = nearEntities.get(contact.body);
+                    if (existingData == null || existingData.fraction > contact.fraction) {
+                        contact.position = i;
+                        nearEntities.put(contact.body, contact);
+                    }
+                }
             }
         }
 
@@ -142,7 +147,7 @@ public class GrenadeHost extends CollisionBehaviour<Grenade> {
             float fract = contact.fraction;
             float damage = Math.max(0, 1 - (fract + (0.1f  + (float) Math.random() * 0.2f) * contact.position )) * grenade.damage;
             //float damage = Math.max(0, 1 - (fract)) * grenade.damage;
-            HandyHelper.instance.log("[GrenadeHost:detonation] Damaged " + entity.getName() + " " + Utils.round(damage,1) + " f: " + (1 - fract));
+            HandyHelper.instance.log("[GrenadeHost:detonation] n: " + entity.getName() + " d: " + Utils.round(damage,1) + " f: " + Utils.round(1 - fract, 1) + " p: " + contact.position);
             entity.hurt(damage);
             GameState.instance.client.entityHurt(entity, damage);
         }

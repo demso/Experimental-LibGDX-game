@@ -25,6 +25,7 @@ public class AcceptHandler {
     volatile public Array<Player> playersToKill = new Array<>();
     volatile public Array<EntityInfo> entitiesToSpawn = new Array<>();
     volatile public LongArray entitiesToKill = new LongArray();
+    volatile public Array<GunFire> gunFires = new Array<>();
     volatile public GameClient client;
     public GameState gameState;
 
@@ -34,6 +35,16 @@ public class AcceptHandler {
     }
 
     public void update(float delta){
+        if (gunFires.size != 0) {
+            synchronized (gunFires) {
+                for (GunFire msg : gunFires) {
+                    if (gameState.players.get(msg.playerID) == null) return;
+                    gameState.players.get(msg.playerID).fire();
+                }
+                gunFires.clear();
+            }
+        }
+
         if (entitiesToKill.size != 0) {
             for (long id : entitiesToKill.toArray()){
                 Entity entity = gameState.entities.get(id);
@@ -107,13 +118,20 @@ public class AcceptHandler {
     }
 
     public void gunFire(GunFire msg){
-        if (gameState.players.get(msg.playerID) == null)
-            return;
-        gameState.players.get(msg.playerID).fire();
+//        if (gameState.players.get(msg.playerID) == null)
+//            return;
+//        gameState.players.get(msg.playerID).fire();
+        synchronized (gunFires){
+            gunFires.add(msg);
+        }
     }
 
     public void updateTile(UpdateTile updater){
         updater.updateTile(gameState.map);
     }
+
+//    public void gunFire(GunFire msg){
+//        gunFires.add(msg);
+//    }
 
 }

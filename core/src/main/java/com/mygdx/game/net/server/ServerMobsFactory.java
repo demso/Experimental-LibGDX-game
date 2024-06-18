@@ -24,7 +24,8 @@ public class ServerMobsFactory extends MobsFactory {
     @Override
     public Zombie spawnZombie(long id, float x, float y){
         tempPosition.set(x,y);
-        Zombie zombie = new Zombie(TileResolver.getTile("zombie"), id, world, tempPosition);
+        Zombie zombie = null;
+            zombie = new Zombie(TileResolver.getTile("zombie"), id, world, tempPosition);
 
         zombie.zombieObject = new GameObject(zombie.getName(), ServerGameState.instance.unbox);
 

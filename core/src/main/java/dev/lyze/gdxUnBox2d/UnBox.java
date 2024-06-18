@@ -201,7 +201,9 @@ public class UnBox {
 
             updateFixedObjects();
 
-            getWorld().step(timeStep, options.getVelocityIteration(), options.getPositionIterations());
+            synchronized (getWorld()) {
+                getWorld().step(timeStep, options.getVelocityIteration(), options.getPositionIterations());
+            }
             contactListener.update();
 
             accumulator -= timeStep;

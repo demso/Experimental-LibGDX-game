@@ -2,6 +2,7 @@ package com.mygdx.game.gamestate.objects.items.grenade;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.game.net.messages.client.GrenadeInfo;
 import dev.lyze.gdxUnBox2d.GameObject;
 import dev.lyze.gdxUnBox2d.behaviours.BehaviourAdapter;
@@ -26,9 +27,14 @@ public class GrenadeHandler extends BehaviourAdapter {
     @Override
     public void update(float delta) {
         if (needsUpdate){
-            body.setLinearVelocity(grenadeInfo.xS, grenadeInfo.yS);
-            body.setTransform(grenadeInfo.x, grenadeInfo.y, grenadeInfo.rotation);
-            needsUpdate = false;
+//            if (body != null)
+//            try {
+                body.setLinearVelocity(grenadeInfo.xS, grenadeInfo.yS);
+                body.setTransform(grenadeInfo.x, grenadeInfo.y, grenadeInfo.rotation);
+                needsUpdate = false;
+//            }catch (Exception e){
+//                e.printStackTrace();
+//            }
         }
     }
 

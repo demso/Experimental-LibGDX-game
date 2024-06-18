@@ -33,8 +33,8 @@ public class Zombie extends Entity {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
         fixtureDef.density = 1f;
-        fixtureDef.friction = 0f;
-        fixtureDef.restitution = 0f;
+        fixtureDef.friction = 0.1f;
+        fixtureDef.restitution = -100f;
         fixtureDef.filter.categoryBits = Globals.ZOMBIE_CONTACT_FILTER;
         fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits & ~Globals.LIGHT_CONTACT_FILTER);
 
@@ -50,12 +50,8 @@ public class Zombie extends Entity {
         getBody().setLinearDamping(10);
         getBody().setUserData(this);
         circle.dispose();
+        name = "Zombie";
         //new SoutBehaviour("zombieLogger", false, zombieObject);
-    }
-
-    @Override
-    public String getName(){
-        return "zombie";
     }
 
     @Override

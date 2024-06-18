@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import com.esotericsoftware.minlog.Log;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.Utils;
 import com.mygdx.game.gamestate.Globals;
@@ -48,7 +49,7 @@ public class GameServer {
     PlayerInfo defaultPlayer;
     public boolean started;
     Rectangle worldBorders;
-    int entitiesLimit = 350;
+    int entitiesLimit = 50;
 
     public final String mapToLoad = "tiled/firstmap/worldmap.tmx";
     public GameServer() {
@@ -60,11 +61,12 @@ public class GameServer {
             server.addListener(listener);
 
             defaultPlayer = new PlayerInfo("default", null).playerSet(spawnPoint.x, spawnPoint.y, 0, 0, 0);
-            defaultPlayer.hp = Globals.PLAYER_HEALTH * 100;
+            defaultPlayer.hp = Globals.PLAYER_HEALTH;
             defaultPlayer.maxHp = defaultPlayer.hp;
 
-            //Log.TRACE();
-//            Log.setLogger(new CustomKryoLogger());
+            Log.DEBUG();
+            Log.setLogger(new CustomKryoLogger());
+
             listener.addTypeHandler(Message.class, (connection, message) -> {
                         System.out.println("Recived on server!");
                     });
@@ -118,11 +120,11 @@ public class GameServer {
                             zombie.hurt(msg.damage);
                             if (msg.impulseX != 0 || msg.impulseY != 0)
                                 zombie.getBody().applyLinearImpulse(new Vector2(msg.impulseX, msg.impulseY), Vector2.Zero, true);
-                            if (!zombie.isAlive()) {
+                            if (zombie.getHp() <= 0) {
                                 killEntity(msg.id);
                                 sendToAllPlayers(new KillEntity().set(msg.id));
                             } else
-                                server.sendToAllExceptTCP(players.get(msg.playerId).connection.getID(), msg);
+                                server.sendToAllExceptTCP(con.getID(), msg);
                         }
                     });
             listener.addTypeHandler(GunFire.class, (con, msg) -> {
@@ -199,6 +201,9 @@ public class GameServer {
                             con.sendTCP(new Message().set("[MoveItemFromStorageToStorage0] Nothing in target here! " + msg.targetX + " " + msg.targetY));
                             return;
                         }
+                        if (!((Storage) sourceCell.getData()).getInventoryItems().contains(items.get(msg.uid), false)) {
+                            return;
+                        }
                         removeItemFromStorage((Storage) sourceCell.getData(), msg.uid);
                         addItemToStorage((Storage) targetCell.getData(), msg.uid);
                         break;
@@ -235,23 +240,26 @@ public class GameServer {
                 server.sendToAllExceptTCP(con.getID(), msg);
             });
             listener.addTypeHandler(DropItems.class, (con, msg) -> {
-                Item item = handler.allocateItem(items.get(msg.itemUid), msg.x, msg.y);
+                    Item item = handler.allocateItem(items.get(msg.itemUid), msg.x, msg.y);
+
                 players.get(msg.playerId).removeItem(items.get(msg.itemUid));
                 server.sendToAllExceptTCP(con.getID(),new AllocateItem().set(new ItemInfo().set(item.uid, item.stringID), item.getPosition().x, item.getPosition().y));
             });
             listener.addTypeHandler(GrenadeInfo.class, (con, msg) -> {
-                Grenade item = (Grenade) gameState.items.get(msg.uid);
-                if (item == null){
-                    item = (Grenade) gameState.itemsFactory.getItem(msg.uid, msg.tileName);
-                    item.fire(Math.round(msg.timeToDetonation * 1000), false);
-                } else {
-                    if ( item.getGameObject() != null){
-                        GrenadeHandler handler = item.getGameObject().getBehaviour(GrenadeHandler.class);
-                        if (handler != null)
-                            handler.requestUpdate(msg);
+
+                    Grenade item = (Grenade) gameState.items.get(msg.uid);
+                    if (item == null) {
+                        synchronized (gameState.world) {
+                            item = (Grenade) gameState.itemsFactory.getItem(msg.uid, msg.tileName);
+                            item.fire(Math.round(msg.timeToDetonation * 1000), false);
+                        }
+                    } else {
+                        if (item.getGameObject() != null) {
+                            GrenadeHandler handler = item.getGameObject().getBehaviour(GrenadeHandler.class);
+                            if (handler != null) handler.requestUpdate(msg);
+                        }
                     }
-                }
-                server.sendToAllExceptTCP(con.getID(),msg);
+                    server.sendToAllExceptTCP(con.getID(), msg);
             });
             listener.addTypeHandler(DisposeItem.class, (con, msg) -> {
                 Item item = gameState.items.get(msg.uid);
@@ -282,13 +290,14 @@ public class GameServer {
     public void update() throws InterruptedException {
         while (true){
                 long curTime = System.currentTimeMillis();
-                gameState.update((curTime - tempTime)/1000f);
+                gameState.update(Globals.SERVER_UPDATE_TIME);
                 spawner();
-                tempTime = curTime;
                 sendUpdatePlayersAndEntities();
-                HandyHelper.instance.log("[GameServer] Entities counter: " + entities.size());
+                //HandyHelper.instance.log("[GameServer] Entities counter: " + entities.size());
                 //sendStorageUpdates();
+                tempTime = curTime;
                 Thread.sleep(sleepTime);
+
         }
     }
 
@@ -403,15 +412,15 @@ public class GameServer {
 
     Vector2 spawnCenter = new Vector2(10, 85);
     float spawnRadius = 5f;
-    long spawnPeriod = 5000;
+    long spawnPeriod = 25000;
     Vector2 zombieSpawnPoint = new Vector2(1, 1).nor().scl(spawnRadius);
     int wave = 0;
     long lastSpawnTime = 0;
 
-    long waveDuration = 60 * 1000;
+    long waveDuration = 300 * 1000;
 
     void spawner(){
-        if (started && wave > 0 && (System.currentTimeMillis() - lastSpawnTime > spawnPeriod && entities.size() < entitiesLimit)){
+        if (started && (System.currentTimeMillis() - lastSpawnTime > spawnPeriod && entities.size() < entitiesLimit)){
 
             if (waveDuration < System.currentTimeMillis() - waveStartTime){
                 newWave();
@@ -419,15 +428,15 @@ public class GameServer {
             }
 
             Vector2 pos = new Vector2();
-            float minX = worldBorders.x + 1, maxX = worldBorders.x + worldBorders.width, minY = worldBorders.y + 1, maxY = worldBorders.y + worldBorders.height;
+            float minX = worldBorders.x + 3, maxX = worldBorders.x + worldBorders.width, minY = worldBorders.y + 3, maxY = worldBorders.y + worldBorders.height;
 
-            float amountMultiplier = 3;
+            float amountMultiplier = 1;
             int packSizeMultiplier = 7;
             int howMuchSpawns = Math.round(amountMultiplier) * wave; //pack of zombies counter per spawn
 
             for (int i = 0; i < howMuchSpawns; i++) {
                 do {
-                    float random1 = (float) Math.random() * (worldBorders.width - 2), random2 = (float) Math.random() * (worldBorders.height - 2);
+                    float random1 = (float) Math.random() * (worldBorders.width - 6), random2 = (float) Math.random() * (worldBorders.height - 6);
                     pos.set(minX, minY).add(random1, random2);
                 } while (((TiledMapTileLayer) gameState.map.getLayers().get("obstacles")).getCell((int) pos.x, (int) pos.y) != null);
 
@@ -438,6 +447,8 @@ public class GameServer {
                 for (int j = 0; j < pack; j++) {
                     float spawnX = pos.x + (float) Math.random() * spawnRadius,
                             spawnY = pos.y + (float) Math.random() * spawnRadius;
+                    if (((TiledMapTileLayer) gameState.map.getLayers().get("obstacles")).getCell(Math.round(spawnX), Math.round(spawnY)) != null)
+                        continue;
                     spawnZombie(spawnX, spawnY);
 
                 }
@@ -460,7 +471,9 @@ public class GameServer {
             return;
         }
         if (entity.isAlive())
-            entity.kill();
+            synchronized (gameState.world) {
+                entity.kill();
+            }
         entities.remove(id);
     }
 

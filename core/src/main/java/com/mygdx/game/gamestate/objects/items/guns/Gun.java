@@ -59,7 +59,7 @@ public class Gun extends Item {
         return insertedMagazine;
     }
 
-    public boolean fireBullet(){
+    public boolean fireBullet(boolean real){
         if (isOwnedByClientPlayer()) {
             if (!isEquipped()) return false;
             if (insertedMagazine == null || insertedMagazine.getCurrentAmount() == 0) {
@@ -70,7 +70,7 @@ public class Gun extends Item {
         }
         bulletTempRotationVec.setAngleDeg(((Player)owner).itemRotation);
         gunSpriteBehaviour.onFire();
-        new Bullet(TileResolver.getTile("bullet"), owner.getPosition(), bulletTempRotationVec);
+        new Bullet(TileResolver.getTile("bullet"), owner.getPosition(), bulletTempRotationVec, real);
         return true;
     }
 

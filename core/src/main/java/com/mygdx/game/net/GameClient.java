@@ -5,6 +5,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.minlog.Log;
 import com.mygdx.game.SecondGDXGame;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
@@ -19,6 +20,7 @@ import com.mygdx.game.net.messages.common.*;
 import com.mygdx.game.net.messages.common.tileupdate.CloseTile;
 import com.mygdx.game.net.messages.common.tileupdate.OpenTile;
 import com.mygdx.game.net.messages.server.*;
+import com.mygdx.game.net.server.CustomKryoLogger;
 
 import java.io.IOException;
 
@@ -35,6 +37,9 @@ public class GameClient {
         Registerer.register(client.getKryo());
         listener = new Listener.TypeListener();
         client.addListener(listener);
+
+        Log.DEBUG();
+        Log.setLogger(new CustomKryoLogger());
 
         listener.addTypeHandler(Message.class, (con, msg) -> {
                     HandyHelper.instance.log("[GameClient] Message from server:  " + msg.message);
@@ -164,7 +169,6 @@ public class GameClient {
             if (item != null)
                 item.dispose();
         });
-
     }
 
     public boolean checkReady(Object obj) {

@@ -7,16 +7,18 @@ import com.mygdx.game.gamestate.objects.Interactable;
 import com.mygdx.game.gamestate.objects.items.grenade.Grenade;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.objects.items.Meds;
+import com.mygdx.game.gamestate.objects.items.guns.Gun;
 
 public class ClientPlayer extends Player {
     public boolean debug = true;
     @Override
     public boolean fire() {
-        if(super.fire()){
-            SecondGDXGame.instance.client.onGunFire();
-            return true;
+        if (equipedItem != null && equipedItem instanceof Gun gun) {
+            if(gun.fireBullet(true)){
+                SecondGDXGame.instance.client.onGunFire();
+                return true;
+            }
         }
-
         return false;
     }
 
@@ -110,9 +112,16 @@ public class ClientPlayer extends Player {
         return false;
     }
 
-    @Override
+    @Override 
     public void equipItem(Item item) {
         super.equipItem(item);
         SecondGDXGame.instance.client.onItemEquipped(item, true);
+    }
+
+    public float hurt(float damage){
+        hp = Math.max(0, hp-damage);
+        if (hp == 0)
+            kill();
+        return hp;
     }
 }

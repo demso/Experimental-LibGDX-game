@@ -77,7 +77,8 @@ public class SpriteBehaviour extends BehaviourAdapter {
     @Override
     public void render(Batch batch) {
         Vector3 vec = GameState.instance.camera.project(new Vector3(sprite.getX(), sprite.getY(), 0f));
-        if (vec.x < 0 || vec.x > Gdx.graphics.getWidth() || vec.y < 0 || vec.y > Gdx.graphics.getHeight())
+        Vector3 vec2 = GameState.instance.camera.project(new Vector3(sprite.getX() + sprite.getWidth(), sprite.getY() + sprite.getHeight(), 0f));
+        if (vec2.x < 0 || vec.x > Gdx.graphics.getWidth() || vec2.y < 0 || vec.y > Gdx.graphics.getHeight())
             return;
         sprite.draw(batch);
     }

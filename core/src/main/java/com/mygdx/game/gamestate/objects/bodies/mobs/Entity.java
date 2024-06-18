@@ -41,8 +41,8 @@ public abstract class Entity implements BodyData {
 
     public float hurt(float damage){
         hp = Math.max(0, hp-damage);
-        if (hp == 0)
-            kill();
+//        if (hp == 0)
+//            kill();
         return hp;
     }
     public void setHp(float hp) {

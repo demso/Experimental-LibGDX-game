@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.SecondGDXGame;
+import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
 import com.mygdx.game.gamestate.UI.console.InGameConsole;
@@ -50,7 +51,7 @@ public class ServerGameState {
     public static final float TILE_SIDE = 32f;
     public HUD hud;
     public Stage gameStage;
-    public float physicsStep = 1/75f;
+    public float physicsStep = Globals.SERVER_UPDATE_TIME;
     public InGameConsole console;
     public ShapeRenderer shapeRenderer;
     public UnBox unbox;
@@ -69,7 +70,9 @@ public class ServerGameState {
     }
 
     public void update(float deltaTime) {
-        unbox.preRender(deltaTime);
+        synchronized (world) {
+            unbox.preRender(deltaTime);
+        }
         unbox.postRender();
         //getServerHandler().update();
     }

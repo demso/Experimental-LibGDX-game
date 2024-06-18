@@ -109,7 +109,9 @@ public class GameState extends AbstractGameState {
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        unbox.preRender(deltaTime);
+        synchronized (world) {
+            unbox.preRender(deltaTime);
+        }
 
         update(deltaTime);
 

@@ -18,7 +18,7 @@ public class Bullet implements BodyData {
     Body body;
     Vector2 moveVec;
     @Getter int damage = 4;
-    public Bullet(TiledMapTile tile,  Vector2 position, Vector2 target) {
+    public Bullet(TiledMapTile tile,  Vector2 position, Vector2 target, boolean real) {
         float bulletSpeed = 200f;
         body = GameState.instance.bodyResolver.bulletBody(position.x, position.y, this);
 
@@ -31,8 +31,7 @@ public class Bullet implements BodyData {
 
         new BulletTracer(bulletObject, tracer, Globals.DEFAULT_RENDER_ORDER);
 
-        new BulletCollisionBehaviour(bulletObject);
-
+        new BulletCollisionBehaviour(bulletObject, real);
 
         //new SpriteBehaviour(bulletObject, 0.5f, 0.5f, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
 

@@ -2,18 +2,16 @@ package com.mygdx.game.gamestate.objects.items.grenade;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.utils.ObjectSet;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.Globals;
-import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.player.Player;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
 public class Grenade extends Item {
-    public float flySpeed = 8f;
-    public float detonationTime = 3f;
+    public float flySpeed = 15f;
+    public float detonationTime = 2.5f;
     public float timeToDetonation = 0f;
     public float damage = 25f;
     public float radius = 4f;
@@ -27,7 +25,7 @@ public class Grenade extends Item {
             onDrop();
             prepareForRendering();
 
-            physicalBody = bodyResolver.notInteractableItemBody(0, 0, this);
+            physicalBody = bodyResolver.activeGrenadeBody(0, 0, this);
             physicalBody.setLinearDamping(0);
             physicalBody.setAngularDamping(0);
             physicalBody.getFixtureList().get(0).setRestitution(0);
@@ -43,11 +41,11 @@ public class Grenade extends Item {
 
             float time = (float) t/1000f + 0.05f;
 
-            if (time > 1.8f) {
-                time = 1.8f;
+            if (time > 1.2f) {
+                time = 1.2f;
             }
 
-            physicalBody = bodyResolver.notInteractableItemBody(player.getPosition().x, player.getPosition().y, this);
+            physicalBody = bodyResolver.activeGrenadeBody(player.getPosition().x, player.getPosition().y, this);
             physicalBody.setLinearDamping(2);
 
             physicalBody.setAngularDamping(1);
@@ -78,33 +76,16 @@ public class Grenade extends Item {
 
             Vector2 flyVec = new Vector2(0, flySpeed).scl(time).setAngleDeg(player.itemRotation);
             Vector2 vec = physicalBody.getPosition();
+            Vector2 playerSpeed = new Vector2(player.getVelocity());
+            //Vector2 addImp = playerSpeed.scl(physicalBody.getMass() * physicalBody.getLinearDamping());
             vec.y -= 0.4f;
+            physicalBody.setLinearVelocity(playerSpeed);
             physicalBody.applyLinearImpulse(flyVec, vec, true);
             host.thrown(detonationTime);
         }
     }
 
-//    float fract = 1;
-//    Vector2 vec = new Vector2();
     public void onDetonation(){
-//        World world = physicalBody.getWorld();
-//        nearEntities.forEach(entity -> {
-//            world.rayCast(
-//                    (fixture, point, normal, fraction) -> {
-//                        if (((fixture.getFilterData().maskBits & (Globals.DEFAULT_CONTACT_FILTER)) == 0) || fixture.isSensor())
-//                            return -1;
-//                        Object data = fixture.getBody().getUserData();
-//                        if (data == entity) {
-//                            fract = fraction;
-//                        } else if (data instanceof Entity) {
-//                            fract = fraction +  0.1f + (float) Math.random() * 0.3f;
-//                        };
-//                        return fraction;
-//                    },
-//                    physicalBody.getPosition(),
-//                    new Vector2(physicalBody.getPosition()).add( new Vector2(entity.getPosition()).sub(physicalBody.getPosition()).nor().scl(3)));
-//            entity.hurt(Math.max(0, 1 - fract) * damage);
-//        });
         dispose();
     }
 
