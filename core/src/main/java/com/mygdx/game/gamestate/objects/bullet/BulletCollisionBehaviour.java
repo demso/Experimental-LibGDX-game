@@ -52,8 +52,18 @@ public class BulletCollisionBehaviour extends CollisionBehaviour<Bullet> {
             return;
         }
 
+<<<<<<< HEAD
         if (real && otherUserData instanceof Zombie zombie){
             GameState.instance.client.onHit(zombie.getId(), data.getDamage(), new Vector2(thisBody.getLinearVelocity()).scl(thisBody.getMass()));
+=======
+        switch (otherBodyUserName) {
+            case "zombie" -> {
+                if (otherUserData instanceof Zombie zombie){
+                    zombie.hurt(data.getDamage());
+                    //GameState.instance.client.onHit(zombie.getId(), data.getDamage(), new Vector2(thisBody.getLinearVelocity()).scl(thisBody.getMass()));
+                }
+            }
+>>>>>>> single
         }
 
         body.setLinearVelocity(0, 0);

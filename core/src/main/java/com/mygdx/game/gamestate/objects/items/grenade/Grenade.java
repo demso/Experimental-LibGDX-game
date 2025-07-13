@@ -20,6 +20,7 @@ public class Grenade extends Item {
         super(uid, iId, itemName);
     }
 
+<<<<<<< HEAD
     public void fire(long t, boolean real){
         if (!real) {
             onDrop();
@@ -36,6 +37,10 @@ public class Grenade extends Item {
             gameObject.setEnabled(true);
         }
         if (real && owner instanceof Player player) {
+=======
+    public void fire(long t){
+        if (owner instanceof Player player) {
+>>>>>>> single
             onDrop();
             prepareForRendering();
 
@@ -50,7 +55,6 @@ public class Grenade extends Item {
 
             physicalBody.setAngularDamping(1);
 
-            //physicalBody.getFixtureList().get(0).setDensity(10);
             physicalBody.getFixtureList().get(0).setRestitution(1f);
             physicalBody.getFixtureList().get(0).setFriction(0.1f);
 
@@ -105,7 +109,6 @@ public class Grenade extends Item {
 
     @Override
     public void dispose() {
-        GameState.instance.client.localGrenades.remove(this);
         super.dispose();
     }
 }

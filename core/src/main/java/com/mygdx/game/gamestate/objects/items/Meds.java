@@ -2,7 +2,6 @@ package com.mygdx.game.gamestate.objects.items;
 
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
-import com.mygdx.game.gamestate.player.ClientPlayer;
 import com.mygdx.game.gamestate.player.Player;
 import lombok.Getter;
 
@@ -17,7 +16,7 @@ public class Meds extends UsableItem{
     @Override
     public boolean use() {
         Storage own = getOwner();
-        if (own instanceof ClientPlayer player) {
+        if (own instanceof Player player) {
             player.heal(healAmount);
             dispose();
             return true;

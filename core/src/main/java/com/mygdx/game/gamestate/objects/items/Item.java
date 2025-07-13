@@ -1,25 +1,26 @@
 package com.mygdx.game.gamestate.objects.items;
 
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.mygdx.game.gamestate.UI.HUD;
-import com.mygdx.game.gamestate.factories.BodyResolver;
-import com.mygdx.game.gamestate.factories.ItemsFactory;
-import com.mygdx.game.gamestate.objects.tiles.Storage;
-import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Null;
 import com.mygdx.game.gamestate.Globals;
+import com.mygdx.game.gamestate.UI.HUD;
+import com.mygdx.game.gamestate.factories.BodyResolver;
+import com.mygdx.game.gamestate.factories.ItemsFactory;
 import com.mygdx.game.gamestate.objects.Interactable;
 import com.mygdx.game.gamestate.objects.behaviours.SpriteBehaviour;
-import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.objects.bodies.userdata.BodyData;
+import com.mygdx.game.gamestate.objects.tags.Tags;
+import com.mygdx.game.gamestate.objects.tiles.Storage;
+import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
+import com.mygdx.game.gamestate.tiledmap.tiled.TiledMapTile;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 import dev.lyze.gdxUnBox2d.GameObjectState;
@@ -51,6 +52,7 @@ public class Item implements BodyData, Interactable {
     protected @Getter SpriteBehaviour spriteBehaviour;
     ItemsFactory factory;
     @Getter public boolean isDisposed;
+    Tags tags = new Tags();
 
 
     public Item(long uid, TiledMapTile tile, String itemName){
@@ -209,5 +211,6 @@ public class Item implements BodyData, Interactable {
         }
         return super.equals(obj);
     }
+
 
 }

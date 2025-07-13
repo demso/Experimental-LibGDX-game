@@ -2,7 +2,8 @@ package com.mygdx.game.gamestate.objects.bodies.mobs.zombie;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.mygdx.game.net.messages.server.ZombieMove;
+import com.mygdx.game.gamestate.GameState;
+import com.mygdx.game.gamestate.player.Player;
 import dev.lyze.gdxUnBox2d.GameObject;
 import dev.lyze.gdxUnBox2d.behaviours.BehaviourAdapter;
 
@@ -10,11 +11,8 @@ public class ZombieAIBehaviour extends BehaviourAdapter {
 
     Zombie zombie;
     Body body;
-    Vector2 zeroVector = new Vector2();
-    ZombieMove zombieMove;
-    boolean needsUpdate;
     Vector2 tempVec = new Vector2();
-    Vector2 velocity = new Vector2();
+    Vector2 tempVec2 = new Vector2();
 
     public ZombieAIBehaviour(GameObject gameObject) {
         super(gameObject);
@@ -24,6 +22,7 @@ public class ZombieAIBehaviour extends BehaviourAdapter {
 
 
     @Override
+<<<<<<< HEAD
     public void start() {
         zombie.getBody().setLinearDamping(0);
     }
@@ -48,14 +47,29 @@ public class ZombieAIBehaviour extends BehaviourAdapter {
     }
 
     @Override
+=======
+>>>>>>> single
     public void fixedUpdate() {
-//        Vector2 moveVec = GameState.instance.player.getPosition();
-//        moveVec = moveVec.set(moveVec.x - body.getPosition().x, moveVec.y - body.getPosition().y).nor();
-//        body.applyLinearImpulse(moveVec.scl(zombie.getSpeed()), zeroVector, true);
+        Player target = getPlayerTarget(zombie);
+        Vector2 pos = target.getPosition();
+        tempVec.set(pos.x, pos.y);
+        tempVec2.set(tempVec.x - body.getPosition().x, tempVec.y - body.getPosition().y).nor();
+        tempVec2.scl(zombie.getMaxSpeed() * zombie.getBody().getMass() *  zombie.getBody().getLinearDamping() * GameState.instance.physicsStep);
+        body.applyLinearImpulse(tempVec2, Vector2.Zero, true);
     }
 
-    public void serverUpdate(ZombieMove move){
-        needsUpdate = true;
-        zombieMove = move;
+    public Player getPlayerTarget(Zombie zombie) {
+        var players = GameState.instance.players;
+        Vector2 zombiePos = zombie.getPosition();
+        Player firstPlayer =  players.values().iterator().next();
+        for (Player secondPlayer : players.values()) {
+            Vector2 pos1 = firstPlayer.getPosition();
+            Vector2 pos2 = secondPlayer.getPosition();
+            tempVec.set(pos1.x, pos1.y);
+            tempVec2.set(pos2.x, pos2.y);
+            if (tempVec2.sub(zombiePos).len2() < tempVec.sub(zombiePos).len2())
+                firstPlayer = secondPlayer;
+        }
+        return firstPlayer;
     }
 }

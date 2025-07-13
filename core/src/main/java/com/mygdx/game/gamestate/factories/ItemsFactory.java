@@ -9,7 +9,6 @@ import com.mygdx.game.gamestate.objects.items.Meds;
 import com.mygdx.game.gamestate.objects.items.guns.AutoRifle;
 import com.mygdx.game.gamestate.objects.items.guns.GunMagazine;
 import com.mygdx.game.gamestate.objects.items.guns.Pistol;
-import com.mygdx.game.net.messages.common.ItemInfo;
 import dev.lyze.gdxUnBox2d.UnBox;
 
 import java.lang.reflect.InvocationTargetException;
@@ -90,10 +89,6 @@ public class ItemsFactory {
         }
         addToContainer(createdItem);
         return createdItem;
-    }
-
-    public Item getItem(ItemInfo info) {
-        return getItem(info.uid, info.itemId);
     }
 
     public void onItemDispose(Item item){

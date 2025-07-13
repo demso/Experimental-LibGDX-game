@@ -64,7 +64,6 @@ public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
             case Drop -> {
                 putItemFromInventory(contextMenu.itemEntry);
                 Vector2 pos = GameState.instance.clientPlayer.getPosition();
-                instance.client.droppedItem(contextMenu.itemEntry.item, pos);
             }
             case Equip -> {
                 contextAction(ContextMenu.Action.Take, contextMenu);
@@ -86,9 +85,7 @@ public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
         storage.removeItem(item);
         GameState.instance.clientPlayer.takeItem(item);
 
-        Vector2 pos = storage.getPosition();
-        instance.hud.updateInvHUDContent();//todo update when items are taken or stored from server not on client
-        instance.client.tookItemFromStorage(item, (int)Math.floor(pos.x), (int)Math.floor(pos.y));
+        instance.hud.updateInvHUDContent();
     }
 
     public void putItemFromInventory(ItemEntry itemEntry){
@@ -103,12 +100,9 @@ public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
                 closeItemContextMenu( (ContextMenu) ac);
             }
         }
-        for (Item item : storage.getInventoryItems()){
-            item.dispose();
-        }
-        storage.getInventoryItems().clear();
-        storage.setInventoryItems((Item[]) null);
-        hud.gameState.client.stopStorageUpdate(storage.getPosition().x, storage.getPosition().y);
+//        for (Item item : storage.getInventoryItems()){
+//            item.dispose();
+//        }
     }
     public void onPositionChanged(Vector2 offset){
         for (Actor invPopup : popups){
@@ -129,16 +123,14 @@ public class StorageInventoryHUD extends ScrollPane implements InventoryHUD{
 
     public void onShow(Storage storage){
         //setStorage(storage);
+        this.storage = storage;
         refill();
         //hud.gameState.client.getStoredItems(storage.getPosition().x, storage.getPosition().y);
     }
 
     public void requestShowOnStorage(Storage storage){
-        if (this.storage != null){
-            hud.closeStorageInventoryHUD(false);
-       }
-        this.storage = storage;
-        instance.client.needsStorageUpdate(storage.getPosition().x, storage.getPosition().y);
+
+        //instance.client.needsStorageUpdate(storage.getPosition().x, storage.getPosition().y);
     }
 
     public StorageInventoryHUD(HUD hud, ContextMenu.Action... actions) {

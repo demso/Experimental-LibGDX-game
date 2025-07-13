@@ -66,12 +66,12 @@ public class Door implements Interactable, BodyData, Closeable, Openable {
     public void interact(Player player) {
         toggle();
         player.getBody().getFixtureList().get(0).refilter();
-        if (player.getId() == gameState.clientPlayer.getId()){
-            if (isOpen)
-                gameState.client.onTileOpen((int)Math.floor(physicalBody.getPosition().x), (int)Math.floor(physicalBody.getPosition().y));
-            else
-                gameState.client.onTileClose((int)Math.floor(physicalBody.getPosition().x), (int)Math.floor(physicalBody.getPosition().y));
-        }
+//        if (player.getId() == gameState.clientPlayer.getId()){
+//            if (isOpen)
+//                gameState.client.onTileOpen((int)Math.floor(physicalBody.getPosition().x), (int)Math.floor(physicalBody.getPosition().y));
+//            else
+//                gameState.client.onTileClose((int)Math.floor(physicalBody.getPosition().x), (int)Math.floor(physicalBody.getPosition().y));
+//        }
     }
 
     public TiledMapTile getTile(){

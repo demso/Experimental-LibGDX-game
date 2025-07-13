@@ -22,20 +22,20 @@ public class Lwjgl3Launcher {
             ex.printStackTrace(new PrintWriter(errors));
             ex.printStackTrace();
             saveCrashLog(errors.toString());
-            try {
-                if (SecondGDXGame.instance != null && SecondGDXGame.instance.server != null) {
-                    SecondGDXGame.instance.server.dispose();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            try {
-                if (SecondGDXGame.instance != null && SecondGDXGame.instance.client != null) {
-                    SecondGDXGame.instance.client.dispose();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            try {
+//                if (SecondGDXGame.instance != null && SecondGDXGame.instance.server != null) {
+//                    SecondGDXGame.instance.server.dispose();
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//            try {
+//                if (SecondGDXGame.instance != null && SecondGDXGame.instance.client != null) {
+//                    SecondGDXGame.instance.client.dispose();
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
             try {
                 if (SecondGDXGame.instance != null && SecondGDXGame.instance.helper != null)
                     SecondGDXGame.instance.helper.dispose();

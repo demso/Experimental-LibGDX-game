@@ -53,7 +53,7 @@ public class MainMenuScreen implements Screen {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y){
-                game.createServerAndConnect(nameField.getText());
+                game.createServerAndConnect();
             }
         });
         stage.addListener(new InputListener(){

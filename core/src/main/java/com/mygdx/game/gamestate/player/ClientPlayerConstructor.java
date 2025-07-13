@@ -15,19 +15,17 @@ import com.mygdx.game.gamestate.Globals;
 import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.bodies.userdata.SimpleUserData;
-import com.mygdx.game.gamestate.objects.items.Item;
-import com.mygdx.game.net.PlayerInfo;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
 public class ClientPlayerConstructor {
-    public ClientPlayer createPlayer(GameState gameState, PlayerInfo info){
-        ClientPlayer player = new ClientPlayer();
+    public Player createPlayer(GameState gameState){
+        Player player = new Player();
 
-        player.setId(info.id);
+        player.setId(gameState.entitiesCounter++);
+        player.setMaxHp(Globals.PLAYER_HEALTH);
+        player.setHp(Globals.PLAYER_HEALTH);
         player.setName(SecondGDXGame.instance.name);
-        player.setHp(info.hp);
-        player.setMaxHp(info.maxHp);
         player.setFriendliness(Entity.Friendliness.PLAYER);
         player.setKind(Entity.Kind.PLAYER);
 
@@ -114,13 +112,7 @@ public class ClientPlayerConstructor {
         massData.center.set(new Vector2(0f,0f));
         body.setMassData(massData);
 
-        player.setPosition(info.x, info.y);
-        player.setId(info.id);
         player.setName(SecondGDXGame.instance.name);
-        if (info.equippedItem != null) {
-            Item it = gameState.items.get(info.equippedItem.uid);
-            player.equipItem(it == null ? gameState.itemsFactory.getItem(info.equippedItem) : it);
-        }
 
         return player;
     }

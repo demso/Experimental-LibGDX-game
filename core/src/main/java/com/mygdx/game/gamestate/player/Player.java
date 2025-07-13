@@ -1,12 +1,15 @@
 package com.mygdx.game.gamestate.player;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.objects.Interactable;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
 import com.mygdx.game.gamestate.objects.items.Item;
+import com.mygdx.game.gamestate.objects.items.Meds;
+import com.mygdx.game.gamestate.objects.items.grenade.Grenade;
 import com.mygdx.game.gamestate.objects.items.guns.Gun;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
 import dev.lyze.gdxUnBox2d.GameObject;
@@ -41,7 +44,7 @@ public class Player extends Entity implements Storage {
     public Item equipedItem;
 
     public GameObject playerObject;
-    public PlayerMoveReceiver playerHandler;
+    public ClientPlayerHandler playerHandler;
 
     float normalSpeedMultiplier = 1;
     float currentSpeedMultiplier = normalSpeedMultiplier;
@@ -66,6 +69,7 @@ public class Player extends Entity implements Storage {
         item.onTaking(this);
         item.removeFromWorld();
         inventoryItems.add(item);
+        GameState.instance.hud.updateInvHUDContent();
     }
     @Override
     public void removeItem(Item item){
@@ -73,7 +77,70 @@ public class Player extends Entity implements Storage {
         if (equipedItem == item)
             uneqipItem();
         inventoryItems.removeValue(item, true);
+        GameState.instance.hud.updateInvHUDContent();
     }
+
+    public boolean throwGrenade(long time){
+        Grenade item = getItemOfType(Grenade.class);
+        if (item != null) {
+            item.fire(time);
+            return true;
+        }
+
+        return false;
+    }
+        public void reload(){
+        if (equipedItem instanceof Gun gun) {
+
+                needsReload = true;
+//            if (magaz != null) {
+//                gun.reload(magaz);
+//            } else {
+//                gun.reload(null);
+//            }
+        }
+    }
+
+    public <T extends Item> T getItemOfType(Class<T> itemClass){
+        for (Item item : getInventoryItems()){
+            if (item.getClass().isInstance(itemClass) || item.getClass().equals(itemClass))
+                return (T)item;
+        }
+        return null;
+    }
+
+    public <T extends Item> Array<T> getItemsOfType(Class<T> itemClass){
+        Array<T> tempStorage = new Array<>();
+        for (Item item : getInventoryItems()){
+            if (item.getClass().isInstance(itemClass) || item.getClass().equals(itemClass))
+                tempStorage.add((T)item);
+        }
+
+        if (tempStorage.size > 0)
+            return tempStorage;
+        else
+            return null;
+    }
+
+    public void heal(float hp){
+        if (hp <= 0)
+            return;
+        this.hp += hp;
+        if (this.hp > maxHp)
+            this.hp = maxHp;
+    }
+
+    public void autoHeal(){
+        if (getHp() == getMaxHp())
+            return;
+        Meds meds = getItemOfType(Meds.class);
+        if (meds != null) {
+            meds.use();
+        }
+        else
+            HandyHelper.instance.log("[ClientPlayer:autoHeal] No Meds found");
+    }
+
     @Override
     public Array<Item> getInventoryItems(){
         return inventoryItems;
@@ -144,7 +211,7 @@ public class Player extends Entity implements Storage {
         return getBody().getLinearVelocity();
     }
 
-    public boolean interact(){
+    public boolean interact() {
         if (closestObject != null) {
             var obj = (Interactable) closestObject.getUserData();
             obj.interact(this);
@@ -163,7 +230,6 @@ public class Player extends Entity implements Storage {
         }
         playerObject.destroy();
     }
-
 
     @Override
     public String toString() {

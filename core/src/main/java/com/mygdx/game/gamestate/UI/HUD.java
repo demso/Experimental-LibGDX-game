@@ -6,7 +6,7 @@ import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.mygdx.game.Utils;
 import com.mygdx.game.gamestate.UI.inventory.*;
-import com.mygdx.game.gamestate.player.ClientPlayer;
+import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -44,7 +44,7 @@ public class HUD extends Stage {
     volatile boolean showRequestSatisfied;
     volatile int showRequestX, showRequestY;
     Item[] showRequestItems;
-    public ClientPlayer clientPlayer;
+    public Player clientPlayer;
     InfoPanel infoPanel;
 
     public void showItemInfoWindow(Item item){
@@ -60,7 +60,7 @@ public class HUD extends Stage {
     }
 
     public void showRequestStorageInventoryHUD(Storage storage){
-        storageInventoryHUD.requestShowOnStorage(storage);
+        showStorageInventoryHUD(storage);
     }
 
     public void onStoredItemsReceived(int recX, int recY, Item[] items){
@@ -312,7 +312,7 @@ public class HUD extends Stage {
         infoPanel.update(delta);
     }
 
-    public void setClientPlayer(ClientPlayer pl){
+    public void setClientPlayer(Player pl){
         clientPlayer = pl;
         infoPanel.refresh();
     }

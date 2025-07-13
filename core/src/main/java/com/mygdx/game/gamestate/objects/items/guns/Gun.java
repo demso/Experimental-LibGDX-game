@@ -1,6 +1,5 @@
 package com.mygdx.game.gamestate.objects.items.guns;
-import com.mygdx.game.gamestate.HandyHelper;
-import com.mygdx.game.gamestate.player.ClientPlayer;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -10,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Null;
 import com.mygdx.game.gamestate.Globals;
+import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.objects.bullet.Bullet;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.player.Player;
@@ -101,10 +101,7 @@ public class Gun extends Item {
             createSpriteBehaviour();
                 //gunSpriteBehaviour = new GunSpriteBehaviour(GO, this, spriteWidth, spiteHeight, tile.getTextureRegion(), Globals.DEFAULT_RENDER_ORDER);
 
-        if (getOwner() instanceof ClientPlayer)
             gunSpriteBehaviour.setRenderOrder(Globals.PLAYER_RENDER_ORDER);
-        else
-            gunSpriteBehaviour.setRenderOrder(Globals.ANOTHER_PLAYER_RENDER_ORDER);
 
         if (isEquipped()) {}
         else {
@@ -138,7 +135,7 @@ public class Gun extends Item {
     }
 
     public boolean isOwnedByClientPlayer(){
-        return owner instanceof ClientPlayer;
+        return owner instanceof Player;
     }
 
     @Override
