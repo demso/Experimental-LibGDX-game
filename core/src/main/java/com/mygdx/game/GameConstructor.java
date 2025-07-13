@@ -26,7 +26,7 @@ import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.player.ClientPlayerConstructor;
 import com.mygdx.game.gamestate.tiledmap.tiled.TmxMapLoader;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.mygdx.game.net.server.ServerMapLoader;
+import com.mygdx.game.gamestate.tiledmap.loader.ServerMapLoader;
 import dev.lyze.gdxUnBox2d.UnBox;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 

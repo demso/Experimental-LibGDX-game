@@ -1,4 +1,4 @@
-package com.mygdx.game.net.server;
+package com.mygdx.game.gamestate.tiledmap.loader;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,8 +13,6 @@ import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.objects.tiles.Storage;
 import com.mygdx.game.gamestate.objects.tiles.TileInitializer;
-import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
-import com.mygdx.game.gamestate.tiledmap.loader.TileResolver;
 import com.mygdx.game.gamestate.tiledmap.tiled.TiledMapTileLayer;
 import com.mygdx.game.gamestate.tiledmap.tiled.TmxMapLoader;
 import dev.lyze.gdxUnBox2d.Box2dBehaviour;

@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Collections;
 import com.mygdx.game.gamestate.GameState;
 import com.mygdx.game.gamestate.HandyHelper;
-import com.mygdx.game.net.GameServer;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.screens.MainMenuScreen;
 
@@ -26,8 +25,6 @@ public class SecondGDXGame extends Game {
     public static BitmapFont fontRoboto18;
     public BitmapFont fontRoboto12;
     public HandyHelper helper;
-    public GameServer server;
-    public boolean readyToInit = false;
     public boolean gameIsReady = false;
     public String name;
     public EndCause endCause;
