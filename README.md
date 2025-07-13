@@ -4,30 +4,23 @@ A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://git
 
 Хобби-проект для практики написания кода.
 
-## Platforms
+LibGDX — это мощный кросс-платформенный фреймворк с открытым исходным кодом для разработки игр и графических приложений на Java/Kotlin. Созданный Марио Цайгнером (Badlogic Games), он позволяет писать код один раз и запускать его на множестве устройств. Вот ключевые аспекты:
 
-- `core`: Main module with the application logic shared by all platforms.
-- `lwjgl3`: Primary desktop platform using LWJGL3.
+# Поддерживаемые платформы:
+- Десктоп: Windows, Linux, macOS
+- Мобильные: Android, iOS (через RoboVM)
+- Веб: Браузеры через WebGL (GWT)
+- Встраиваемые системы: Raspberry Pi
+- Технические компоненты:
+- Графика: OpenGL ES 2.0/3.0, Vulkan (экспериментально)
+- Аудио: 3D-звук, эффекты, поддержка форматов (OGG, MP3, WAV)
+- Физика: Интеграция с Box2D и Bullet Physics
+- Управление: Мышь, клавиатура, геймпады, тачскрин, акселерометр
+- Сеть: TCP/UDP сокеты, HTTP-запросы, WebSockets
 
-## Gradle
-
-This project uses [Gradle](http://gradle.org/) to manage dependencies.
-The Gradle wrapper was included, so you can run Gradle tasks using `gradlew.bat` or `./gradlew` commands.
-Useful Gradle tasks and flags:
-
-- `--continue`: when using this flag, errors will not stop the tasks from running.
-- `--daemon`: thanks to this flag, Gradle daemon will be used to run chosen tasks.
-- `--offline`: when using this flag, cached dependency archives will be used.
-- `--refresh-dependencies`: this flag forces validation of all dependencies. Useful for snapshot versions.
-- `build`: builds sources and archives of every project.
-- `cleanEclipse`: removes Eclipse project data.
-- `cleanIdea`: removes IntelliJ project data.
-- `clean`: removes `build` folders, which store compiled classes and built archives.
-- `eclipse`: generates Eclipse project data.
-- `idea`: generates IntelliJ project data.
-- `lwjgl3:jar`: builds application's runnable jar, which can be found at `lwjgl3/build/lib`.
-- `lwjgl3:run`: starts the application.
-- `test`: runs unit tests (if any).
-
-Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
-For example, `core:clean` removes `build` folder only from the `core` project.
+# Инструментарий:
+- Scene2D: UI-библиотека для интерфейсов
+- Box2DLights: Динамическое освещение
+- Particle Editor: Визуальный редактор эффектов
+- TexturePacker: Упаковка текстур в атласы
+- Hiero: Генератор растровых шрифтов
