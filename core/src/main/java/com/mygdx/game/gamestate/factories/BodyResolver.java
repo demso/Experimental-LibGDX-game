@@ -1,5 +1,6 @@
 package com.mygdx.game.gamestate.factories;
 
+import com.mygdx.game.gamestate.HandyHelper;
 import com.mygdx.game.gamestate.tiledmap.tiled.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -143,38 +144,45 @@ public class BodyResolver {
     }
 
     public Body itemBody(float x, float y, Object userData){
-        BodyDef transparentBodyDef = new BodyDef();
-        transparentBodyDef.type = BodyDef.BodyType.DynamicBody;
-        transparentBodyDef.fixedRotation = false;
-        CircleShape transparentBox = new CircleShape();
-        FixtureDef transparentFixtureDef = new FixtureDef();
-        transparentBox.setRadius(0.2f);
-        transparentFixtureDef.shape = transparentBox;
-        transparentFixtureDef.restitution = 0.1f;
-        transparentFixtureDef.friction = 1f;
-        transparentBodyDef.active = false;
-        transparentBodyDef.position.set(x, y);
-        Body body = world.createBody(transparentBodyDef);
-        body.createFixture(transparentFixtureDef);
-        Filter filtr = body.getFixtureList().get(0).getFilterData();
-        filtr.maskBits = Globals.ALL_CONTACT_FILTER & ~Globals.LIGHT_CONTACT_FILTER & ~Globals.PLAYER_CONTACT_FILTER;
-        body.getFixtureList().get(0).refilter();
-        body.setUserData(userData);
+            BodyDef transparentBodyDef = new BodyDef();
+            transparentBodyDef.type = BodyDef.BodyType.DynamicBody;
+            transparentBodyDef.fixedRotation = false;
+            CircleShape transparentBox = new CircleShape();
+            FixtureDef transparentFixtureDef = new FixtureDef();
+            transparentBox.setRadius(0.2f);
+            transparentFixtureDef.shape = transparentBox;
+            transparentFixtureDef.restitution = 0.1f;
+            transparentFixtureDef.friction = 1f;
+            transparentBodyDef.active = false;
+            transparentBodyDef.position.set(x, y);
+            Body body = null;
+            synchronized (world) {
+                body = world.createBody(transparentBodyDef);
+            }
 
-        return body;
+            body.createFixture(transparentFixtureDef);
+            Filter filtr = body.getFixtureList().get(0).getFilterData();
+            filtr.maskBits = Globals.ALL_CONTACT_FILTER & ~Globals.LIGHT_CONTACT_FILTER & ~Globals.PLAYER_CONTACT_FILTER;
+            body.getFixtureList().get(0).refilter();
+            body.setUserData(userData);
+
+            return body;
     }
 
-    public Body notInteractableItemBody(float x, float y, Object userData){
+    public Body activeGrenadeBody(float x, float y, Object userData){
         Body body = itemBody(x, y, userData);
         Filter filter = body.getFixtureList().get(0).getFilterData();
-        filter.maskBits = Globals.ALL_CONTACT_FILTER & ~Globals.PLAYER_INTERACT_CONTACT_FILTER & ~Globals.PLAYER_CONTACT_FILTER & ~Globals.LIGHT_CONTACT_FILTER;
+        filter.maskBits = Globals.ALL_CONTACT_FILTER & ~Globals.PLAYER_INTERACT_CONTACT_FILTER & ~Globals.PLAYER_CONTACT_FILTER & ~Globals.LIGHT_CONTACT_FILTER & ~Globals.ZOMBIE_CONTACT_FILTER;
         body.getFixtureList().get(0).refilter();
         return body;
     }
 
     public Body bulletBody(float x, float y, Object userData){
         BodyDef bodyDef = MobsFactory.bodyDef(x, y, BodyDef.BodyType.DynamicBody, true);
-        Body body = world.createBody(bodyDef);
+        Body body = null;
+        synchronized (world) {
+            body = world.createBody(bodyDef);
+        }
 
         CircleShape circle = new CircleShape();
         circle.setRadius(0.04f);

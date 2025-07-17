@@ -1,6 +1,7 @@
 package com.mygdx.game.gamestate.player;
 
 import box2dLight.PointLight;
+import box2dLight.PositionalLight;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;

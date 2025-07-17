@@ -34,8 +34,18 @@ public class Zombie extends Entity {
 
         BodyDef bodyDef = MobsFactory.bodyDef(position.x, position.y, BodyDef.BodyType.DynamicBody);
 
+<<<<<<< HEAD
+        CircleShape circle = new CircleShape();
+        circle.setRadius(0.3f);
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = circle;
+        fixtureDef.density = 1f;
+        fixtureDef.friction = 0.1f;
+        fixtureDef.restitution = -100f;
+=======
         CircleShape circle = new CircleShape(); circle.setRadius(0.3f); FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle; fixtureDef.density = 1f; fixtureDef.friction = 0f; fixtureDef.restitution = 0f;
+>>>>>>> single
         fixtureDef.filter.categoryBits = Globals.ZOMBIE_CONTACT_FILTER;
         fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits & ~Globals.LIGHT_CONTACT_FILTER);
 
@@ -43,13 +53,26 @@ public class Zombie extends Entity {
 
         MassData massData = new MassData(); massData.mass = 50f; massData.center.set(new Vector2(0f, 0f));
 
+<<<<<<< HEAD
+        getBody().setMassData(massData);
+        getBody().setLinearDamping(10);
+        getBody().setUserData(this);
+        circle.dispose();
+        name = "Zombie";
+=======
         getBody().setMassData(massData); getBody().setLinearDamping(10); getBody().setUserData(this); circle.dispose();
+>>>>>>> single
         //new SoutBehaviour("zombieLogger", false, zombieObject);
     }
 
     @Override
+<<<<<<< HEAD
+    public void serverUpdate(ZombieMove move){
+        zombieHandler.serverUpdate(move);
+=======
     public String getName() {
         return "zombie";
+>>>>>>> single
     }
 
     @Override

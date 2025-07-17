@@ -13,8 +13,10 @@ import dev.lyze.gdxUnBox2d.Box2dBehaviour;
 import dev.lyze.gdxUnBox2d.GameObject;
 
 public class BulletCollisionBehaviour extends CollisionBehaviour<Bullet> {
-    public BulletCollisionBehaviour(GameObject gameObject) {
+    boolean real;
+    public BulletCollisionBehaviour(GameObject gameObject, boolean real) {
         super(gameObject);
+        this.real = real;
     }
 
     @Override
@@ -39,7 +41,7 @@ public class BulletCollisionBehaviour extends CollisionBehaviour<Bullet> {
 //
 //
 //        getGameObject().destroy();
-        return true;
+        return false;
     }
 
     @Override
@@ -50,6 +52,10 @@ public class BulletCollisionBehaviour extends CollisionBehaviour<Bullet> {
             return;
         }
 
+<<<<<<< HEAD
+        if (real && otherUserData instanceof Zombie zombie){
+            GameState.instance.client.onHit(zombie.getId(), data.getDamage(), new Vector2(thisBody.getLinearVelocity()).scl(thisBody.getMass()));
+=======
         switch (otherBodyUserName) {
             case "zombie" -> {
                 if (otherUserData instanceof Zombie zombie){
@@ -57,7 +63,10 @@ public class BulletCollisionBehaviour extends CollisionBehaviour<Bullet> {
                     //GameState.instance.client.onHit(zombie.getId(), data.getDamage(), new Vector2(thisBody.getLinearVelocity()).scl(thisBody.getMass()));
                 }
             }
+>>>>>>> single
         }
+
+        body.setLinearVelocity(0, 0);
 
         BulletTracer tracer = getGameObject().getBehaviour(BulletTracer.class);
         tracer.setPosition(contact.getWorldManifold().getPoints()[0]);
