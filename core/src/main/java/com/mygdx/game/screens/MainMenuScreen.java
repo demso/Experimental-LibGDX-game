@@ -3,22 +3,21 @@ package com.mygdx.game.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.scenes.scene2d.*;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.kotcrab.vis.ui.*;
 import com.mygdx.game.SecondGDXGame;
 
 import java.awt.*;
@@ -49,7 +48,7 @@ public class MainMenuScreen implements Screen {
         buttonsGroup = new VerticalGroup().space(30);
         buttonsGroup.setColor(Color.BLUE);
         buttonsGroup.fill();
-        playButton = new TextButton("Create server", skin);
+        playButton = new TextButton("Play", skin);
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y){
@@ -84,7 +83,7 @@ public class MainMenuScreen implements Screen {
         });
         exitButton = new TextButton("Exit", skin);
         buttonsGroup.addActor(playButton);
-        buttonsGroup.addActor(connectButton);
+        //buttonsGroup.addActor(connectButton);
         buttonsGroup.addActor(settingsButton);
         buttonsGroup.setPosition(230,stage.getHeight()-200);
         stage.addActor(buttonsGroup);

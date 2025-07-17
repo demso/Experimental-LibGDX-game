@@ -94,6 +94,7 @@ public class ClientPlayerHandler extends BehaviourAdapter{
         if (player.needsReload) {
             if (player.equipedItem instanceof Gun gun) {
                 Array<GunMagazine> magazs = player.getItemsOfType(GunMagazine.class);
+                if (magazs == null) return;
                 var magaz = Arrays.stream(magazs.toArray(GunMagazine.class)).filter(magaz0 -> magaz0.getGunTypes().contains(gun.stringID, false)).findFirst();
                 if (magaz.isPresent()) {
                     gunReloading = gun;
