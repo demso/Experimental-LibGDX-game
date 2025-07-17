@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
@@ -24,9 +25,9 @@ import com.mygdx.game.gamestate.factories.BodyResolver;
 import com.mygdx.game.gamestate.factories.ItemsFactory;
 import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.player.ClientPlayerConstructor;
+import com.mygdx.game.gamestate.tiledmap.loader.ServerMapLoader;
 import com.mygdx.game.gamestate.tiledmap.tiled.TmxMapLoader;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.mygdx.game.gamestate.tiledmap.loader.ServerMapLoader;
 import dev.lyze.gdxUnBox2d.UnBox;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
@@ -67,6 +68,8 @@ public class GameConstructor {
         gameState.camera.setToOrtho(false, 30, 20);
 
         gameState.map = new ServerMapLoader(gameState).load(gameState.mapToLoad, new TmxMapLoader.Parameters());
+        Vector2 mapSize = new Vector2((int)gameState.map.getProperties().get("width"),(int) gameState.map.getProperties().get("height"));
+        gameState.worldBorders = new Rectangle(0, 0, mapSize.x, mapSize.y);
 
         gameState.hud.init();
 

@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -18,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.mygdx.game.SecondGDXGame;
+import com.mygdx.game.Utils;
 import com.mygdx.game.gamestate.UI.HUD;
 import com.mygdx.game.gamestate.UI.HUDInputListener;
 import com.mygdx.game.gamestate.UI.console.InGameConsole;
@@ -25,9 +27,11 @@ import com.mygdx.game.gamestate.factories.BodyResolver;
 import com.mygdx.game.gamestate.factories.ItemsFactory;
 import com.mygdx.game.gamestate.factories.MobsFactory;
 import com.mygdx.game.gamestate.objects.bodies.mobs.Entity;
+import com.mygdx.game.gamestate.objects.bodies.mobs.zombie.Zombie;
 import com.mygdx.game.gamestate.objects.items.Item;
 import com.mygdx.game.gamestate.player.Player;
 import com.mygdx.game.gamestate.tiledmap.loader.MyTiledMap;
+import com.mygdx.game.gamestate.tiledmap.tiled.TiledMapTileLayer;
 import com.mygdx.game.gamestate.tiledmap.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.mygdx.game.screens.GameScreen;
 import dev.lyze.gdxUnBox2d.UnBox;
@@ -93,6 +97,7 @@ public class GameState extends AbstractGameState {
         //CAMERA UPDATE
         camera.position.set(clientPlayer.getPosition(), 0);
         camera.update();
+        spawner();
 
         HandyHelper.instance.refreshLogsInConsole(Gdx.graphics.getDeltaTime());
     }
@@ -135,6 +140,72 @@ public class GameState extends AbstractGameState {
         }
 
         if (console.isVisible()) console.draw();
+    }
+
+    Vector2 spawnCenter = new Vector2(10, 85);
+    float spawnRadius = 5f;
+    long spawnPeriod = 25000;
+    Vector2 zombieSpawnPoint = new Vector2(1, 1).nor().scl(spawnRadius);
+    int wave = 0;
+    long lastSpawnTime = 0;
+    int entitiesLimit = 50;
+    public Rectangle worldBorders;
+
+    long waveDuration = 300 * 1000;
+
+    long waveStartTime;
+
+    void newWave() {
+        wave += 1;
+        waveStartTime = System.currentTimeMillis();
+    }
+
+    void spawner(){
+        if ((System.currentTimeMillis() - lastSpawnTime > spawnPeriod && entities.size < entitiesLimit)){
+
+            if (waveDuration < System.currentTimeMillis() - waveStartTime){
+                newWave();
+                HandyHelper.instance.log("[GameState] New wave: " + wave);
+            }
+
+            Vector2 pos = new Vector2();
+            float minX = worldBorders.x + 3, maxX = worldBorders.x + worldBorders.width, minY = worldBorders.y + 3, maxY = worldBorders.y + worldBorders.height;
+
+            float amountMultiplier = 1;
+            int packSizeMultiplier = 7;
+            int howMuchSpawns = Math.round(amountMultiplier) * wave; //pack of zombies counter per spawn
+
+            for (int i = 0; i < howMuchSpawns; i++) {
+                do {
+                    float random1 = (float) Math.random() * (worldBorders.width - 6), random2 = (float) Math.random() * (worldBorders.height - 6);
+                    pos.set(minX, minY).add(random1, random2);
+                } while (((TiledMapTileLayer) map.getLayers().get("obstacles")).getCell((int) pos.x, (int) pos.y) != null);
+
+
+                long pack = Math.round( Math.max(Math.random() * packSizeMultiplier * Math.cbrt(wave), 1));
+                float spawnRadius = (float) Math.sqrt(pack) + 0.5f;
+
+                for (int j = 0; j < pack; j++) {
+                    float spawnX = pos.x + (float) Math.random() * spawnRadius,
+                            spawnY = pos.y + (float) Math.random() * spawnRadius;
+                    if (((TiledMapTileLayer) map.getLayers().get("obstacles")).getCell(Math.round(spawnX), Math.round(spawnY)) != null)
+                        continue;
+                    spawnZombie(spawnX, spawnY);
+
+                }
+                HandyHelper.instance.log("[GameState:spawner] Spawning zombie pack at: " + Utils.round(pos.x, 1) + ", " + Utils.round(pos.y, 1) + " with size: " + pack);
+            }
+
+            lastSpawnTime = System.currentTimeMillis();
+        }
+    }
+
+    void spawnZombie(float x, float y){
+        Zombie zomb = (Zombie) mobsFactory.spawnEntity(entitiesCounter, Entity.Kind.ZOMBIE, x, y);
+        zomb.setName("zombie" + entitiesCounter);
+        zomb.setHp(10);
+        entities.put((long)entitiesCounter, zomb);
+        entitiesCounter += 1;
     }
 
     Vector2 beginV;
