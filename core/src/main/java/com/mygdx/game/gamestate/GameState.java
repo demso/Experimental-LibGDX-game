@@ -97,8 +97,18 @@ public class GameState extends AbstractGameState {
         HandyHelper.instance.refreshLogsInConsole(Gdx.graphics.getDeltaTime());
     }
 
+<<<<<<< HEAD
+    public void render(float deltaTime){
+        Gdx.gl.glClearColor(0,0,0,1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        synchronized (world) {
+            unbox.preRender(deltaTime);
+        }
+=======
     public void render(float deltaTime) {
         Gdx.gl.glClearColor(0, 0, 0, 1); Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+>>>>>>> single
 
         update(deltaTime);
 

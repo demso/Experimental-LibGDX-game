@@ -22,8 +22,7 @@ public class HUDInputListener extends InputListener {
     @Override
     public boolean keyUp (InputEvent event, int keycode) {
         if (keycode == Input.Keys.ESCAPE){
-            if (!instance.hud.closeTopPopup())
-                Gdx.app.exit();
+            instance.hud.closeTopPopup();
         }
         if (keycode == Input.Keys.B){
             instance.debug = !instance.debug;

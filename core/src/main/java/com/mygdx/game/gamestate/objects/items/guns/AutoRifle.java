@@ -17,10 +17,10 @@ public class AutoRifle extends Gun{
     }
 
     @Override
-    public boolean fireBullet() {
+    public boolean fireBullet(boolean real) {
         long curTime = System.currentTimeMillis();
         if (curTime - lastShotTime > timeBetweenShots) {
-            super.fireBullet();
+            super.fireBullet(real);
             lastShotTime = System.currentTimeMillis();
             return true;
         }

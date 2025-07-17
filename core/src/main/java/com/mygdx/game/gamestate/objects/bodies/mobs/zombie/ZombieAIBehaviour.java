@@ -22,6 +22,33 @@ public class ZombieAIBehaviour extends BehaviourAdapter {
 
 
     @Override
+<<<<<<< HEAD
+    public void start() {
+        zombie.getBody().setLinearDamping(0);
+    }
+
+    @Override
+    public void update(float delta) {
+        if (needsUpdate && zombieMove != null){
+            Vector2 pos = zombie.getBody().getPosition();
+
+            velocity.set(zombieMove.xSpeed, zombieMove.ySpeed);
+
+            float offsetX = Math.abs(zombieMove.x - pos.x), offsetY = Math.abs(zombieMove.y - pos.y);
+            if (offsetX > 0.5 || offsetY > 0.5)
+                zombie.setPosition(zombieMove.x, zombieMove.y);
+            else if (offsetX > 0.05f || offsetY > 0.05f) {
+                velocity.add(zombieMove.x - pos.x, zombieMove.y - pos.y);
+            }
+            body.setLinearVelocity(velocity);
+
+            needsUpdate = false;
+        }
+    }
+
+    @Override
+=======
+>>>>>>> single
     public void fixedUpdate() {
         Player target = getPlayerTarget(zombie);
         Vector2 pos = target.getPosition();

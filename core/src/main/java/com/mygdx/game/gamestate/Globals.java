@@ -1,12 +1,12 @@
 package com.mygdx.game.gamestate;
 
 public class Globals {
-    public static final int
+    public static final float
             DEFAULT_RENDER_ORDER =              0,
-            ZOMBIE_RENDER_ORDER =               DEFAULT_RENDER_ORDER,
+            ZOMBIE_RENDER_ORDER =               0.5f,
             PLAYER_RENDER_ORDER =               2,
             ANOTHER_PLAYER_RENDER_ORDER =       1,
-            ITEMS_RENDER_ORDER =                DEFAULT_RENDER_ORDER;
+            ITEMS_RENDER_ORDER =                0.4f;
 
     public static float
             SERVER_UPDATE_TIME =                1/30f,
