@@ -220,14 +220,21 @@ public abstract class AbstractConsole implements Console, Disposable {
 				Class<?>[] params = m.getParameterTypes();
 
 				if (params.length > 0)
-					s += " : ";
+					s += " {";
 
 				for (int i = 0; i < params.length; i++) {
 					s += params[i].getSimpleName();
 					if (i < params.length - 1) {
-						s += ", ";
+						s += "}, {";
 					}
 				}
+				if (params.length > 0)
+					s += "}";
+
+
+				Annotation annotation = m.getDeclaredAnnotation(ConsoleDoc.class);
+				if (annotation != null)
+					s += " : " + annotation.getAnnotation(ConsoleDoc.class).description();
 
 				log(s);
 			}

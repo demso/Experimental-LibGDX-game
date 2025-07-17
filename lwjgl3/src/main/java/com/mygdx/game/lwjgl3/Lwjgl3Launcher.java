@@ -5,7 +5,6 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.mygdx.game.SecondGDXGame;
 
 import java.io.*;
-import java.util.Arrays;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
@@ -73,7 +72,7 @@ public class Lwjgl3Launcher {
         config.setForegroundFPS(refreshRate);
         config.useVsync(useVSync);
         config.setTitle("My GDX Game");
-        config.setWindowedMode(1000, 700);
+        config.setWindowedMode(1280, 720);
         config.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
         config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL20, 4, 5);
         return config;

@@ -163,7 +163,7 @@ public class CustomConsole extends AbstractConsole {
         stage.addActor(consoleWindow);
         stage.setKeyboardFocus(display.root);
 
-        consoleWindow.setSize(350, 200);
+        consoleWindow.setSize(550, 300);
         //setSizePercent(50, 50);
         setPositionPercent(50, 50);
     }
@@ -526,6 +526,8 @@ public class CustomConsole extends AbstractConsole {
             } else {
                 input.setText("");
                 consoleWindow.setTouchable(Touchable.enabled);
+                //disbled selection on show
+                selected = false;
                 if (selected) {
                     select();
                 }

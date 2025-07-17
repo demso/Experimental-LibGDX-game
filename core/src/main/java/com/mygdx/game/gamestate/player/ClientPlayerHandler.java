@@ -94,7 +94,10 @@ public class ClientPlayerHandler extends BehaviourAdapter{
         if (player.needsReload) {
             if (player.equipedItem instanceof Gun gun) {
                 Array<GunMagazine> magazs = player.getItemsOfType(GunMagazine.class);
-                if (magazs == null) return;
+                if (magazs == null){
+                    player.needsReload = false;
+                    return;
+                }
                 var magaz = Arrays.stream(magazs.toArray(GunMagazine.class)).filter(magaz0 -> magaz0.getGunTypes().contains(gun.stringID, false)).findFirst();
                 if (magaz.isPresent()) {
                     gunReloading = gun;
@@ -103,6 +106,8 @@ public class ClientPlayerHandler extends BehaviourAdapter{
                     player.isReloading = true;
                     gun.reload(null);
                     reloadAnimation.start(((Gun)player.equipedItem).getReloadTime() * player.reloadFactor);
+                }else{
+                    player.needsReload = false;
                 }
             }
             player.needsReload = false;
